@@ -21,7 +21,7 @@ lookup (*SubBytes* or its inverse), evaluate a part of the MDS matrix
 (*MixColumns*), rotate the result by a multiple of 8 bits (*ShiftRows*),
 and exclusive-or the result with `rs2` (*AddRoundKey*). Despite complex
 description, it can be seen that hardware implementation of the instructions
-is quite compact and the overall software implementation is compact.
+is quite compact and the overall software implementation is fast.
 
 The `fn` immediate "constant" is currently 7 bits, of which 5 are actually
 used. The same information can be encoded into 3 bits without affecting
