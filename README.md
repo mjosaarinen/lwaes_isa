@@ -3,14 +3,14 @@
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
-encryption and decyption with 128/192/256 - bit secret key, as defined in
+encryption and decryption with 128/192/256 - bit secret key, as defined in
 the [FIPS 197](https://doi.org/10.6028/NIST.FIPS.197) standard.
 
 This package contains a mock implementation of the two instructions together
 with full encryption, decryption, and key schedule algorithms for evaluation.
 
 The two instructions are encapsulated in two these two functions
-(located in `aes_enc1s.c` and `aes_dec1s.c`, respecitvely):
+(located in `aes_enc1s.c` and `aes_dec1s.c`, respectively):
 ```C
 uint32_t aes_enc1s(uint32_t rs1, uint32_t rs2, int fn);
 uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
