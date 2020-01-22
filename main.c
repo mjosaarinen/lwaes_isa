@@ -10,7 +10,6 @@
 #include "aesenc.h"
 #include "aesdec.h"
 
-
 //  load hex
 
 size_t sethex(uint8_t *v, size_t maxlen, const char *str)
@@ -58,7 +57,7 @@ int chkhex(const char *lab, const void *data, size_t len, const char *ref)
     return 0;
 }
 
-//  Little test battery
+//  unit test with standard test vectors
 
 int main(int argc, char **argv)
 {
