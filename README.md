@@ -17,7 +17,7 @@ uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 
 The instructions select a byte from `rs1`, perform a single S-box
-lookup (*SubBytes* or its inverse), compute MDS matrix expansion
+lookup (*SubBytes* or its inverse), evaluate a part of the MDS matrix
 (*MixColumns*), rotate the result by a multiple of 8 bits (*ShiftRows*),
 and exclusive-or the result with `rs2` (*AddRoundKey*). Despite complex
 description, it can be seen that hardware implementation of the instructions
