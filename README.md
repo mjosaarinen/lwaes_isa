@@ -67,7 +67,7 @@ encryption and decryption speeds (key schedule becomes slightly slower).
 
 ## Testing
 
-You need a C compiler. A `Makefile` is provided and the file `main.c`
+Only a C compiler is required. A `Makefile` is provided and the file `main.c`
 contains a minimal unit test with standard test vectors.
 
 ```console
