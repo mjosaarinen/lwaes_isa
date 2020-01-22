@@ -9,7 +9,8 @@ the [FIPS 197](https://doi.org/10.6028/NIST.FIPS.197) standard.
 This package contains a mock implementation of the two instructions together
 with full encryption, decryption, and key schedule algorithms for evaluation.
 
-The two instructions are encapsulated in two functions in `aes_enc1s.c` and `aes_dec1s.c`:
+The two instructions are encapsulated in two these two functions 
+(located in `aes_enc1s.c` and `aes_dec1s.c`, respecitvely):
 ```C
 uint32_t aes_enc1s(uint32_t rs1, uint32_t rs2, int fn);
 uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
@@ -52,11 +53,22 @@ encryption and decryption speeds (key schedule becomes slightly slower).
 	computation, they are likely to have expired.
     Other approaches have been considered
     [in the literature](https://iacr.org/archive/ches2006/22/22.pdf).
-*   This is a *lightweight* proposal for RV32/RV64 instruction set; a fast
-    implementation would have more than a single S-Box lookup.
 *   In hardware implementation the S-Box and its inverse share much
     of their circuitry. For an example of gate-optimized logic for this
     purpose, see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf)
+*   This is a *lightweight* proposal for RV32/RV64 instruction set; a fast
+    implementation would have more than a single S-Box lookup. 
+
+**Disclaimer and Status**
+
+*	[PQShield](https://pqshield.com) offers no warranty or specific claims of 
+	standards compliance nor does not endorse this proposal above other
+	proposals. [PQSoC](https://pqsoc.com) may or may not implement AES 
+	according to this proposal in the future (it currently has a different
+	type of AES implementation).
+*	Despite being proposed in personal capacity, this proposal
+	constitutes a "contribution" as defined in Section 1.4 of the 
+	RISC-V foundation membership agreement.
 
 ## Testing
 
