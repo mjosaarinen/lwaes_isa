@@ -56,12 +56,12 @@ encryption and decryption speeds (key schedule becomes slightly longer).
 *   In hardware implementation the S-Box and its inverse share much f their 
     circuitry. For an example of gate-optimized logic for this purpose, 
     see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf).
-*   Other national standard ciphers: If there is support for this type of
-    lightweight AES implementation, we can expand the specificatio to
-    offer support to other national ciphers via very similar
-    instructions, and with a similar size-speed tradeoff.
-    SM4, Aria, Cammellia can actually share some of the circuit with the AES
-    implementation and Kuznyechik also fits in the same mold.
+*   *Other national ciphers*: If there is support for this type of
+    lightweight AES implementation, we can expand the specification to
+    offer support to other national ciphers via very similar instructions, 
+    and with a similar size-speed tradeoff. At least SM4, Aria, Cammellia can 
+    actually share some of the S-Box circuitry and control logic with the AES
+    implementation. Kuznyechik also broadly fits in the same mold.
 *   This is a *lightweight* proposal for the RV32/RV64 instruction set; a fast
     implementation would have more than a single S-Box lookup. The main
     concern here is to resist timing attacks with minimal effort, second is
