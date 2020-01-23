@@ -10,7 +10,8 @@ This package contains a mock implementation of the two instructions together
 with full encryption, decryption, and key schedule algorithms for evaluation.
 
 The two instructions are encapsulated in two these two functions
-(located in `aes_enc1s.c` and `aes_dec1s.c`, respectively):
+(located in [aes_enc1s.c](aes_enc1s.c) and [aes_dec1s.c](aes_dec1s.c), 
+respectively):
 ```C
 uint32_t aes_enc1s(uint32_t rs1, uint32_t rs2, int fn);
 uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
@@ -70,8 +71,9 @@ encryption and decryption speeds (key schedule becomes slightly longer).
 
 ## Testing
 
-Only a C compiler is required. A `Makefile` is provided and the file `main.c`
-contains a minimal unit test with standard test vectors.
+Only a C compiler is required to test; RISC-V instruction counts can be
+seen from the source code. A [Makefile](Makefile) is provided and the file 
+[main.c](main.c) contains a minimal unit test with standard test vectors.
 
 ```console
 $ make
