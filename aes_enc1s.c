@@ -273,16 +273,14 @@ void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
     t6 = GETU32_LE(key + 24);
     t7 = GETU32_LE(key + 28);
 
+    rk[0] = t0;                             //  store first subkey
+    rk[1] = t1;
+    rk[2] = t2;
+    rk[3] = t3;
+
     for (;;) {
 
-        rk[0] = t0;                         //  store subkey
-        rk[1] = t1;
-        rk[2] = t2;
-        rk[3] = t3;
-        if (rk == rke)                      //  end condition
-            return;
-
-        rk[4] = t4;                         //  store subkey
+        rk[4] = t4;                         //  store odd subkey
         rk[5] = t5;
         rk[6] = t6;
         rk[7] = t7;
@@ -296,6 +294,13 @@ void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
         t1 ^= t0;
         t2 ^= t1;
         t3 ^= t2;
+
+        rk[0] = t0;                         //  store even subkey
+        rk[1] = t1;
+        rk[2] = t2;
+        rk[3] = t3;
+        if (rk == rke)                      //  end condition
+            return;
 
         t4 = aes_enc1s(t3, t4, 0000);       //  SubWord() - NO rotation
         t4 = aes_enc1s(t3, t4, 0011);
