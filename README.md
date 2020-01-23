@@ -25,7 +25,7 @@ is quite compact and the overall software implementation is fast.
 
 The `fn` immediate "constant" is currently 7 bits, of which 5 are actually
 used. The same information can be encoded into 3 bits without affecting
-encryption and decryption speeds (key schedule becomes slightly slower).
+encryption and decryption speeds (key schedule becomes slightly longer).
 
 **Discussion**:
 *   Code density is 16 instructions per round (+ round key fetch), despite
@@ -33,7 +33,7 @@ encryption and decryption speeds (key schedule becomes slightly slower).
     [RISC-V Crypto proposal](https://github.com/scarv/riscv-crypto)
     (Section 4.4, "Lightweight AES Acceleration") contains an instruction for
     4 parallel S-Box lookups. Without additional helper instructions this
-    will lead to a slower round function. Furthermore, the circuit size is
+    will result in a slower round function. Furthermore, the circuit size is
     dominated by the S-Box, so hardware size of this proposal is lower.
 *   In addition to being 500+% faster than plain software implementation
     (depending on table lookup speed), the most important feature of this
@@ -53,9 +53,9 @@ encryption and decryption speeds (key schedule becomes slightly slower).
     computation, they are likely to have expired.
     Other approaches have been considered
     [in the literature](https://iacr.org/archive/ches2006/22/22.pdf).
-*   In hardware implementation the S-Box and its inverse share much
-    of their circuitry. For an example of gate-optimized logic for this
-    purpose, see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf)
+*   In hardware implementation the S-Box and its inverse share much f their 
+    circuitry. For an example of gate-optimized logic for this purpose, 
+    see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf).
 *   Other national standard ciphers: If there is support for this type of
     lightweight AES implementation, we can expand the specificatio to
     offer support to other national ciphers via very similar
@@ -63,7 +63,10 @@ encryption and decryption speeds (key schedule becomes slightly slower).
     SM4, Aria, Cammellia can actually share some of the circuit with the AES
     implementation and Kuznyechik also fits in the same mold.
 *   This is a *lightweight* proposal for the RV32/RV64 instruction set; a fast
-    implementation would have more than a single S-Box lookup.
+    implementation would have more than a single S-Box lookup. The main
+    concern here is to resist timing attacks with minimal effort, second is
+    performance, and third is that SM4 and other national standards can be
+	implemented with very similar speed-size tradeoffs.
 
 ## Testing
 
@@ -103,6 +106,9 @@ $
 *   Despite being proposed in personal capacity, this proposal
     constitutes a "contribution" as defined in Section 1.4 of the
     RISC-V foundation membership agreement.
+*   This distribution is offered under MIT license agreement, so you're free
+    to use the pseudocode to build actual cipher implementations (that's 
+    what it's for).
 
 Cheers,
 - markku
