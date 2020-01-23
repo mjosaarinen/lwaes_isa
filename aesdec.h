@@ -9,7 +9,7 @@
 
 #include "aesenc.h"
 
-//  Inrvrse S-Box lookup and partial MixColumn(), 7-bit fn (5 bits used)
+//  Inverse S-Box lookup and partial MixColumn(), 7-bit fn (5 bits used)
 uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
 
 //  API:
@@ -19,7 +19,7 @@ void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
 void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
 void aes256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 
-//  deccrypt a block
+//  decrypt a block
 void aes_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
                     const uint32_t rk[], int nr);
 
