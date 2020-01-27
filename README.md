@@ -25,7 +25,7 @@ The `fn` immediate "constant" is currently 5 bits, covering encryption,
 decryption, and key schedule for both algorithms. Bits `fn[1:0]` specify
 the input byte and output rotation while `fn[4:2]` specify the operation.
 Appropriate pseudo instruction names for the code points can be proposed;
-current defined in [enc1s.h](enc1s.h) are:
+current identifiers defined in [enc1s.h](enc1s.h) are:
 
 | **Identifier** | **fn[4:2]** | **Description or Use**             |
 |----------------|:-----------:|------------------------------------|
