@@ -136,8 +136,6 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
             break;
     }
 
-    //  For AES: Multiply by "x" in AES's GF(256) - LFSR style
-
     //  8->32 bit linear transforms expressed as little-endian
     switch (fb) {
 
@@ -150,7 +148,7 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
             break;
 
         case 2:     //  2 : AES Inverse MixCol
-//      case 6:     //  6 : AES Inverse MixCol *only*
+//    ( case 6:     //  6 : AES Inverse MixCol *only* )
             x2 = aes_mulx(x);               //  "double" it
             x4 = aes_mulx(x2);              //  "double" it to 4
             x8 = aes_mulx(x4);              //  "double" it to 8
