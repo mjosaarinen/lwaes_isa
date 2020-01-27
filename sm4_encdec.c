@@ -71,7 +71,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
     x3 = GETU32_LE(key + 12);
 
     x0 ^= 0xC6BAB1A3;                       //  "FK" constants, little-endian
-    x1 ^= 0x5033AA56;                       //  (note: these seem pointless)
+    x1 ^= 0x5033AA56;                       //  (note: seems pointless?)
     x2 ^= 0x97917D67;
     x3 ^= 0xDC2270B2;
 
