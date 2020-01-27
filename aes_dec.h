@@ -9,8 +9,6 @@
 
 #include "aes_enc.h"
 
-//  API:
-
 //  set decryption key
 void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
 void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);

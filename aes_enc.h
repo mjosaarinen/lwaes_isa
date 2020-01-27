@@ -9,12 +9,13 @@
 
 #include <stdint.h>
 #include <stddef.h>
-//  API:
 
+//  number of rounds
 #define AES128_ROUNDS 10
 #define AES192_ROUNDS 12
 #define AES256_ROUNDS 14
 
+//  expanded key size
 #define AES128_RK_WORDS (4 * (AES128_ROUNDS + 1))
 #define AES192_RK_WORDS (4 * (AES192_ROUNDS + 1))
 #define AES256_RK_WORDS (4 * (AES256_ROUNDS + 1))
