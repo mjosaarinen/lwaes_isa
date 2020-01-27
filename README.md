@@ -15,8 +15,8 @@ schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
 AES-128/192/256 and SM4 for instruction coutns and other evaluation.
-This instruction is encapsulated in a function
-respectively):
+This instruction is encapsulated in the function contained in 
+[enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
