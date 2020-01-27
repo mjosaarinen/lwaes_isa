@@ -15,7 +15,7 @@ schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
 AES-128/192/256 and SM4, intended for instruction counts and other evaluation.
-The instruction is entirely encapsulated in the function contained in 
+The instruction is encapsulated in a single function in 
 [enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
@@ -23,7 +23,17 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 
 The `fn` immediate "constant" is currently 5 bits, covering encryption,
 decryption, and key schedule for both algorithms. Appropriate pseudo 
-instruction names the code points can be proposed.
+instruction names for the code points can be proposed; current ones contained
+in [enc1s.h](enc1s.h) are
+
+	|**Identifier**|**fn[4:2]**|**Description**|
+	|--------------|---|-----------------------|
+	| `AES_FN_ENC` | 0 | AES Encrypt (with *MixColumns*)		|
+	| `AES_FN_FWD` | 1 | AES Encrypt final Round / key schedule	|
+	| `AES_FN_DEC` | 2 | AES Decrypt (with *MixColumns*)		|
+	| `AES_FN_REV` | 3 | AES Decrypt final round				|
+	| `SM4_FN_ENC` | 4 | SM4 Encrypt / Decrypt					|
+	| `SM4_FN_KEY` | 5 | SM4 Key Schedule 						|
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
