@@ -83,10 +83,10 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 
     The SM4 "CK" round constants are a sequence of bytes 7*i (mod 256) with
     i = 0..127, interpreted as 32-bit words. Often these words are stored in
-    constant table. However many ISAs have a "SIMD" addition that adds 4 or
+    a constant table. However many ISAs have a "SIMD" addition that adds 4 or
     more bytes in parallel, which is faster than a table look-up. Even some
     low-ended embedded targets such as Cortex M4 (Armv7E-M/DSP) support this
-    (SADD8) and it's introduction as a RISC-V extension should be considered.
+    (SADD8) and its introduction as a RISC-V extension should be considered.
     Meanwhile, we can perfom the same function with three simple arithmetic
     ops which is likely to still be faster than fetching from a table and
     (with the address arithmatic). This implementation is certainly smaller.
