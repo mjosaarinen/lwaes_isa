@@ -61,7 +61,8 @@ uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
 
     return rs2;
 }
-````
+```
+
 Note that `ENC4S` does **not** to speed up AES encryption and decryption
 over `ENC1S`, but does speed up SM4 significantly and also helps make AES key
 schedule very fast -- perhaps even faster than fetching the subkeys from
