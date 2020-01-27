@@ -28,7 +28,7 @@ code points can be used.
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
 (*MixColumns*), rotates the result by a multiple of 8 bits (*ShiftRows*),
-and exclusive-ors the result with `rs2` (*AddRoundKey*). Despite complex
+and exclusive-ors the result with `rs2` (*AddRoundKey*). Despite its complex
 description, it can be seen that hardware implementation of the instructions
 is quite compact and the overall software implementation is fast.
 
@@ -36,7 +36,7 @@ For SM4 the instruction has exactly the same data path with byte selection,
 S-Box lookup, but with different linear operations, depending on whether
 encryption/decryption or key scheduling is being performed.
 
-Furthermore there is a second primitive `ENC4S`, which may be implemented
+There is also a secondary primitive `ENC4S`, which may be implemented
 as pseudo-instruction. It can be expressed as:
 ```C
 
@@ -73,7 +73,7 @@ require it.
     [Cache-timing attacks on AES](http://cr.yp.to/antiforgery/cachetiming-20050414.pdf).
     Constant-time implementations of AES are possible in pure software but
     are exceedingly slow.
-*   The instructions also support key schedule; it is possible to compute
+*   The instructions also support the key schedule; it is possible to compute
     the round keys "on the fly" without committing them to RAM. This may be
     helpful in some types of security applications.
 *   Many applications do not actually require the AES inverse function;
@@ -148,7 +148,7 @@ $
     standards compliance nor does not endorse this proposal above other
     proposals. PQShield may or may not implement AES and SM4 according to this
     proposal in the future.
-*   Despite being proposed in personal capacity, this proposal
+*   Despite being proposed in a personal capacity, this proposal
     constitutes a "contribution" as defined in Section 1.4 of the
     RISC-V foundation membership agreement.
 *   This distribution is offered under MIT license agreement, so you're free
