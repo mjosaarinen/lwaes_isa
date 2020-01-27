@@ -9,11 +9,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-
-//  One S-Box lookup and partial MixColumn(), 7-bit fn (5 bits used)
-
-uint32_t aes_enc1s(uint32_t rs1, uint32_t rs2, int fn);
-
 //  API:
 
 #define AES128_ROUNDS 10

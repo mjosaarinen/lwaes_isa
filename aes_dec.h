@@ -9,9 +9,6 @@
 
 #include "aes_enc.h"
 
-//  Inverse S-Box lookup and partial MixColumn(), 7-bit fn (5 bits used)
-uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
-
 //  API:
 
 //  set decryption key
