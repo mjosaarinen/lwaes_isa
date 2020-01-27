@@ -1,4 +1,6 @@
 # project specific
+xtest
+
 firmware.*
 config.h
 *.vvp
