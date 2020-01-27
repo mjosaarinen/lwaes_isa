@@ -14,16 +14,16 @@ A single instruction, `ENC1S` is used for encryption, decryption, and key
 schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
-AES-128/192/256 and SM4 for instruction counts and other evaluation.
-This instruction is encapsulated in the function contained in 
+AES-128/192/256 and SM4, intended for instruction counts and other evaluation.
+The instruction is entirely encapsulated in the function contained in 
 [enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 
-The `fn` immediate "constant" is currently 5 bits, covering encryption
-and decryption for both algorithms. Appropriate pseudo names for the used
-code points can be used.
+The `fn` immediate "constant" is currently 5 bits, covering encryption,
+decryption, and key schedule for both algorithms. Appropriate pseudo 
+instruction names the code points can be proposed.
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
