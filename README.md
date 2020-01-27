@@ -2,7 +2,7 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-**Updated** January 27, 2020 with SM4
+**Updated** January 27, 2020 with SM4.
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
 encryption and decryption with 128/192/256 - bit secret key, as defined in
@@ -14,7 +14,7 @@ A single instruction, `ENC1S` is used for encryption, decryption, and key
 schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
-AES-128/192/256 and SM4 for instruction coutns and other evaluation.
+AES-128/192/256 and SM4 for instruction counts and other evaluation.
 This instruction is encapsulated in the function contained in 
 [enc1s.c](enc1s.c):
 ```C
@@ -23,7 +23,7 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 
 The `fn` immediate "constant" is currently 5 bits, covering encryption
 and decryption for both algorithms. Appropriate pseudo names for the used
-codepoints can be used.
+code points can be used.
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
@@ -33,8 +33,8 @@ description, it can be seen that hardware implementation of the instructions
 is quite compact and the overall software implementation is fast.
 
 For SM4 the instruction has exactly the same data path with byte selection,
-S-Box lookup, but with different linear operation, depending on whether
-encryption/decryption or key scheduling is being peformed.
+S-Box lookup, but with different linear operations, depending on whether
+encryption/decryption or key scheduling is being performed.
 
 Furthermore there is a second primitive `ENC4S`, which may be implemented
 as pseudo-instruction. It can be expressed as:
@@ -63,21 +63,21 @@ require it.
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
     [RISC-V Crypto proposal](https://github.com/scarv/riscv-crypto)
-    (Section 4.4, "Lightweight AES Acceleration") contains an instruction for
-    4 parallel S-Box lookups. Without additional helper instructions this
+    (Section 4.4, "Lightweight AES Acceleration") contains instruction for
+    4 parallel S-Box lookups. Without additional helper instructions, this
     will result in a slower round function. Furthermore, the circuit size is
-    dominated by the S-Box, so hardware size of this proposal is lower.
+    dominated by the S-Box, so hardware the size of this proposal is lower.
 *   In addition to being 500+% faster than plain software implementation
     (depending on table lookup speed), the most important feature of this
     implementation is that it is constant time and resistant to
     [Cache-timing attacks on AES](http://cr.yp.to/antiforgery/cachetiming-20050414.pdf).
-    Constant-time implementations of AES are possible in pure software, but
+    Constant-time implementations of AES are possible in pure software but
     are exceedingly slow.
 *   The instructions also support key schedule; it is possible to compute
     the round keys "on the fly" without committing them to RAM. This may be
     helpful in some types of security applications.
 *   Many applications do not actually require the AES inverse function;
-    even full TLS implementations may be implemented without it since the
+    even full TLS implementations may be implemented without it since
     the AES-GCM mode is based on CTR; essentially a stream cipher.
 *   Mathematically the AES computation is organized as in the well-known
     "T-Tables" technique, which is more than 20 years old in the context of
@@ -90,7 +90,7 @@ require it.
     see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf).
 *   SM4 S-Box is mathematically very close to AES S-Box, as both are based
     on finite field inversion in GF(256). This property also makes the inverse
-    S-Box required by AES self-similar to firward S-Box. Even though different
+    S-Box required by AES self-similar to forward S-Box. Even though different
     polynomial bases are used by AES and SM4, finite fields are affine
     equivalent, so much of the circuitry of the three is shared.
     SM4 does not need an inverse S-Box for decryption.
@@ -99,9 +99,9 @@ require it.
     concern here is to resist timing attacks with minimal effort, second is
     performance, and third is that SM4 and other national standards can be
     implemented with very similar speed-size tradeoffs.
-*   **Question:** Should we support Russian GOST R 34.12-2015 Kuznyechik ?
+*   **Question:** Should we also support Russian GOST R 34.12-2015 Kuznyechik?
     It has a different type of S-Box construction, but it is also 8-8 bit
-    and the instrction could be quite similar.
+    and the instruction could be quite similar.
 
 ## Testing
 
