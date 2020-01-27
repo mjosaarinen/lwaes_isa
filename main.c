@@ -69,11 +69,10 @@ int test_aes()
     uint32_t rk[AES256_RK_WORDS];
     int fail = 0;
 
+    //  FIPS 197 test vectors
     sethex(pt, sizeof(pt), "00112233445566778899AABBCCDDEEFF");
     sethex(key, sizeof(key),
         "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F");
-
-    //  FIPS 197 test vectors
     aes128_enc_key(rk, key);
     aes128_enc_ecb(ct, pt, rk);
     fail += chkhex("AES-128 Enc", ct, 16, "69C4E0D86A7B0430D8CDB78070B4C55A");
@@ -136,7 +135,7 @@ int test_sm4()
     uint32_t rk[SM4_RK_WORDS];
     int fail = 0;
 
-    //  The standard test vector.
+    //  the sole test vector in the standard itself
     sethex(key, sizeof(key), "0123456789ABCDEFFEDCBA9876543210");
     sm4_enc_key(rk, key);
     sethex(pt, sizeof(pt), "0123456789ABCDEFFEDCBA9876543210");
@@ -146,7 +145,7 @@ int test_sm4()
     sm4_enc_ecb(xt, ct, rk);
     fail += chkhex("SM4 Decrypt", xt, 16, "0123456789ABCDEFFEDCBA9876543210");
 
-    //  From various sources.
+    //  from various sources..
     sethex(key, sizeof(key), "FEDCBA98765432100123456789ABCDEF");
     sm4_enc_key(rk, key);
     sethex(pt, sizeof(pt), "000102030405060708090A0B0C0D0E0F");
