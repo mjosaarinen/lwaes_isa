@@ -1,13 +1,13 @@
-//  aesdec.h
+//  aes_dec.h
 //  2020-01-22  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  AES 128/192/256 block decryption
 
-#ifndef _AESDEC_H_
-#define _AESDEC_H_
+#ifndef _AES_DEC_H_
+#define _AES_DEC_H_
 
-#include "aesenc.h"
+#include "aes_enc.h"
 
 //  Inverse S-Box lookup and partial MixColumn(), 7-bit fn (5 bits used)
 uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
@@ -28,4 +28,4 @@ void aes_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 #define aes192_dec_ecb(ct, pt, rk) aes_dec_rounds(ct, pt, rk, AES192_ROUNDS);
 #define aes256_dec_ecb(ct, pt, rk) aes_dec_rounds(ct, pt, rk, AES256_ROUNDS);
 
-#endif                          /* _AESDEC_H_ */
+#endif                          /* _AES_DEC_H_ */

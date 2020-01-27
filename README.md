@@ -2,35 +2,65 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
+**Updated** January 27, 2020 with SM4
+
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
 encryption and decryption with 128/192/256 - bit secret key, as defined in
-the [FIPS 197](https://doi.org/10.6028/NIST.FIPS.197) standard.
+[FIPS 197](ref/NIST.FIPS.197.pdf). Also implements the SM4
+Chinese Encryption algorithm [GM/T 002-2012](ref/gmt0002-2012sm4.pdf).
+SM4 has only one key size, 128 bits.
 
-This package contains a mock implementation of the two instructions together
-with full encryption, decryption, and key schedule algorithms for evaluation.
-
-The two instructions are encapsulated in two these two functions
-(located in [aes_enc1s.c](aes_enc1s.c) and [aes_dec1s.c](aes_dec1s.c), 
+A single instruction, `ENC1S` is used for encryption, decryption, and key
+schedule for both ciphers.
+This package contains a mock implementation of the instruction together
+with full encryption, decryption, and key schedule algorithms of
+AES-128/192/256 and SM4 for instruction coutns and other evaluation.
+This instruction is encapsulated in a function
 respectively):
 ```C
-uint32_t aes_enc1s(uint32_t rs1, uint32_t rs2, int fn);
-uint32_t aes_dec1s(uint32_t rs1, uint32_t rs2, int fn);
+uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 
-The instructions select a byte from `rs1`, perform a single S-box
-lookup (*SubBytes* or its inverse), evaluate a part of the MDS matrix
-(*MixColumns*), rotate the result by a multiple of 8 bits (*ShiftRows*),
-and exclusive-or the result with `rs2` (*AddRoundKey*). Despite complex
+For AES the instruction selects a byte from `rs1`, performs a single S-box
+lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
+(*MixColumns*), rotates the result by a multiple of 8 bits (*ShiftRows*),
+and exclusive-ors the result with `rs2` (*AddRoundKey*). Despite complex
 description, it can be seen that hardware implementation of the instructions
 is quite compact and the overall software implementation is fast.
 
-The `fn` immediate "constant" is currently 7 bits, of which 5 are actually
-used. The same information can be encoded into 3 bits without affecting
-encryption and decryption speeds (key schedule becomes slightly longer).
+For SM4 the instruction has exactly the same data path with byte selection,
+S-Box lookup, but with different linear operation, depending on whether
+encryption/decryption or key scheduding is being
+
+The `fn` immediate "constant" is currently 5 bits, covering encryption
+and decryption for both algorithms.
+
+Furthermore there is a second primitive `ENC4S`, which may be implemented
+as pseudo-instruction. It can be expressed as:
+```C
+
+uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
+{
+    rs2 = enc1s(rs1, rs2, fn);
+    rs2 = enc1s(rs1, rs2, fn | 1);
+    rs2 = enc1s(rs1, rs2, fn | 2);
+    rs2 = enc1s(rs1, rs2, fn | 3);
+
+    return rs2;
+}
+````
+Note that `ENC4S` does **not** to speed up AES encryption and decryption
+over `ENC1S`, but does speed up SM4 significantly and also helps make AES key
+schedule very fast -- perhaps even faster than fetching the subkeys from
+memory. Since four S-Boxes are required for `ENC4S` in a 1-cycle
+implementation, implementors may consider their priorities regarding these
+two ciphers when deciding if and how to implement `ENC4S`. Some may also
+want to drop AES inverse, as decryption in many modes does not actually
+require it.
 
 **Discussion**:
-*   Code density is 16 instructions per round (+ round key fetch), despite
-    only requiring a single S-box in hardware. The current
+*   AES code density is 16 instructions per round (+ round key fetch), despite
+    only requiring a single S-box in hardware. The initial
     [RISC-V Crypto proposal](https://github.com/scarv/riscv-crypto)
     (Section 4.4, "Lightweight AES Acceleration") contains an instruction for
     4 parallel S-Box lookups. Without additional helper instructions this
@@ -48,39 +78,44 @@ encryption and decryption speeds (key schedule becomes slightly longer).
 *   Many applications do not actually require the AES inverse function;
     even full TLS implementations may be implemented without it since the
     the AES-GCM mode is based on CTR; essentially a stream cipher.
-*   Mathematically the computation is organized as in the well-known
+*   Mathematically the AES computation is organized as in the well-known
     "T-Tables" technique, which is more than 20 years old in the context of
     AES. If there are patents for this specific way of organizing the
     computation, they are likely to have expired.
     Other approaches have been considered
     [in the literature](https://iacr.org/archive/ches2006/22/22.pdf).
-*   In hardware implementation the S-Box and its inverse share much f their 
-    circuitry. For an example of gate-optimized logic for this purpose, 
+*   In hardware implementation the AES S-Box and its inverse share much f their
+    circuitry. For an example of gate-optimized logic for this purpose,
     see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf).
-*   *Other national ciphers*: If there is support for this type of
-    lightweight AES implementation, we can expand the specification to
-    offer support to other national ciphers via very similar instructions, 
-    and with a similar size-speed tradeoff. At least SM4, Aria, Cammellia can 
-    actually share some of the S-Box circuitry and control logic with the AES
-    implementation. Kuznyechik also broadly fits in the same mold.
+*   SM4 S-Box is mathematically very close to AES S-Box, as both are based
+    on finite field inversion in GF(256). This property also makes the inverse
+    S-Box required by AES self-similar to firward S-Box. Even though different
+    polynomial bases are used by AES and SM4, finite fields are affine
+    equivalent, so much of the circuitry of the three is shared.
+    SM4 does not need an inverse S-Box for decryption.
 *   This is a *lightweight* proposal for the RV32/RV64 instruction set; a fast
     implementation would have more than a single S-Box lookup. The main
     concern here is to resist timing attacks with minimal effort, second is
     performance, and third is that SM4 and other national standards can be
-	implemented with very similar speed-size tradeoffs.
+    implemented with very similar speed-size tradeoffs.
+*   **Question:** Should we support Russian GOST R 34.12-2015 Kuznyechik ?
+    It has a different type of S-Box construction, but it is also 8-8 bit
+    and the instrction could be quite similar.
 
 ## Testing
 
 Only a C compiler is required to test; RISC-V instruction counts can be
-seen from the source code. A [Makefile](Makefile) is provided and the file 
+seen from the source code. A [Makefile](Makefile) is provided and the file
 [main.c](main.c) contains a minimal unit test with standard test vectors.
 
 ```console
 $ make
-gcc  -c aes_enc1s.c -o aes_enc1s.o
+gcc  -c aes_enc.c -o aes_enc.o
+gcc  -c sm4_encdec.c -o sm4_encdec.o
+gcc  -c aes_dec.c -o aes_dec.o
 gcc  -c main.c -o main.o
-gcc  -c aes_dec1s.c -o aes_dec1s.o
-gcc  -o xtest aes_enc1s.o main.o aes_dec1s.o
+gcc  -c enc1s.c -o enc1s.o
+gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o main.o enc1s.o
 $ ./xtest
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A
 [PASS] AES-128 Dec 00112233445566778899AABBCCDDEEFF
@@ -94,6 +129,14 @@ $ ./xtest
 [PASS] AES-192 Dec AE2D8A571E03AC9C9EB76FAC45AF8E51
 [PASS] AES-256 Enc B6ED21B99CA6F4F9F153E7B1BEAFED1D
 [PASS] AES-256 Dec 30C81C46A35CE411E5FBC1191A0A52EF
+[PASS] SM4 Encrypt 681EDF34D206965E86B3E94F536E4246
+[PASS] SM4 Decrypt 0123456789ABCDEFFEDCBA9876543210
+[PASS] SM4 Encrypt F766678F13F01ADEAC1B3EA955ADB594
+[PASS] SM4 Decrypt 000102030405060708090A0B0C0D0E0F
+[PASS] SM4 Encrypt 865DE90D6B6E99273E2D44859D9C16DF
+[PASS] SM4 Decrypt D294D879A1F02C7C5906D6C2D0C54D9F
+[PASS] SM4 Encrypt 94CFE3F59E8507FEC41DBE738CCD53E1
+[PASS] SM4 Decrypt A27EE076E48E6F389710EC7B5E8A3BE5
 [PASS] all tests passed.
 $
 ```
@@ -102,14 +145,14 @@ $
 
 *   [PQShield](https://pqshield.com) offers no warranty or specific claims of
     standards compliance nor does not endorse this proposal above other
-    proposals. PQShield may or may not implement AES according to this
+    proposals. PQShield may or may not implement AES and SM4 according to this
     proposal in the future ([PQSoC](https://pqsoc.com) currently has a
     different type of AES implementation).
 *   Despite being proposed in personal capacity, this proposal
     constitutes a "contribution" as defined in Section 1.4 of the
     RISC-V foundation membership agreement.
 *   This distribution is offered under MIT license agreement, so you're free
-    to use the pseudocode to build actual cipher implementations (that's 
+    to use the pseudocode to build actual cipher implementations (that's
     what it's for).
 
 Cheers,
