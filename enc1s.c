@@ -137,10 +137,11 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
     }
 
     //  8->32 bit linear transforms expressed as little-endian
+
     switch (fb) {
 
         case 0:     //  0 : AES Forward MixCol
-            x2 = aes_mulx(x);               //  "double" it
+            x2 = aes_mulx(x);               //  double x
             x = ((x ^ x2)   << 24) |        //  0x03    MixCol MDS Matrix
                 (x          << 16) |        //  0x01
                 (x          <<  8) |        //  0x01
@@ -149,9 +150,9 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
 
         case 2:     //  2 : AES Inverse MixCol
 //    ( case 6:     //  6 : AES Inverse MixCol *only* )
-            x2 = aes_mulx(x);               //  "double" it
-            x4 = aes_mulx(x2);              //  "double" it to 4
-            x8 = aes_mulx(x4);              //  "double" it to 8
+            x2 = aes_mulx(x);               //  double x
+            x4 = aes_mulx(x2);              //  double to 4*x
+            x8 = aes_mulx(x4);              //  double to 8*x
             x = ((x ^ x2 ^ x8)  << 24) |    //  0x0B    Inv MixCol MDS Matrix
                 ((x ^ x4 ^ x8)  << 16) |    //  0x0D
                 ((x ^ x8)       <<  8) |    //  0x09
