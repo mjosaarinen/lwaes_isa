@@ -10,10 +10,10 @@
 #ifndef _SM4_ENCDEC_H_
 #define _SM4_ENCDEC_H_
 
+#include <stdint.h>
+
 //  Size of the expanded key.
 #define SM4_RK_WORDS  32
-
-#include <stdint.h>
 
 //  encrypt/decrypt a block, depending on ordering of rk
 void sm4_encdec(uint8_t out[16], const uint8_t in[16],
