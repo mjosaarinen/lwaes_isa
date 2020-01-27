@@ -2,7 +2,7 @@
 //  2020-01-24  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  Running pseudocode for ENC1S and ENC4S for AES and SM4 instructions.
+//  Running pseudocode for ENC1S (and ENC4S) AES/SM4 instruction.
 
 #include "enc1s.h"
 
