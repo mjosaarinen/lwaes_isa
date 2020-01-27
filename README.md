@@ -26,14 +26,14 @@ decryption, and key schedule for both algorithms. Appropriate pseudo
 instruction names for the code points can be proposed; current ones contained
 in [enc1s.h](enc1s.h) are
 
-	|**Identifier**|**fn[4:2]**|**Description**|
-	|--------------|---|-----------------------|
-	| `AES_FN_ENC` | 0 | AES Encrypt (with *MixColumns*)		|
-	| `AES_FN_FWD` | 1 | AES Encrypt final Round / key schedule	|
-	| `AES_FN_DEC` | 2 | AES Decrypt (with *MixColumns*)		|
-	| `AES_FN_REV` | 3 | AES Decrypt final round				|
-	| `SM4_FN_ENC` | 4 | SM4 Encrypt / Decrypt					|
-	| `SM4_FN_KEY` | 5 | SM4 Key Schedule 						|
+| **Identifier** | **fn[4:2]** | **Description** |
+|----------------|-------------|-----------------|
+| `AES_FN_ENC` 	 | 0 | AES Encrypt (with *MixColumns*)			|
+| `AES_FN_FWD`   | 1 | AES Encrypt final Round / key schedule	|
+| `AES_FN_DEC`   | 2 | AES Decrypt (with *MixColumns*)			|
+| `AES_FN_REV`   | 3 | AES Decrypt final round					|
+| `SM4_FN_ENC`   | 4 | SM4 Encrypt / Decrypt					|
+| `SM4_FN_KEY`   | 5 | SM4 Key Schedule               			|
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
