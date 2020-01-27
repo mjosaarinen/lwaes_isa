@@ -29,13 +29,13 @@ current identifiers defined in [enc1s.h](enc1s.h) are:
 
 | **Identifier** | **fn[4:2]** | **Description or Use**             |
 |----------------|:-----------:|------------------------------------|
-| `AES_FN_ENC`   | 0    | AES Encrypt with *MixColumns*.            |
-| `AES_FN_FWD`   | 1    | AES Encrypt final round / key schedule.   |
-| `AES_FN_DEC`   | 2    | AES Decrypt with *MixColumns*.            |
+| `AES_FN_ENC`   | 0    | AES Encrypt main body with *MixColumns*.  |
+| `AES_FN_FWD`   | 1    | AES Encrypt final round / Key Schedule.   |
+| `AES_FN_DEC`   | 2    | AES Decrypt main body with *MixColumns*.  |
 | `AES_FN_REV`   | 3    | AES Decrypt final round.                  |
 | `SM4_FN_ENC`   | 4    | SM4 Encrypt and Decrypt.                  |
 | `SM4_FN_KEY`   | 5    | SM4 Key Schedule.                         |
-|                | 6-7  | *Unused.*                                 |
+|                | 6-7  | *Unused. 4x6=24 points currently used.*   |
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
