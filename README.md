@@ -147,8 +147,7 @@ $
 *   [PQShield](https://pqshield.com) offers no warranty or specific claims of
     standards compliance nor does not endorse this proposal above other
     proposals. PQShield may or may not implement AES and SM4 according to this
-    proposal in the future ([PQSoC](https://pqsoc.com) currently has a
-    different type of AES implementation).
+    proposal in the future.
 *   Despite being proposed in personal capacity, this proposal
     constitutes a "contribution" as defined in Section 1.4 of the
     RISC-V foundation membership agreement.
