@@ -161,12 +161,12 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
 
         case 4:     //  4 : SM4 linear transform L (encrypt / decrypt)
             x = x ^ (x << 8) ^ (x << 2) ^ (x << 18) ^
-                    ((x & 0x3F) << 26) ^ ((x & 0xC0) << 10);
+             	((x & 0x3F) << 26) ^ ((x & 0xC0) << 10);
             break;
 
-        case 5:     //  5 : SM4 linear transform L' (key schedule))
+        case 5:     //  5 : SM4 linear transform L' (key schedule)
             x = x ^ ((x & 0x07) << 29) ^ ((x & 0xFE) << 7) ^
-                    ((x & 1) << 23) ^ ((x & 0xF8) << 13);
+            	((x & 1) << 23) ^ ((x & 0xF8) << 13);
             break;
 
         default:                            //  none
