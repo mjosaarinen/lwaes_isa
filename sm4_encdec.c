@@ -47,7 +47,7 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
         t   ^=  x2;
         x3  =   enc4s(t, x3, SM4_FN_ENC);
 
-        rk += 4;                        //  unroll to taste
+        rk += 4;                            //  unroll to taste
 
     } while (rk != kp);
 
@@ -92,8 +92,8 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
     (with the address arithmatic). This implementation is certainly smaller.
 */
         t   =   ck ^ 0x01000100;            //  these constants in registers
-        ck  +=  0x1C1C1C1C;                 //  if we have "SADD4", then
-        ck  &=  0xFEFEFEFE;                 //  -> 4 x "SADD4" per round.
+        ck  +=  0x1C1C1C1C;                 //  if we have "SADD8", then
+        ck  &=  0xFEFEFEFE;                 //  -> 4 x "SADD8" per round.
 
         u   =   x2 ^ x3;                    //  10 XORs per round
         t   =   t  ^ u;
