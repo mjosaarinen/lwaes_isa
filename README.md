@@ -21,6 +21,10 @@ respectively):
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 
+The `fn` immediate "constant" is currently 5 bits, covering encryption
+and decryption for both algorithms. Appropriate pseudo names for the used
+codepoints can be used.
+
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
 (*MixColumns*), rotates the result by a multiple of 8 bits (*ShiftRows*),
@@ -30,10 +34,7 @@ is quite compact and the overall software implementation is fast.
 
 For SM4 the instruction has exactly the same data path with byte selection,
 S-Box lookup, but with different linear operation, depending on whether
-encryption/decryption or key scheduding is being
-
-The `fn` immediate "constant" is currently 5 bits, covering encryption
-and decryption for both algorithms.
+encryption/decryption or key scheduling is being peformed.
 
 Furthermore there is a second primitive `ENC4S`, which may be implemented
 as pseudo-instruction. It can be expressed as:
