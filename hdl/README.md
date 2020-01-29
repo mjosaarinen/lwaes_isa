@@ -7,7 +7,7 @@ s-box implementations for AES (forward and reverse) and SM4.
 
 I popped this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
 an obvious way, with fn going into funct7), wrote wrappers for inline assembly
-and ran the test code first in simulator, and then on FPGA. Seems to work 
+and ran the test code first in a simulator, and then on FPGA. It seems to work 
 fine. (Our SoC also has a hardware AES module, can run against it too.)
 
 The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
@@ -15,7 +15,7 @@ better implementation, but this one pretty compact as can be seen.
 
 Note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
 layers for the Boyar-Peralta AES S-Box to demonstrate the fact that all 
-three s-box types canshare circuitry. That file has some commentary on this.
+three s-box types can share circuitry. That file has some commentary on this.
 
 However, I didn't mux it as the mux logic would be relatively large. 
 Of course, all of that is irrelevant for FPGAs where it's probably a table 
@@ -26,6 +26,11 @@ There's a super-simplistic [Makefile](Makefile) and testbench for Icarus
 Verilog (which is a standard package on Debian/Ubuntu etc). I have aslo tried 
 this on Xilinx xsim and vivado with the C language test suite (in the 
 parent).
+
+Apologies if you're offended by my verilog style..
+
+Cheers,
+- markku
 
 ```console
 $ make
