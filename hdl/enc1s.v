@@ -57,7 +57,7 @@ module sm4_8to32( output [31:0] out, input [7:0] in, input f );
     sm4_sbox  sbox  ( x,  in );
 
     //  Either L' or L linear layers (for keying and encrypt / decrypt)
-
+	//	( this looks slightly odd due to the little-endian byte order )
     assign out = f ? { x[2:0], 5'b0, x[0], 2'b0 ,x[7:3], 1'b0, x[7:1], x } :
         { x[5:0], x, x[7:6], x[7:2], x[1:0] ^ x[7:6], x[7:2] ^ x[5:0], x[1:0] };
 
