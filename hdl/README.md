@@ -22,10 +22,10 @@ Of course, all of that is irrelevant for FPGAs where it's probably a table
 anyway -- the purpose was just wanted to demonstrate the relationship 
 between the S-Boxes.
 
-There's a super-simplistic [Makefile](Makefile) and testbench for Icarus 
-Verilog (which is a standard package on Debian/Ubuntu etc). I have aslo tried 
-this on Xilinx xsim and vivado with the C language test suite (in the 
-parent).
+There's a super-simplistic [Makefile](Makefile) and a testbench for Icarus 
+Verilog (which is freely available for Debian/Ubuntu etc). I have also tried 
+this on Xilinx xsim and vivado with the C language test suite (the same
+one as in the parent).
 
 Apologies if you're offended by my verilog style..
 
