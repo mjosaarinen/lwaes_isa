@@ -4,10 +4,10 @@
 
 /*
 
-    Non-hardened combinatorial logic of AES, AES inverse, and SM4 S-Boxes.
+    Non-hardened combinatorial logic for AES, inverse AES, and SM4 S-Boxes.
 
     Each S-Box has a nonlinear middle layer sandwitched between linear
-    top and middle layers. In this version the top ("inner") layer expands
+    top and bottom layers. In this version the top ("inner") layer expands
     8 bits to 21 bits while the bottom layer compresses 18 bits back to 8.
 
     Overall structure and AES and AES^-1 slightly modified from [BoPe12].
