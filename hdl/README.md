@@ -12,7 +12,7 @@ an obvious way, with fn going into funct7), wrote wrappers for inline assembly
 and ran the test code first in a simulator, and then on FPGA. It seems to work 
 fine. (Our SoC also has a hardware AES module, can run against it too.)
 
-Note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
+A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
 layers for the Boyar-Peralta AES S-Box to demonstrate the fact that all 
 three s-box types can share circuitry. That file has some commentary on this.
 
