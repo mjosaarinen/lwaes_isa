@@ -122,11 +122,11 @@ static void aes_dec_invmc(uint32_t *v, size_t len)
     for (i = 0; i < len; i++) {
         x = v[i];
 
-//      x = enc4s(x, 0, AES_FN_RMC);            //  Inverse MixColulmns
+//      x = enc4s(x, 0, AES_FN_RMC);        //  Inverse MixColulmns
 //      This is the only place where AES_FN_RMC is used. Slightly slower:
 
-        x = enc4s(x, 0, AES_FN_FWD);            //  SubWord()
-        x = enc4s(x, 0, AES_FN_DEC);            //  Just want inv MixCol()
+        x = enc4s(x, 0, AES_FN_FWD);        //  SubWord()
+        x = enc4s(x, 0, AES_FN_DEC);        //  Just want inv MixCol()
 
         v[i] = x;
     }

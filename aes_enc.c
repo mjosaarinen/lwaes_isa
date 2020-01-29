@@ -8,7 +8,7 @@
 #include "aes_enc.h"
 #include "endian.h"
 
-//  round constants -- just iterations of the mulx() LFSR
+//  round constants -- just iterations of the xtime() LFSR
 
 static const uint8_t aes_rcon[] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
@@ -124,7 +124,7 @@ void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
 {
     uint32_t t0, t1, t2, t3, tr;            //  subkey registers
     const uint32_t *rke = &rk[44 - 4];      //  end pointer
-    const uint8_t *rc = aes_rcon;               //  round constants
+    const uint8_t *rc = aes_rcon;           //  round constants
 
     t0 = GETU32_LE(key);                    //  load secret key
     t1 = GETU32_LE(key + 4);
@@ -157,7 +157,7 @@ void aes192_enc_key(uint32_t rk[52], const uint8_t key[24])
 {
     uint32_t t0, t1, t2, t3, t4, t5, tr;    //  subkey registers
     const uint32_t *rke = &rk[52 - 4];      //  end pointer
-    const uint8_t *rc = aes_rcon;               //  round constants
+    const uint8_t *rc = aes_rcon;           //  round constants
 
     t0 = GETU32_LE(key);                    //  load secret key
     t1 = GETU32_LE(key + 4);
@@ -196,7 +196,7 @@ void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
 {
     uint32_t t0, t1, t2, t3, t4, t5, t6, t7, tr; // subkey registers
     const uint32_t *rke = &rk[60 - 4];      //  end pointer
-    const uint8_t *rc = aes_rcon;               //  round constants
+    const uint8_t *rc = aes_rcon;           //  round constants
 
     t0 = GETU32_LE(key);
     t1 = GETU32_LE(key + 4);
