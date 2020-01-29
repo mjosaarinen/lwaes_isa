@@ -21,6 +21,8 @@ module aes_8to32( output [31:0] out, input [7:0] in, input f );
     aes_sbox  sbox  ( x,  in );
     aes_xtime lfsr1 ( x2, x  );
 
+    //  NOP / MixColumns MDS Matrix
+
     assign out = f ? { 24'b0, x } : { x ^ x2, x, x, x2 } ;
 
 endmodule
@@ -39,6 +41,8 @@ module aesi_8to32( output [31:0] out, input [7:0] in, input f );
     aes_xtime  lfsr2 ( x4, x2 );
     aes_xtime  lfsr3 ( x8, x4 );
 
+    //  NOP / Inverse MixColumns MDS Matrix
+
     assign out = f ? { 24'b0, x } :
         { x ^ x2 ^ x8, x ^ x4 ^ x8, x ^ x8, x2 ^ x4 ^ x8 };
 
@@ -51,6 +55,9 @@ module sm4_8to32( output [31:0] out, input [7:0] in, input f );
     wire [7:0] x;
 
     sm4_sbox  sbox  ( x,  in );
+
+    //  Either L' or L linear layers (for keying and encrypt / decrypt)
+
     assign out = f ? { x[2:0], 5'b0, x[0], 2'b0 ,x[7:3], 1'b0, x[7:1], x } :
         { x[5:0], x, x[7:6], x[7:2], x[1:0] ^ x[7:6], x[7:2] ^ x[5:0], x[1:0] };
 
