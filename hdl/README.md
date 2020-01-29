@@ -6,7 +6,7 @@ The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v) has
 s-box implementations for AES (forward and reverse) and SM4.
 
 I popped this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
-an obvious way, with fn goinginto funct7), wrote wrappers for inline assembly
+an obvious way, with fn going into funct7), wrote wrappers for inline assembly
 and ran the test code first in simulator, and then on FPGA. Seems to work 
 fine. (Our SoC also has a hardware AES module, can run against it too.)
 
