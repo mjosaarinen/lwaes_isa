@@ -1,8 +1,8 @@
-//  aes_enc.v
-//  2020-01-01  Markku-Juhani O. Saarinen <mjos@pqshield.com>
+//  enc1s.v
+//  2020-01-29  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  The proposed ENC1S lightweight instruction for AES, AES^-1, and SM4 (RV32).
+//  Proposed ENC1S instruction for lightweight AES, AES^-1, and SM4 (RV32).
 
 
 //  Multiply by 0x02 in AES's GF(256) - LFSR style
@@ -13,7 +13,7 @@ endmodule
 
 //  aes encrypt
 
-module aes_8to32( output [31:0] out, input [7:0] in, input f );
+module aes_t( output [31:0] out, input [7:0] in, input f );
 
     wire [7:0] x;
     wire [7:0] x2;
@@ -29,7 +29,7 @@ endmodule
 
 //  aes decrypt
 
-module aesi_8to32( output [31:0] out, input [7:0] in, input f );
+module aesi_t( output [31:0] out, input [7:0] in, input f );
 
     wire [7:0] x;
     wire [7:0] x2;
@@ -37,7 +37,7 @@ module aesi_8to32( output [31:0] out, input [7:0] in, input f );
     wire [7:0] x8;
 
     aesi_sbox  sbox  ( x,  in );
-    aes_xtime  lfsr1 ( x2, x  );
+    aes_xtime  lfsr1 ( x2, x  );            //  todo: reduce circuit depth
     aes_xtime  lfsr2 ( x4, x2 );
     aes_xtime  lfsr3 ( x8, x4 );
 
@@ -50,7 +50,7 @@ endmodule
 
 //  sm4 encrypt / decrypt
 
-module sm4_8to32( output [31:0] out, input [7:0] in, input f );
+module sm4_t( output [31:0] out, input [7:0] in, input f );
 
     wire [7:0] x;
 
@@ -63,7 +63,7 @@ module sm4_8to32( output [31:0] out, input [7:0] in, input f );
 
 endmodule
 
-//  ENC1S instruction
+//  Combinatorial logic for the "ENC1S instruction" itself
 
 module enc1s(
     output  [31:0]  rs,                 //  output register (wire!)
@@ -85,9 +85,9 @@ module enc1s(
     wire [31:0] aesi_32;
     wire [31:0] sm4_32;
 
-    aes_8to32   aes     ( aes_32,  x, fn[2] );
-    aesi_8to32  aesi    ( aesi_32, x, fn[2] );
-    sm4_8to32   sm4     ( sm4_32,  x, fn[2] );
+    aes_t   aes     ( aes_32,  x, fn[2] );
+    aesi_t  aesi    ( aesi_32, x, fn[2] );
+    sm4_t   sm4     ( sm4_32,  x, fn[2] );
 
     wire [31:0] y = fn[4:3] == 2'b00 ?  aes_32 :
                     fn[4:3] == 2'b01 ?  aesi_32 :
