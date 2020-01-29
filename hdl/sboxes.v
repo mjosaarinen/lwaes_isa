@@ -380,7 +380,7 @@ module sbox_sm4_out( output [7:0] y, input [17:0] x);
 
 endmodule
 
-//  SM4 inverse S-box
+//  SM4 S-box (there is no need for inverse)
 
 module sm4_sbox( output [7:0] fx, input [7:0] in );
 
