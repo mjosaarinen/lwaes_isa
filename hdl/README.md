@@ -4,14 +4,13 @@
 
 The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v) has 
 s-box implementations for AES (forward and reverse) and SM4.
+The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
+better implementation, but this one pretty compact as can be seen.
 
 I popped this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
 an obvious way, with fn going into funct7), wrote wrappers for inline assembly
 and ran the test code first in a simulator, and then on FPGA. It seems to work 
 fine. (Our SoC also has a hardware AES module, can run against it too.)
-
-The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
-better implementation, but this one pretty compact as can be seen.
 
 Note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
 layers for the Boyar-Peralta AES S-Box to demonstrate the fact that all 
@@ -66,5 +65,6 @@ vvp -n sim.vvp | grep "[TB]" | diff - tbref.txt
 $
 ```
 
-No output from `make test` implies that output matches with `tbref.txt`.
+No output from `make test` implies that output matches with 
+[tbref.txt](tbref.txt).
 
