@@ -5,7 +5,7 @@
 The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v) has 
 s-box implementations for AES (forward and reverse) and SM4.
 The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
-better implementation, but this one pretty compact as can be seen.
+better implementation, but this one is pretty compact as can be seen.
 
 I popped this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
 an obvious way, with fn going into funct7), wrote wrappers for inline assembly
