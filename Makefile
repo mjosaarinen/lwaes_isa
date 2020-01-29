@@ -1,5 +1,6 @@
 #	Makefile
 #	2020-01-22	Markku-Juhani O. Saarinen <mjos@pqshield.com>
+#   Copyright (c) 2020, PQShield Ltd.  All rights reserved.
 
 BIN		= xtest
 CSRC	= $(wildcard *.c)

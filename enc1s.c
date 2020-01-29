@@ -8,7 +8,6 @@
 
 //  Note that these three S-Boxes are affinely related -- they are all
 //  based on multiplicative inverse x^-1 in the finite field GF(256).
-//  In an ASIC implementation they share much of their circuit.
 
 //  AES Forward S-Box
 
@@ -91,9 +90,9 @@ static const uint8_t sm4_sbox[256] = {
     0xD7, 0xCB, 0x39, 0x48
 };
 
-//  Multiply by "x" in AES's GF(256) - LFSR style
+//  Multiply by 0x02 in AES's GF(256) - LFSR style
 
-static inline uint8_t aes_mulx(uint8_t x)
+static inline uint8_t aes_xtime(uint8_t x)
 {
     return (x << 1) ^ ((x & 0x80) ? 0x11B : 0x00 );
 }
@@ -141,7 +140,7 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
     switch (fb) {
 
         case 0:     //  0 : AES Forward MixCol
-            x2 = aes_mulx(x);               //  double x
+            x2 = aes_xtime(x);              //  double x
             x = ((x ^ x2)   << 24) |        //  0x03    MixCol MDS Matrix
                 (x          << 16) |        //  0x01
                 (x          <<  8) |        //  0x01
@@ -150,9 +149,9 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
 
         case 2:     //  2 : AES Inverse MixCol
 //    ( case 6:     //  6 : AES Inverse MixCol *only* )
-            x2 = aes_mulx(x);               //  double x
-            x4 = aes_mulx(x2);              //  double to 4*x
-            x8 = aes_mulx(x4);              //  double to 8*x
+            x2 = aes_xtime(x);              //  double x
+            x4 = aes_xtime(x2);             //  double to 4*x
+            x8 = aes_xtime(x4);             //  double to 8*x
             x = ((x ^ x2 ^ x8)  << 24) |    //  0x0B    Inv MixCol MDS Matrix
                 ((x ^ x4 ^ x8)  << 16) |    //  0x0D
                 ((x ^ x8)       <<  8) |    //  0x09
