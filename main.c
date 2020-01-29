@@ -177,26 +177,26 @@ int test_sm4()
     return fail;
 }
 
-//	generate "reference" hw testbench data for the instruction
+//  generate "reference" hw testbench data for the instruction
 
 int test_hwtb()
 {
-	uint32_t rd, rs1, rs2, fn;
+    uint32_t rd, rs1, rs2, fn;
 
-	rs1 = 0x00000000;
-	rs2 = 0x00000000;
+    rs1 = 0x00000000;
+    rs2 = 0x00000000;
 
-	for (fn = 0; fn < 24; fn++) {
+    for (fn = 0; fn < 24; fn++) {
 
-		rd = enc1s(rs1, rs2, fn);
+        rd = enc1s(rs1, rs2, fn);
 
-		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n",
-			rd, rs1, rs2, fn);
+        printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n",
+            rd, rs1, rs2, fn);
 
-		rs1 += 0x01234567;
-	}
+        rs1 += 0x01234567;
+    }
 
-	return 0;
+    return 0;
 }
 
 //  stub main: run unit tests
@@ -205,12 +205,12 @@ int main(int argc, char **argv)
 {
     int fail = 0;
 
-	//	hack for hardware testbench data
-	if (argc > 1) {
-		return test_hwtb();
-	}
+    //  hack for hardware testbench data
+    if (argc > 1) {
+        return test_hwtb();
+    }
 
-	//	full algorithm tests
+    //  full algorithm tests
 
     fail += test_aes();
     fail += test_sm4();
