@@ -76,10 +76,10 @@ require it.
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
     [RISC-V Crypto proposal](https://github.com/scarv/riscv-crypto)
-    (Section 4.4, "Lightweight AES Acceleration") contains instruction for
-    4 parallel S-Box lookups. Without additional helper instructions, this
+    (Section 4.4, "Lightweight AES Acceleration") contains an instruction for
+    four parallel S-Box lookups. Without additional helper instructions, this
     will result in a slower round function. Furthermore, the circuit size is
-    dominated by the S-Box, so hardware the size of this proposal is lower.
+    dominated by the S-Box, so the hardware size of this proposal is lower.
 *   In addition to being 500+% faster than plain software implementation
     (depending on table lookup speed), the most important feature of this
     implementation is that it is constant time and resistant to
