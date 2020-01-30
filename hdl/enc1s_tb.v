@@ -22,7 +22,7 @@ module enc1s_tb;
     wire [7:0] box;
 
     //  test instance
-    enc1s tb0 ( rd, rs1, rs2, fn );
+    enc1s uut ( rd, rs1, rs2, fn );
 
     always @(posedge clk) begin
 
