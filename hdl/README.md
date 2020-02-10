@@ -68,6 +68,6 @@ $
 No output from `make test` implies that output matches with 
 [tbref.txt](tbref.txt). More test output can be generated using the C
 emulator code (in parent directory); the same testbench output can be 
-generated with `./xtest tb`; just modifyl the ` test_hwtb()` function
-in [../main.c](../main.c) to generate more.
+generated with `./xtest tb`; just modify the ` test_hwtb()` function
+in [../main.c](../main.c) to generate more test cases.
 
