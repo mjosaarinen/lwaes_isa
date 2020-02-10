@@ -15,10 +15,21 @@ schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
 AES-128/192/256 and SM4, intended for instruction counts and other evaluation.
-The instruction is encapsulated in a single function in
+The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
+```
+The file [hdl/enc1s.v](hdl/enc1s.v) contains Verilog combinatorial 
+logic for the instruction. The AES and SM4 S-boxes are defined in 
+[hdl/sboxes.v](hdl/sboxes.v).
+```verilog
+module enc1s(
+    output  [31:0]  rs,                 //  output register (wire!)
+    input   [31:0]  rs1,                //  input register 1
+    input   [31:0]  rs2,                //  input register 2
+    input   [4:0]   fn                  //  5-bit function specifier
+);
 ```
 
 The `fn` immediate "constant" is currently 5 bits, covering encryption,
@@ -36,6 +47,7 @@ current identifiers defined in [enc1s.h](enc1s.h) are:
 | `SM4_FN_ENC`   | 4    | SM4 Encrypt and Decrypt.                  |
 | `SM4_FN_KEY`   | 5    | SM4 Key Schedule.                         |
 |                | 6-7  | *Unused. 4x6=24 points currently used.*   |
+
 
 For AES the instruction selects a byte from `rs1`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
@@ -70,7 +82,9 @@ memory. Since four S-Boxes are required for `ENC4S` in a 1-cycle
 implementation, implementors may consider their priorities regarding these
 two ciphers when deciding if and how to implement `ENC4S`. Some may also
 want to drop AES inverse, as decryption in many modes does not actually
-require it.
+require it. The `fn[1:0]` is of course zero in input to `ENC4S` -- six code 
+points are required in total and two for a fast implementation of SM4.
+
 
 **Discussion**:
 *   AES code density is 16 instructions per round (+ round key fetch), despite
