@@ -178,6 +178,7 @@ int test_sm4()
 }
 
 //  generate "reference" hw testbench data for the instruction
+//	output should match with hdl/enc1s_tb.v
 
 int test_hwtb()
 {
@@ -205,8 +206,8 @@ int main(int argc, char **argv)
 {
     int fail = 0;
 
-    //  hack for hardware testbench data
-    if (argc > 1) {
+    //  generate hardware testbench data
+    if (argc > 1 && strcmp(argv[1], "tb") == 0) {
         return test_hwtb();
     }
 
