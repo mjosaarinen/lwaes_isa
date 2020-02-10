@@ -84,7 +84,6 @@ module sbox_inv_mid( output [17:0] y, input [20:0] x );
     assign  t[43] = t[37] ^  t[38];
     assign  t[44] = t[39] ^  t[40];
     assign  t[45] = t[42] ^  t[41];
-
     assign  y[ 0] = t[38] &  x[ 7];
     assign  y[ 1] = t[37] &  x[13];
     assign  y[ 2] = t[42] &  x[11];
