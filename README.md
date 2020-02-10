@@ -21,8 +21,8 @@ The instruction is encapsulated in a single emulator function in
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 The file [hdl/enc1s.v](hdl/enc1s.v) contains Verilog combinatorial 
-logic for the instruction. The AES and SM4 S-boxes are defined in 
-[hdl/sboxes.v](hdl/sboxes.v).
+logic for the instruction that can be used in a RISC-V core.
+The AES and SM4 S-boxes are defined in [hdl/sboxes.v](hdl/sboxes.v).
 ```verilog
 module enc1s(
     output  [31:0]  rs,                 //  output register (wire!)
@@ -82,8 +82,9 @@ memory. Since four S-Boxes are required for `ENC4S` in a 1-cycle
 implementation, implementors may consider their priorities regarding these
 two ciphers when deciding if and how to implement `ENC4S`. Some may also
 want to drop AES inverse, as decryption in many modes does not actually
-require it. The `fn[1:0]` is of course zero in input to `ENC4S` -- six code 
-points are required in total and two for a fast implementation of SM4.
+require it. The selector input `fn[1:0]` is of course zero in for `ENC4S` -- 
+six code points are required in total and only two for a fast (but large) 
+implementation of SM4, if `ENC4S` is implemented as a real instruction.
 
 
 **Discussion**:
