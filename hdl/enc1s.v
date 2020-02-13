@@ -66,7 +66,7 @@ endmodule
 //  Combinatorial logic for the "ENC1S instruction" itself
 
 module enc1s(
-    output  [31:0]  rs,                 //  output register (wire!)
+    output  [31:0]  rd,                 //  output register (wire!)
     input   [31:0]  rs1,                //  input register 1
     input   [31:0]  rs2,                //  input register 2
     input   [4:0]   fn                  //  5-bit function specifier
@@ -102,7 +102,7 @@ module enc1s(
 
     //  XOR the result with rs2
 
-    assign  rs = z ^ rs2;
+    assign  rd = z ^ rs2;
 
 endmodule
 
