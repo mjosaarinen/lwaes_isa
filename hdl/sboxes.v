@@ -16,19 +16,17 @@
     The middle layer is common between all; the beneficiality of muxing it
     depends on target. Currently we are not doing it.
 
-    How? Because all of these are built from a "Nyberg S-box"; essentially
-    a multiplicative inverse in GF(256) and are therefore affine isomorphic.
+    How? Because all of these are "Nyberg S-boxes" [Ny93]; built form a
+	multiplicative inverse in GF(256) and are therefore affine isomorphic.
 
-    [BoPe12] Boyar J., Peralta R. "Small Depth-16 Circuit for the AES S-Box."
-    In: Gritzalis D., Furnell S., Theoharidou M. (eds) Information Security
-    and Privacy Research. SEC 2012. IFIP Advances in Information and
-    Communication Technology, vol 376. Springer, Berlin, Heidelberg (2012)
+    [BoPe12] Boyar J., Peralta R. "A Small Depth-16 Circuit for the AES 
+	S-Box." Proc.SEC 2012. IFIP AICT 376. Springer, pp. 287-298 (2012)
     DOI: https://doi.org/10.1007/978-3-642-30436-1_24
     Preprint: https://eprint.iacr.org/2011/332.pdf
 
-    [NyKn95] Nyberg K., Knudsen L. R., "Provable security against a
-    differential attack" J. Cryptology 8:1 pp. 27-36, Springer (1995)
-    DOI: https://doi.org/10.1007/BF00204800
+    [Ny93] Nyberg K., "Differentially Uniform Mappings for Cryptography",
+	Proc. EUROCRYPT '93, LNCS 765, Springer, pp. 55-64 (1993) 
+	DOI: https://doi.org/10.1007/3-540-48285-7_6
 
 */
 
