@@ -6,8 +6,8 @@ January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
 encryption and decryption with 128/192/256 - bit secret key, as defined in
-[FIPS 197](dpc/NIST.FIPS.197.pdf). It is an official proposal to the RISC-V
-Foundation, and is free to use. It is primarily geared towards
+[FIPS 197](doc/NIST.FIPS.197.pdf). It is an official proposal to the RISC-V
+Foundation, and free to use. It is primarily geared towards
 ultra-lightweight RV32 use cases.
 
 These ISA extensions also support the SM4 Chinese Encryption algorithm 
