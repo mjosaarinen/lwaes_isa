@@ -1,4 +1,4 @@
-# lwaes_isa
+# An Ultra-Lightweight (RISC-V) ISA Extension for AES and SM4 Cryptography
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
@@ -6,16 +6,19 @@ January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
 encryption and decryption with 128/192/256 - bit secret key, as defined in
-[FIPS 197](ref/NIST.FIPS.197.pdf). Also implements the SM4
-Chinese Encryption algorithm from [GM/T 0002-2012](ref/gmt0002-2012sm4.pdf).
+[FIPS 197](dpc/NIST.FIPS.197.pdf).
+ 
+The ISA extensions further support the SM4 Chinese Encryption algorithm 
+from [GM/T 0002-2012](doc/gmt0002-2012sm4.pdf) [english spec](doc/sm4en.pdf), 
+also defined in {GB}/{T} 32907-2016 and ISO/IEC 18033-3:2010/DAmd 2. 
 SM4 has only one key size, 128 bits.
 
 A single instruction, `ENC1S` is used for encryption, decryption, and key
 schedule for both ciphers.
 This package contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule algorithms of
-AES-128/192/256 and SM4, intended for instruction counts and other evaluation.
-The instruction is encapsulated in a single emulator function in
+AES-128/192/256 and SM4-128, intended for instruction counts and other 
+evaluation. The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
