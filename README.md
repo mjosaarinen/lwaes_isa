@@ -1,4 +1,4 @@
-# An Ultra-Lightweight (RISC-V) ISA Extension for AES and SM4 Cryptography
+# Ultra-Lightweight (RISC-V) ISA Extension for AES and SM4
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
