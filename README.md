@@ -13,7 +13,7 @@ from [GM/T 0002-2012](doc/gmt0002-2012sm4.pdf) [(english spec)](doc/sm4en.pdf),
 also defined in GB/T 32907-2016 and ISO/IEC 18033-3:2010/DAmd 2. 
 SM4 has only one key size, 128 bits.
 
-For design rationale and analysis, see the short report
+For design rationale and some analysis, see the short report
 [A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
 
 
