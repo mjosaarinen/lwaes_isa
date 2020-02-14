@@ -96,7 +96,8 @@ six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
 
 
-**Discussion**:
+## Discussion
+
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
     [RISC-V Crypto proposal](https://github.com/scarv/riscv-crypto)
@@ -139,6 +140,7 @@ implementation of SM4, if `ENC4S` is implemented as a real instruction.
 *   **Question:** Should we also support Russian GOST R 34.12-2015 Kuznyechik?
     It has a different type of S-Box construction, but it is also 8-8 bit
     and the instruction could be quite similar.
+
 
 ## Testing
 
