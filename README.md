@@ -2,7 +2,6 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-**Updated** February 14, 2020: with the short report.
 **Updated** February 16, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
