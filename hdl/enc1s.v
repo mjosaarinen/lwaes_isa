@@ -72,7 +72,7 @@ module enc1s(
     input   [4:0]   fn                  //  5-bit function specifier
 );
 
-    //  select input byte from rs1 according to fn[1:0]
+    //  select input byte from rs2 according to fn[1:0]
 
     wire [7:0] x =  fn[1:0] == 2'b00 ?  rs2[ 7: 0] :
                     fn[1:0] == 2'b01 ?  rs2[15: 8] :
@@ -100,7 +100,7 @@ module enc1s(
                     fn[1:0] == 2'b10 ?  { y[15: 0], y[31:16] } :
                                         { y[ 7: 0], y[31: 8] };
 
-    //  XOR the result with rs2
+    //  XOR the result with rs1
 
     assign  rd = z ^ rs1;
 
