@@ -17,16 +17,16 @@
     depends on target. Currently we are not doing it.
 
     How? Because all of these are "Nyberg S-boxes" [Ny93]; built form a
-	multiplicative inverse in GF(256) and are therefore affine isomorphic.
+    multiplicative inverse in GF(256) and are therefore affine isomorphic.
 
-    [BoPe12] Boyar J., Peralta R. "A Small Depth-16 Circuit for the AES 
-	S-Box." Proc.SEC 2012. IFIP AICT 376. Springer, pp. 287-298 (2012)
+    [BoPe12] Boyar J., Peralta R. "A Small Depth-16 Circuit for the AES
+    S-Box." Proc.SEC 2012. IFIP AICT 376. Springer, pp. 287-298 (2012)
     DOI: https://doi.org/10.1007/978-3-642-30436-1_24
     Preprint: https://eprint.iacr.org/2011/332.pdf
 
     [Ny93] Nyberg K., "Differentially Uniform Mappings for Cryptography",
-	Proc. EUROCRYPT '93, LNCS 765, Springer, pp. 55-64 (1993) 
-	DOI: https://doi.org/10.1007/3-540-48285-7_6
+    Proc. EUROCRYPT '93, LNCS 765, Springer, pp. 55-64 (1993)
+    DOI: https://doi.org/10.1007/3-540-48285-7_6
 
 */
 

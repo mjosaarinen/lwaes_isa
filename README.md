@@ -2,7 +2,8 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-**Updated** February 14, 2020 with the short report.
+**Updated** February 14, 2020: with the short report.
+**Updated** February 16, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
 
 A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
 encryption and decryption with 128/192/256 - bit secret key, as defined in
@@ -58,10 +59,10 @@ current identifiers defined in [enc1s.h](enc1s.h) are:
 |                | 6-7  | *Unused. 4x6=24 points currently used.*   |
 
 
-For AES the instruction selects a byte from `rs1`, performs a single S-box
+For AES the instruction selects a byte from `rs2`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
 (*MixColumns*), rotates the result by a multiple of 8 bits (*ShiftRows*),
-and exclusive-ors the result with `rs2` (*AddRoundKey*). Despite its complex
+and exclusive-ors the result with `rs1` (*AddRoundKey*). Despite its complex
 description, it can be seen that hardware implementation of the instructions
 is quite compact and the overall software implementation is fast.
 
@@ -75,12 +76,12 @@ as pseudo-instruction. It can be expressed as:
 
 uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
 {
-    rs2 = enc1s(rs1, rs2, fn);
-    rs2 = enc1s(rs1, rs2, fn | 1);
-    rs2 = enc1s(rs1, rs2, fn | 2);
-    rs2 = enc1s(rs1, rs2, fn | 3);
+    rs1 = enc1s(rs1, rs2, fn);
+    rs1 = enc1s(rs1, rs2, fn | 1);
+    rs1 = enc1s(rs1, rs2, fn | 2);
+    rs1 = enc1s(rs1, rs2, fn | 3);
 
-    return rs2;
+    return rs1;
 }
 ```
 

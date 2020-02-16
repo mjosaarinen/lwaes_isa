@@ -178,7 +178,7 @@ int test_sm4()
 }
 
 //  generate "reference" hw testbench data for the instruction
-//	output should match with hdl/enc1s_tb.v
+//  output should match with hdl/enc1s_tb.v
 
 int test_hwtb()
 {
@@ -194,7 +194,7 @@ int test_hwtb()
         printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n",
             rd, rs1, rs2, fn);
 
-        rs1 += 0x01234567;
+        rs2 += 0x01234567;
     }
 
     return 0;

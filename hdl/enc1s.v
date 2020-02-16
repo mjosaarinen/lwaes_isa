@@ -74,10 +74,10 @@ module enc1s(
 
     //  select input byte from rs1 according to fn[1:0]
 
-    wire [7:0] x =  fn[1:0] == 2'b00 ?  rs1[ 7: 0] :
-                    fn[1:0] == 2'b01 ?  rs1[15: 8] :
-                    fn[1:0] == 2'b10 ?  rs1[23:16] :
-                                        rs1[31:24];
+    wire [7:0] x =  fn[1:0] == 2'b00 ?  rs2[ 7: 0] :
+                    fn[1:0] == 2'b01 ?  rs2[15: 8] :
+                    fn[1:0] == 2'b10 ?  rs2[23:16] :
+                                        rs2[31:24];
 
     //  expand to 32 bits
 
@@ -102,7 +102,7 @@ module enc1s(
 
     //  XOR the result with rs2
 
-    assign  rd = z ^ rs2;
+    assign  rd = z ^ rs1;
 
 endmodule
 

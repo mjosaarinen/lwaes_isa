@@ -110,7 +110,7 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
 
     //  select input byte
 
-    x   = (rs1 >> fa) & 0xFF;               //  select byte
+    x   = (rs2 >> fa) & 0xFF;               //  select byte
 
     //  8->8 bit s-box
 
@@ -179,19 +179,19 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
         x = (x << fa) | (x >> (32 - fa));
     }
 
-    return  x ^ rs2;                        //  XOR with rs2
+    return  x ^ rs1;                        //  XOR with rs2
 }
 
 //  ENC4S: Instruction or pseudoinstruction for four ENC1S's.
-//  We may assume that rd == rs2 and fn[1:0] == 2'b00.
+//  We may assume that rd == rs1 and fn[1:0] == 2'b00.
 
 uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
 {
-    rs2 = enc1s(rs1, rs2, fn);
-    rs2 = enc1s(rs1, rs2, fn | 1);
-    rs2 = enc1s(rs1, rs2, fn | 2);
-    rs2 = enc1s(rs1, rs2, fn | 3);
+    rs1 = enc1s(rs1, rs2, fn);
+    rs1 = enc1s(rs1, rs2, fn | 1);
+    rs1 = enc1s(rs1, rs2, fn | 2);
+    rs1 = enc1s(rs1, rs2, fn | 3);
 
-    return rs2;
+    return rs1;
 }
 

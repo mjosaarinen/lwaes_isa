@@ -29,7 +29,7 @@ module enc1s_tb;
     $display("[TB] rd=%h rs1=%h rs2=%h fn=%h", rd, rs1, rs2, fn );
 
         fn  <= fn  + 1;
-        rs1 <= rs1 + 32'h01234567;
+        rs2 <= rs2 + 32'h01234567;
 
         if (cnt == 23) begin
             $finish;

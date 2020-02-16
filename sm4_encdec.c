@@ -28,24 +28,24 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
         t   =   rk[0];                      //  subkeys can be inline
         t   ^=  u;
         t   ^=  x1;
-        x0  =   enc4s(t, x0, SM4_FN_ENC);   //  4 x enc4s (or 16 x enc1s) per R
+        x0  =   enc4s(x0, t, SM4_FN_ENC);   //  4 x enc4s (or 16 x enc1s) per R
 
         t   =   rk[1];
         t   ^=  u;
         t   ^=  x0;
-        x1  =   enc4s(t, x1, SM4_FN_ENC);
+        x1  =   enc4s(x1, t, SM4_FN_ENC);
 
         u   =   x0 ^ x1;
 
         t   =   rk[2];
         t   ^=  u;
         t   ^=  x3;
-        x2  =   enc4s(t, x2, SM4_FN_ENC);
+        x2  =   enc4s(x2, t, SM4_FN_ENC);
 
         t   =   rk[3];
         t   ^=  u;
         t   ^=  x2;
-        x3  =   enc4s(t, x3, SM4_FN_ENC);
+        x3  =   enc4s(x3, t, SM4_FN_ENC);
 
         rk += 4;                            //  unroll to taste
 
@@ -98,7 +98,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
         u   =   x2 ^ x3;                    //  10 XORs per round
         t   =   t  ^ u;
         t   =   t  ^ x1;
-        x0  =   enc4s(t, x0, SM4_FN_KEY);   //  4 x ENC4S (or 16 x ENC1S)
+        x0  =   enc4s(x0, t, SM4_FN_KEY);   //  4 x ENC4S (or 16 x ENC1S)
         rk[0] = x0;                         //  four stores per round
 
         t   =   ck ^ 0x01000100;
@@ -107,7 +107,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 
         t   =   t  ^ u;
         t   =   t  ^ x0;
-        x1  =   enc4s(t, x1, SM4_FN_KEY);
+        x1  =   enc4s(x1, t, SM4_FN_KEY);
         rk[1] = x1;
 
         t   =   ck ^ 0x01000100;
@@ -117,7 +117,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
         u   =   x0 ^ x1;
         t   ^=  u;
         t   ^=  x3;
-        x2  =   enc4s(t, x2, SM4_FN_KEY);
+        x2  =   enc4s(x2, t, SM4_FN_KEY);
         rk[2] = x2;
 
         t   =   ck ^ 0x01000100;
@@ -126,7 +126,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 
         t   ^=  u;
         t   ^=  x2;
-        x3  =   enc4s(t, x3, SM4_FN_KEY);
+        x3  =   enc4s(x3, t, SM4_FN_KEY);
         rk[3] = x3;
 
         rk  +=  4;
