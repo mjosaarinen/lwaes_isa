@@ -2,7 +2,7 @@
 
 2020-02-16  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-Assembler implementations of the AES and SM4 block ciphers using the 
+Assembler implementations of the AES and SM4 block ciphers using the
 ENC1S instruction -- has the same prototypes  and features as the
 C-language API, so the same unit tests work too.
 
