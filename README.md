@@ -31,7 +31,7 @@ evaluation. Assembler listings for the same functions (with a hacky
 macro instruction encoding) can be found under the [asm](asm) directory.
 Furthermore the [hdl](hdl) directory contains Verilog combinatorial logic
 for the core instruction. The assembler and HDL have been tested on a an
-RV32 emulator and the pluto core on FPGA.
+RV32 emulator and the "Pluto" core on an FPGA target.
 
 The assembler and C implementations use the same AES and SM4 API,
 specified in [aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
