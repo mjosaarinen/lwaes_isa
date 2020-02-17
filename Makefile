@@ -6,7 +6,7 @@ BIN		= xtest
 CSRC	= $(wildcard *.c)
 OBJS	= $(CSRC:.c=.o)
 CC		= gcc
-CFLAGS	?= -g -Wall -Wshadow -fsanitize=address,undefined -O2
+#CFLAGS	?= -g -Wall -Wshadow -fsanitize=address,undefined -O2
 #CFLAGS	= -Wall -march=native -O3
 LIBS    =
 

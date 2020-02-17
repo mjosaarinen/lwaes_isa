@@ -6,16 +6,16 @@ January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 A lightweight ISA extension proposal supporting:
 
-* AES (Advanced Encryption Standard) encryption and decryption with 
-128/192/256 - bit secret key, as defined in [FIPS 197](doc/NIST.FIPS.197.pdf). 
+* AES (Advanced Encryption Standard) with 128/192/256 - bit secret key,
+as defined in [FIPS 197](doc/NIST.FIPS.197.pdf). 
 
 * SM4 Chinese Encryption algorithm [GM/T 0002-2012](doc/gmt0002-2012sm4.pdf) 
 [(english spec)](doc/sm4en.pdf), also defined in GB/T 32907-2016 and ISO/IEC
 18033-3:2010/DAmd 2. SM4 has only one key size, 128 bits.
 
 A more complex ISA extension may be appropriate for higher-end CPUs. The
-primary goal is to eliminate timing-side vulnerabilities. Speed-up over
-pure software table-based implementations is roughly 500 %.
+primary goal of lwaes is to eliminate timing-side vulnerabilities. The 
+speed-up over pure software table-based implementations is roughly 500 %.
 
 
 ## Description
@@ -30,8 +30,8 @@ AES-128/192/256 and SM4-128, intended for instruction counts and other
 evaluation. Assembler listings for the same functions (with a hacky
 macro instruction encoding) can be found under the [asm](asm) directory.
 Furthermore the [hdl](hdl) directory contains Verilog combinatorial logic
-for the core instruction. The assembler and HDL have been tested on a an RV32 
-emulator and FPGA core.
+for the core instruction. The assembler and HDL have been tested on a an
+RV32 emulator and the pluto core on FPGA.
 
 The assembler and C implementations use the same AES and SM4 API,
 specified in [aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
@@ -41,7 +41,7 @@ The API is split in pieces since AES and SM4 are independent and
 some designers may additionally save space by not implementing AES inverse.
 
 
-### Some technical details
+### Brief technical details
 
 The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
@@ -50,7 +50,6 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 ```
 The file [hdl/enc1s.v](hdl/enc1s.v) contains Verilog combinatorial 
 logic for the instruction that can be used in a RISC-V core.
-The AES and SM4 S-boxes are defined in [hdl/sboxes.v](hdl/sboxes.v).
 ```verilog
 module enc1s(
     output  [31:0]  rd,                 //  output register (wire!)
@@ -113,6 +112,7 @@ want to drop AES inverse, as decryption in many modes does not actually
 require it. The selector input `fn[1:0]` is of course zero in for `ENC4S` -- 
 six code points are required in total and only two for a fast (but large) 
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
+Current assembler code only uses `ENC1S`.
 
 
 ### Discussion
