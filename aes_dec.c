@@ -134,7 +134,7 @@ static void aes_dec_invmc(uint32_t *v, size_t len)
 
 //  Key schedule for AES-128 decryption.
 
-void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16])
+void aes128_dec_key(uint32_t rk[44], const uint8_t key[16])
 {
     //  create an encryption key and modify middle rounds
     aes128_enc_key(rk, key);
@@ -143,7 +143,7 @@ void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16])
 
 //  Key schedule for AES-192 decryption.
 
-void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24])
+void aes192_dec_key(uint32_t rk[52], const uint8_t key[24])
 {
     //  create an encryption key and modify middle rounds
     aes192_enc_key(rk, key);
@@ -152,7 +152,7 @@ void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24])
 
 //  Key schedule for AES-256 decryption.
 
-void aes256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32])
+void aes256_dec_key(uint32_t rk[60], const uint8_t key[32])
 {
     //  create an encryption key and modify middle rounds
     aes256_enc_key(rk, key);

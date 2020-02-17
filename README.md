@@ -2,29 +2,48 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-**Updated** February 16, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
+**Updated** February 17, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
 
-A lightweight ISA extension proposal for AES (Advanced Encryption Standard)
-encryption and decryption with 128/192/256 - bit secret key, as defined in
-[FIPS 197](doc/NIST.FIPS.197.pdf). 
+A lightweight ISA extension proposal supporting:
 
-These ISA extensions also support the SM4 Chinese Encryption algorithm 
-from [GM/T 0002-2012](doc/gmt0002-2012sm4.pdf) [(english spec)](doc/sm4en.pdf), 
-also defined in GB/T 32907-2016 and ISO/IEC 18033-3:2010/DAmd 2. 
-SM4 has only one key size, 128 bits.
+* AES (Advanced Encryption Standard) encryption and decryption with 
+128/192/256 - bit secret key, as defined in [FIPS 197](doc/NIST.FIPS.197.pdf). 
 
-For design rationale and some analysis, see the short report
-[A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
+* SM4 Chinese Encryption algorithm [GM/T 0002-2012](doc/gmt0002-2012sm4.pdf) 
+[(english spec)](doc/sm4en.pdf), also defined in GB/T 32907-2016 and ISO/IEC
+18033-3:2010/DAmd 2. SM4 has only one key size, 128 bits.
+
+A more complex ISA extension may be appropriate for higher-end CPUs. The
+primary goal is to eliminate timing-side vulnerabilities. Speed-up over
+pure software table-based implementations is roughly 500 %.
 
 
 ## Description
 
 A single instruction, `ENC1S` is used for encryption, decryption, and key
-schedule for both ciphers.
-This package contains a mock implementation of the instruction together
-with full encryption, decryption, and key schedule algorithms of
+schedule for both ciphers. For design rationale and some analysis, see the 
+short report [A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
+
+This directory contains a mock implementation of the instruction together
+with full encryption, decryption, and key schedule pseudocode of
 AES-128/192/256 and SM4-128, intended for instruction counts and other 
-evaluation. The instruction is encapsulated in a single emulator function in
+evaluation. Assembler listings for the same functions (with a hacky
+macro instruction encoding) can be found under the [asm](asm) directory.
+Furthermore the [hdl](hdl) directory contains Verilog combinatorial logic
+for the core instruction. The assembler and HDL have been tested on a an RV32 
+emulator and FPGA core.
+
+The assembler and C implementations use the same AES and SM4 API,
+specified in [aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
+[aes_dec.h](aes_dec.h) (AES-128/192/256 decryption) and
+[sm4_encdec.h](sm4_encdec.h) (SM4-128 encryption and decryption).
+The API is split in pieces since AES and SM4 are independent and 
+some designers may additionally save space by not implementing AES inverse.
+
+
+### Some technical details
+
+The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
 ```C
 uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
@@ -96,7 +115,7 @@ six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
 
 
-## Discussion
+### Discussion
 
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
@@ -123,40 +142,38 @@ implementation of SM4, if `ENC4S` is implemented as a real instruction.
     computation, they are likely to have expired.
     Other approaches have been considered
     [in the literature](https://iacr.org/archive/ches2006/22/22.pdf).
-*   In hardware implementation the AES S-Box and its inverse share much f their
-    circuitry. For an example of gate-optimized logic for this purpose,
+*   In hardware implementation the AES S-Box and its inverse share much of
+	their circuitry. For an example of gate-optimized logic for this purpose,
     see e.g. [Boyar and Peralta](https://eprint.iacr.org/2011/332.pdf).
+	We've expanded this to SM4, as can be seen in reference combinatorial
+	logic in [hdl/sboxes.v](hdl/sboxes.v).
 *   SM4 S-Box is mathematically very close to AES S-Box, as both are based
     on finite field inversion in GF(256). This property also makes the inverse
     S-Box required by AES self-similar to forward S-Box. Even though different
     polynomial bases are used by AES and SM4, finite fields are affine
     equivalent, so much of the circuitry of the three is shared.
     SM4 does not need an inverse S-Box for decryption.
-*   This is a *lightweight* proposal for the RV32/RV64 instruction set; a fast
-    implementation would have more than a single S-Box lookup. The main
-    concern here is to resist timing attacks with minimal effort, second is
-    performance, and third is that SM4 and other national standards can be
-    implemented with very similar speed-size tradeoffs.
 *   **Question:** Should we also support Russian GOST R 34.12-2015 Kuznyechik?
     It has a different type of S-Box construction, but it is also 8-8 bit
     and the instruction could be quite similar.
 
 
-## Testing
+### Testing
 
 Only a C compiler is required to test; RISC-V instruction counts can be
 seen from the source code. A [Makefile](Makefile) is provided and the file
-[main.c](main.c) contains a minimal unit test with standard test vectors.
+[test_main.c](test-main.c) contains a minimal unit test with some standard
+test vectors.
 
 ```console
 $ make
 gcc  -c aes_enc.c -o aes_enc.o
 gcc  -c sm4_encdec.c -o sm4_encdec.o
 gcc  -c aes_dec.c -o aes_dec.o
-gcc  -c main.c -o main.o
 gcc  -c enc1s.c -o enc1s.o
-gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o main.o enc1s.o
-$ ./xtest
+gcc  -c test_main.c -o test_main.o
+gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o enc1s.o test_main.o 
+$ ./xtest 
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A
 [PASS] AES-128 Dec 00112233445566778899AABBCCDDEEFF
 [PASS] AES-192 Enc DDA97CA4864CDFE06EAF70A0EC0D7191

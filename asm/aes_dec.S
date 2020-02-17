@@ -15,16 +15,10 @@
         .align  2
 
 //  Decrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
+//      void aes_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
+//                          const uint32_t rk[], int nr)
+//      where: a0 = pt, a1 = ct, a2 = rk, a3 = nr
 
-/*
-    C prototype:
-
-        void aes_dec_rounds(uint8_t pt[16],
-                            const uint8_t ct[16],
-                            const uint32_t rk[], int nr)
-
-        abi: a0 = pt, a1 = ct, a2 = rk, a3 = nr
-*/
 
         .globl  aes_dec_rounds
         .type   aes_dec_rounds,  @function
@@ -49,10 +43,10 @@ aes_dec_rounds:
         xor     t2,     t2,     t6
         xor     t3,     t3,     a7
 
-        j       .ent
+        j       .ent                        //  enter loop in middle
 
 .loop:
-        //  odd round
+        //  even round
         enc1s   T0, T0, T4, AES_FN_DEC | 0
         enc1s   T0, T0, A7, AES_FN_DEC | 1
         enc1s   T0, T0, T6, AES_FN_DEC | 2
@@ -80,7 +74,7 @@ aes_dec_rounds:
         lw      t6,     24(a3)
         lw      a7,     28(a3)
 
-        //  even round
+        //  odd round
         enc1s   T4, T4, T0, AES_FN_DEC | 0
         enc1s   T4, T4, T3, AES_FN_DEC | 1
         enc1s   T4, T4, T2, AES_FN_DEC | 2
@@ -136,7 +130,6 @@ aes_dec_rounds:
         jr      ra
         .size   aes_dec_rounds,  .-aes_dec_rounds
 
-
 //  Helper: apply inverse mixcolumns to a vector
 
         .type   .invmc,  @function
@@ -164,7 +157,8 @@ aes_dec_rounds:
 
 
 //  Key schedule for AES-128 decryption.
-//  void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+//      void aes128_dec_key(uint32_t rk[44], const uint8_t key[16]);
+//      where:  a0 = rk, a1 = key
 
         .globl  aes128_dec_key
         .type   aes128_dec_key,  @function
@@ -187,7 +181,8 @@ aes128_dec_key:
 
 
 //  Key schedule for AES-192 decryption.
-//  void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+//      void aes192_dec_key(uint32_t rk[52], const uint8_t key[24]);
+//      where:  a0 = rk, a1 = key
 
         .globl  aes192_dec_key
         .type   aes192_dec_key,  @function
@@ -210,7 +205,8 @@ aes192_dec_key:
 
 
 //  Key schedule for AES-256 decryption.
-//  void aes256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+//      void aes256_dec_key(uint32_t rk[60], const uint8_t key[32]);
+//      where:  a0 = rk, a1 = key
 
         .globl  aes256_dec_key
         .type   aes256_dec_key,  @function

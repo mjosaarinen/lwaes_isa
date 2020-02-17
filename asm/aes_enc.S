@@ -15,16 +15,9 @@
         .align  2
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
-
-/*
-    C prototype:
-
-        void aes_enc_rounds(uint8_t ct[16],
-                            const uint8_t pt[16],
-                            const uint32_t rk[], int nr)
-
-        where: a0 = ct, a1 = pt, a2 = rk, a3 = nr
-*/
+//      void aes_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
+//                          const uint32_t rk[], int nr)
+//      where:  a0 = ct, a1 = pt, a2 = rk, a3 = nr
 
         .globl  aes_enc_rounds
         .type   aes_enc_rounds,  @function
@@ -49,10 +42,10 @@ aes_enc_rounds:
         slli    a3,     a3,     4           //  final pointer
         add     a3,     a3,     a2
 
-        j       .ent
+        j       .ent                        //  enter loop in the middle
 
 .loop:
-        //  even round
+        //  odd round
         enc1s   T0, T0, T4, AES_FN_ENC | 0
         enc1s   T0, T0, T5, AES_FN_ENC | 1
         enc1s   T0, T0, T6, AES_FN_ENC | 2
@@ -79,7 +72,7 @@ aes_enc_rounds:
         lw      t6,     24(a2)
         lw      a7,     28(a2)
 
-        //  odd round
+        //  even round
         enc1s   T4, T4, T0, AES_FN_ENC | 0
         enc1s   T4, T4, T1, AES_FN_ENC | 1
         enc1s   T4, T4, T2, AES_FN_ENC | 2
@@ -138,14 +131,8 @@ aes_enc_rounds:
 
 
 //  Key schedule for AES-128 Encryption.
-
-/*
-    C prototype:
-
-        void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
-
-        where:  a0 = rk, a1 = key
-*/
+//      void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
+//      where:  a0 = rk, a1 = key
 
         .align  2
         .globl  aes128_enc_key
@@ -153,12 +140,10 @@ aes_enc_rounds:
 
 aes128_enc_key:
 
-        //  round constant pointer
-        lui     a2,     %hi(.rcon)
+        lui     a2,     %hi(.rcon)          //  rcon pointer
         addi    a2,     a2,     %lo(.rcon)
 
-        //  end pointer
-        addi    a3,     a0,     16 * 10 + 16
+        addi    a3,     a0,     16 * 10     //  end pointer
 
         lw      t0,     0(a1)               //  input key
         lw      t1,     4(a1)
@@ -205,14 +190,8 @@ aes128_enc_key:
 
 
 //  Key schedule for AES-192 Encryption.
-
-/*
-    C prototype:
-
-        void aes192_enc_key(uint32_t rk[44], const uint8_t key[16])
-
-        with    a0 = rk, a1 = key
-*/
+//      void aes192_enc_key(uint32_t rk[52], const uint8_t key[16])
+//      where:  a0 = rk, a1 = key
 
         .align  2
         .globl  aes192_enc_key
@@ -220,12 +199,10 @@ aes128_enc_key:
 
 aes192_enc_key:
 
-        //  round constant pointer
-        lui     a2,     %hi(.rcon)
+        lui     a2,     %hi(.rcon)          //  rcon pointer
         addi    a2,     a2,     %lo(.rcon)
 
-        //  end pointer
-        addi    a3,     a0,     16 * 12 + 24
+        addi    a3,     a0,     16 * 12     //  end pointer
 
         lw      t0,     0(a1)               //  input key
         lw      t1,     4(a1)
@@ -277,14 +254,8 @@ aes192_enc_key:
 
 
 //  Key schedule for AES-256 Encryption.
-
-/*
-    C prototype:
-
-        void aes256_enc_key(uint32_t rk[44], const uint8_t key[16])
-
-        with    a0 = rk, a1 = key
-*/
+//      void aes256_enc_key(uint32_t rk[60], const uint8_t key[16])
+//      where:  a0 = rk, a1 = key
 
         .align  2
         .globl  aes256_enc_key
@@ -292,12 +263,10 @@ aes192_enc_key:
 
 aes256_enc_key:
 
-        //  round constant pointer
-        lui     a2,     %hi(.rcon)
+        lui     a2,     %hi(.rcon)          //  rcon pointer
         addi    a2,     a2,     %lo(.rcon)
 
-        //  end pointer
-        addi    a3,     a0,     16 * 14 + 32
+        addi    a3,     a0,     16 * 14     //  end pointer
 
         lw      t0,     0(a1)               //  input key
         lw      t1,     4(a1)
