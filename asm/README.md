@@ -11,9 +11,9 @@ primitives do not work directly on plaintext or ciphertext but are
 wrapped in some function that implement an encryption mode such as
 CTR, CCM, SIV, or GCM and operate on buffers provided by the wrapper.
 
-This is definitely not the prettiest way of using (custom-0) ENC1s
-instructions; hacky macros in [enc1s_c0.h](enc1s_c0.h) are used in
-encoding. Uses the C preprocessor, and was tested with RISC-V GCC 9.2.0.
+This is definitely not the prettiest way of using (custom-0) ENC1S
+instructions; hacky macros in [enc1s_c0.h](enc1s_c0.h) are used for
+encoding. Requires the C preprocessor, was tested with RISC-V GCC 9.2.0.
 
 Cheers,
 - markku
