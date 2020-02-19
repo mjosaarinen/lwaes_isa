@@ -4,6 +4,8 @@ January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 **Updated** February 17, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
 
+## Description
+
 A lightweight ISA extension proposal supporting:
 
 * AES (Advanced Encryption Standard) with 128/192/256 - bit secret key,
@@ -13,16 +15,13 @@ as defined in [FIPS 197](doc/NIST.FIPS.197.pdf).
 [(english spec)](doc/sm4en.pdf), also defined in GB/T 32907-2016 and ISO/IEC
 18033-3:2010/DAmd 2. SM4 has only one key size, 128 bits.
 
-A more complex ISA extension may be appropriate for higher-end CPUs. The
-primary goal of lwaes is to eliminate timing-side vulnerabilities. The 
-speed-up over pure software table-based implementations is roughly 500 %.
-
-
-## Description
-
 A single instruction, `ENC1S` is used for encryption, decryption, and key
 schedule for both ciphers. For design rationale and some analysis, see the 
 short report [A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
+
+A more complex ISA extension may be appropriate for higher-end CPUs. The
+primary goal of lwaes is to eliminate timing-side vulnerabilities. The 
+speed-up over pure software table-based implementations is roughly 500 %.
 
 This directory contains a mock implementation of the instruction together
 with full encryption, decryption, and key schedule pseudocode of
