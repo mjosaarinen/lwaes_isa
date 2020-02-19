@@ -36,9 +36,9 @@ The assembler and C implementations use the same AES and SM4 API,
 specified in [aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
 [aes_dec.h](aes_dec.h) (AES-128/192/256 decryption) and
 [sm4_encdec.h](sm4_encdec.h) (SM4-128 encryption and decryption).
-The API is split in pieces since AES and SM4 are independent and 
-some designers may additionally save space by not implementing AES inverse.
-
+The API is split in pieces since AES and SM4 are independent of
+each other and some designers may additionally want to save space by not
+implementing inverse AES (not required for decryption in may modes).
 
 ### Technical Details
 
