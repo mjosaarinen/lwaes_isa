@@ -2,21 +2,20 @@
 //  2020-02-16  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  AES Deccryption and Key Schedule using "lwaes" instructions
+//  AES Decryption and Key Schedule using "lwaes" instructions.
 
 //  macro definitions for the custom instruction
-
 #include    "enc1s_c0.h"
 
         .option nopic
         .text
         .align  2
 
+
 //  Decrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 //      void aes_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 //                          const uint32_t rk[], int nr)
 //      where: a0 = pt, a1 = ct, a2 = rk, a3 = nr
-
 
         .globl  aes_dec_rounds
         .type   aes_dec_rounds,  @function

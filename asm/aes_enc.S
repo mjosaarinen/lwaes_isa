@@ -2,15 +2,15 @@
 //  2020-02-16  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  AES Encryption and Key Schedule using "lwaes" instructions
+//  AES Encryption and Key Schedule using "lwaes" instructions.
 
 //  macro definitions for the custom instruction
-
 #include    "enc1s_c0.h"
 
         .option nopic
         .text
         .align  2
+
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 //      void aes_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
