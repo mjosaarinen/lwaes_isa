@@ -40,7 +40,7 @@ The API is split in pieces since AES and SM4 are independent and
 some designers may additionally save space by not implementing AES inverse.
 
 
-### Brief technical details
+### Technical Details
 
 The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
