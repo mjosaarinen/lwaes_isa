@@ -70,9 +70,9 @@ $
 
 ##	Gate Counts
 
-There's a [Yosys](http://www.clifford.at/yosys/) script to perform gate
+There's a [Yosys](http://www.clifford.at/yosys/) script to make simple gate
 counts against a mock ASIC cell library. Running `make rep` will perform
-synthesis and report counts on four targets:
+synthesis and report counts on four synthesis feature sets of the instruction:
 
 | **Target**           | **Gate Equivalents** | **Transistors** | **LTP** |
 |----------------------|--------:|-------:|----:|
@@ -80,6 +80,10 @@ synthesis and report counts on four targets:
 | AES                  | 1215.0  |  4860  |  29 |
 | SM4                  |  757.0  |  3028  |  27 |
 | AES + SM4 (Full)     | 1629.5  |  6518  |  29 |
+
+If your design doesn't need both AES and SM4, then you can just define macros
+`E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to disable forward AES, inverse
+AES, or SM4 respectively.
 
 LTP is the reported *Longest Topological Path* and essentially a circuit
 depth / gate delay measure.
