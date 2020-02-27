@@ -6,7 +6,24 @@
 #	parse the synthesis output
 
 import sys
-import time
+
+
+# "For evaluation purposes we synthesized these cores for RV32 and RV64 
+#	to the following mockup ASIC cell library:"
+
+wt = {}
+wt["$_NOT_"]	= 0.5
+wt["$_NAND_"] 	= 1.0
+wt["$_NOR_"]	= 1.0
+wt["$_XOR_"]	= 3.0
+wt["$_XNOR_"]	= 3.0
+wt["$_DFF_P_"] 	= 4.0
+wt["$_AOI3_"] 	= 1.5
+wt["$_OAI3_"]	= 1.5
+wt["$_AOI4_"] 	= 2.0
+wt["$_OAI4_"]	= 2.0
+wt["$_NMUX_"] 	= 2.5
+wt["$_MUX_"] 	= 3.0
 
 circ = {}
 
@@ -22,8 +39,8 @@ for fn in sys.argv[1:]:
 	li = 0
 	targ = ""
 	ge = 0.0
-	ent = 0
-	dep = 0
+	tr = 0
+	ltp = 0
 
 	for lin in lns:
 
@@ -34,55 +51,28 @@ for fn in sys.argv[1:]:
 		if ll == 3 and lv[0] == "===":
 			targ = lv[1]
 			ge = 0.0
-			ent = 0.0
+			tr = 0
+			ltp = 0
 
 		if ll == 5 and lv[3] == "transistors:":
-			ent = int(lv[4])
+			tr = int(lv[4])
 
 		if ll == 6 and lv[1] == "topological":
 			tmp = lv[5][8:]
-			dep = int(tmp[:2])
+			ltp = int(tmp[:-2])
 
-		if ll == 2 and lv[0] == "$_AOI3_":
-			ge = ge + float(lv[1]) * 1.5
+		if ll == 2 and lv[0][:2] == "$_":
+			if lv[0] in wt:
+				ge = ge + float(lv[1]) * wt[lv[0]]
+			else:
+				print(f"{fn}:{li} unknown gate {lv[0]}")		
 
-		if ll == 2 and lv[0] == "$_AOI4_":
-			ge = ge + float(lv[1]) * 2.0
-
-		if ll == 2 and lv[0] == "$_DFF_P_":
-			ge = ge + float(lv[1]) * 4.0
-
-		if ll == 2 and lv[0] == "$_MUX_":
-			ge = ge + float(lv[1]) * 3.0
-
-		if ll == 2 and lv[0] == "$_NAND_":
-			ge = ge + float(lv[1]) * 1.0
-
-		if ll == 2 and lv[0] == "$_NMUX_":
-			ge = ge + float(lv[1]) * 2.5
-
-		if ll == 2 and lv[0] == "$_NOR_":
-			ge = ge + float(lv[1]) * 1.0
-
-		if ll == 2 and lv[0] == "$_NOT_":
-			ge = ge + float(lv[1]) * 1.0
-
-		if ll == 2 and lv[0] == "$_OAI3_":
-			ge = ge + float(lv[1]) * 1.5
-
-		if ll == 2 and lv[0] == "$_OAI4_":
-			ge = ge + float(lv[1]) * 2.5
-
-		if ll == 2 and lv[0] == "$_XNOR_":
-			ge = ge + float(lv[1]) * 3.0
-
-		if ll == 2 and lv[0] == "$_XOR_":
-			ge = ge + float(lv[1]) * 3.0
-
+		# update it
 		if targ != "":
-			circ[targ] = ( ge, ent, dep )
+			circ[targ] = ( ge, tr, ltp )
+
+# print the output
 
 for x in circ:
-
-	print(f"{x}: ge={circ[x][0]} tr={circ[x][1]} dep={circ[x][2]}")
+	print(f"{x:20} ge={circ[x][0]:7}  tr={circ[x][1]:5}  ltp={circ[x][2]:3}")
 

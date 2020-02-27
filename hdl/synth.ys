@@ -1,7 +1,7 @@
 design -reset
 read_verilog -D E1S_NO_AESI -D E1S_NO_SM4 -defer enc1s.v sboxes.v
 hierarchy -top enc1s 
-rename enc1s enc1s_aesenc_only
+rename enc1s enc1s_aes_enc_only
 synth -flatten; abc -dff -g cmos; opt -fast
 tee -a synth.tmp stat -tech cmos
 tee -a synth.tmp ltp -noff
