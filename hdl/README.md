@@ -74,8 +74,8 @@ There's a [Yosys](http://www.clifford.at/yosys/) script to perform gate
 counts against a mock ASIC cell library. Running `make rep` will perform
 synthesis and report counts on four targets:
 
-| **Target**           | **Gates** | **Transistors** | **LTP** |
-|:--------------------:|:-------:|:------:|:---:|
+| **Target**           | **Gate Equivalents** | **Transistors** | **LTP** |
+|----------------------|--------:|-------:|----:|
 | AES, Encrypt only    |  644.0  |  2576  |  24 |
 | AES                  | 1215.0  |  4860  |  29 |
 | SM4                  |  757.0  |  3028  |  27 |
