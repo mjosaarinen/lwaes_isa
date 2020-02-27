@@ -7,23 +7,21 @@
 
 import sys
 
-
-# "For evaluation purposes we synthesized these cores for RV32 and RV64 
-#	to the following mockup ASIC cell library:"
+# "For evaluation purposes we [use] the following mockup ASIC cell library:"
 
 wt = {}
 wt["$_NOT_"]	= 0.5
-wt["$_NAND_"] 	= 1.0
+wt["$_NAND_"]	= 1.0
 wt["$_NOR_"]	= 1.0
 wt["$_XOR_"]	= 3.0
 wt["$_XNOR_"]	= 3.0
-wt["$_DFF_P_"] 	= 4.0
-wt["$_AOI3_"] 	= 1.5
+wt["$_DFF_P_"]	= 4.0
+wt["$_AOI3_"]	= 1.5
 wt["$_OAI3_"]	= 1.5
-wt["$_AOI4_"] 	= 2.0
+wt["$_AOI4_"]	= 2.0
 wt["$_OAI4_"]	= 2.0
-wt["$_NMUX_"] 	= 2.5
-wt["$_MUX_"] 	= 3.0
+wt["$_NMUX_"]	= 2.5
+wt["$_MUX_"]	= 3.0
 
 circ = {}
 
@@ -65,14 +63,14 @@ for fn in sys.argv[1:]:
 			if lv[0] in wt:
 				ge = ge + float(lv[1]) * wt[lv[0]]
 			else:
-				print(f"{fn}:{li} unknown gate {lv[0]}")		
+				print(f"{fn}:{li} unknown gate {lv[0]}")
 
 		# update it
 		if targ != "":
 			circ[targ] = ( ge, tr, ltp )
 
-# print the output
+# print the counts
 
 for x in circ:
-	print(f"{x:20} ge={circ[x][0]:7}  tr={circ[x][1]:5}  ltp={circ[x][2]:3}")
+	print(f"{x:20}  ge={circ[x][0]:7}  tr={circ[x][1]:5}  ltp={circ[x][2]:3}")
 
