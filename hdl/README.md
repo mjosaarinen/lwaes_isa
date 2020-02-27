@@ -7,7 +7,7 @@ s-box implementations for AES (forward and reverse) and SM4.
 The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
 better implementation, but this one is pretty compact as can be seen.
 
-I popped this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
+I've tested this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
 an obvious way, with fn going into funct7), wrote wrappers for inline assembly
 and ran the test code first in a simulator, and then on FPGA. It seems to work 
 fine. (Our SoC also has a hardware AES module, can run against it too.)
@@ -26,10 +26,13 @@ Verilog (which is freely available for Debian/Ubuntu etc). I have also tried
 this on Xilinx xsim and vivado with the C language test suite (the same
 one as in the parent).
 
-Apologies if you're offended by my verilog style..
+##	Testing
 
-Cheers,
-- markku
+No output from `make test` implies that output matches with 
+[tbref.txt](tbref.txt). More test output can be generated using the C
+emulator code (in parent directory); the same testbench output can be 
+generated with `./xtest tb`; just modify the ` test_hwtb()` function
+in [../main.c](../main.c) to generate more test cases.
 
 ```console
 $ make
@@ -65,9 +68,22 @@ vvp -n sim.vvp | grep "[TB]" | diff - tbref.txt
 $
 ```
 
-No output from `make test` implies that output matches with 
-[tbref.txt](tbref.txt). More test output can be generated using the C
-emulator code (in parent directory); the same testbench output can be 
-generated with `./xtest tb`; just modify the ` test_hwtb()` function
-in [../main.c](../main.c) to generate more test cases.
+##	Gate Counts
+
+There's a [Yosys](http://www.clifford.at/yosys/) script to perform gate
+counts against a mock ASIC cell library. Running `make rep` will perform
+synthesis and report counts on four targets:
+
+| **Target**           | **Gates** | **Transistors** | **LTP** |
+|:--------------------:|:-------:|:------:|:---:|
+| AES, Encrypt only    |  644.0  |  2576  |  24 |
+| AES                  | 1215.0  |  4860  |  29 |
+| SM4                  |  757.0  |  3028  |  27 |
+| AES + SM4 (Full)     | 1629.5  |  6518  |  29 |
+
+LTP is the reported *Longest Topological Path* and essentially a circuit
+depth / gate delay measure.
+
+Cheers,
+- markku
 
