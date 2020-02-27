@@ -103,6 +103,10 @@ module sbox_inv_mid( output [17:0] y, input [20:0] x );
 
 endmodule
 
+//  === AES (Forward) ===
+
+`ifndef E1S_NO_AES
+
 //  top (inner) linear layer for AES
 
 module sbox_aes_top( output [20:0] y, input [7:0] x);
@@ -199,6 +203,13 @@ module aes_sbox( output [7:0] fx, input [7:0] in );
 
 endmodule
 
+`endif
+
+
+//  === AES^-1 (Inverse) ===
+
+`ifndef E1S_NO_AESI
+
 //  top (inner) linear layer for AES^-1
 
 module sbox_aesi_top( output [20:0] y, input [7:0] x);
@@ -293,7 +304,14 @@ module aesi_sbox( output [7:0] fx, input [7:0] in );
 
 endmodule
 
+`endif
+
+//  === SM4 ===
+
+`ifndef E1S_NO_SM4
+
 //  top (inner) linear layer for SM4
+
 
 module sbox_sm4_top( output [20:0] y, input [7:0] x);
 
@@ -390,3 +408,4 @@ module sm4_sbox( output [7:0] fx, input [7:0] in );
 
 endmodule
 
+`endif

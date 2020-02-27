@@ -1,0 +1,32 @@
+design -reset
+read_verilog -D E1S_NO_AESI -D E1S_NO_SM4 -defer enc1s.v sboxes.v
+hierarchy -top enc1s 
+rename enc1s enc1s_aesenc_only
+synth -flatten; abc -dff -g cmos; opt -fast
+tee -a synth.tmp stat -tech cmos
+tee -a synth.tmp ltp -noff
+
+design -reset
+read_verilog -D E1S_NO_SM4 -defer enc1s.v sboxes.v
+hierarchy -top enc1s 
+rename enc1s enc1s_aes_encdec
+synth -flatten; abc -dff -g cmos; opt -fast
+tee -a synth.tmp stat -tech cmos
+tee -a synth.tmp ltp -noff
+
+design -reset
+read_verilog -D E1S_NO_AES -D E1S_NO_AESI -defer enc1s.v sboxes.v
+hierarchy -top enc1s 
+rename enc1s enc1s_sm4_only
+synth -flatten; abc -dff -g cmos; opt -fast
+tee -a synth.tmp stat -tech cmos
+tee -a synth.tmp ltp -noff
+
+design -reset
+read_verilog -defer enc1s.v sboxes.v
+hierarchy -top enc1s
+rename enc1s enc1s_full
+synth -flatten; abc -dff -g cmos; opt -fast
+tee -a synth.tmp stat -tech cmos
+tee -a synth.tmp ltp -noff
+

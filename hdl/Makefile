@@ -10,18 +10,27 @@ export
 HDL		= 	$(wildcard *.v)
 SIM		=	sim.vvp
 
+#	simulate
+
 sim:	$(SIM)
 	vvp -N $(SIM)
 
 $(SIM):	$(HDL)
 	iverilog -o sim.vvp $(HDL)
 
+#	synthesis and reporting
+
+synth.tmp:	$(HDL) synth.ys
+	yosys -v1 synth.ys
+
+rep:	synth.tmp
+	./yoparse.py synth.tmp
+
 #	prints differing lines
 
 test:	$(SIM)
 	vvp -n $(SIM) | grep "[TB]" | diff - tbref.txt
 
-
 clean:
-	rm -f	$(SIM)
+	rm -f	$(SIM) synth.tmp
 

@@ -4,7 +4,6 @@
 
 //  Proposed ENC1S instruction for lightweight AES, AES^-1, and SM4 (RV32).
 
-
 //  Multiply by 0x02 in AES's GF(256) - LFSR style
 
 module aes_xtime( output [7:0] out, input [7:0] in );
@@ -12,6 +11,8 @@ module aes_xtime( output [7:0] out, input [7:0] in );
 endmodule
 
 //  aes encrypt
+
+`ifndef E1S_NO_AES
 
 module aes_t( output [31:0] out, input [7:0] in, input f );
 
@@ -27,7 +28,11 @@ module aes_t( output [31:0] out, input [7:0] in, input f );
 
 endmodule
 
+`endif
+
 //  aes decrypt
+
+`ifndef E1S_NO_AESI
 
 module aesi_t( output [31:0] out, input [7:0] in, input f );
 
@@ -48,7 +53,11 @@ module aesi_t( output [31:0] out, input [7:0] in, input f );
 
 endmodule
 
+`endif
+
 //  sm4 encrypt / decrypt
+
+`ifndef E1S_NO_SM4
 
 module sm4_t( output [31:0] out, input [7:0] in, input f );
 
@@ -62,6 +71,8 @@ module sm4_t( output [31:0] out, input [7:0] in, input f );
         { x[5:0], x, x[7:6], x[7:2], x[1:0] ^ x[7:6], x[7:2] ^ x[5:0], x[1:0] };
 
 endmodule
+
+`endif
 
 //  Combinatorial logic for the "ENC1S instruction" itself
 
@@ -81,17 +92,32 @@ module enc1s(
 
     //  expand to 32 bits
 
+`ifndef E1S_NO_AES
     wire [31:0] aes_32;
-    wire [31:0] aesi_32;
-    wire [31:0] sm4_32;
-
     aes_t   aes     ( aes_32,  x, fn[2] );
-    aesi_t  aesi    ( aesi_32, x, fn[2] );
-    sm4_t   sm4     ( sm4_32,  x, fn[2] );
+`endif
 
-    wire [31:0] y = fn[4:3] == 2'b00 ?  aes_32 :
+`ifndef E1S_NO_AESI
+    wire [31:0] aesi_32;
+    aesi_t  aesi    ( aesi_32, x, fn[2] );
+`endif
+
+`ifndef E1S_NO_SM4
+    wire [31:0] sm4_32;
+    sm4_t   sm4     ( sm4_32,  x, fn[2] );
+`endif
+
+    wire [31:0] y =
+`ifndef E1S_NO_AES
+                    fn[4:3] == 2'b00 ?  aes_32 :
+`endif
+`ifndef E1S_NO_AESI
                     fn[4:3] == 2'b01 ?  aesi_32 :
-                    fn[4:3] == 2'b10 ?  sm4_32 : 32'hDEADBABE;
+`endif
+`ifndef E1S_NO_SM4
+                    fn[4:3] == 2'b10 ?  sm4_32 :
+`endif
+                    32'h00000000;
 
     //  rotate output
 
