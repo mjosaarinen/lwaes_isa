@@ -89,8 +89,8 @@ int chkhex(const char *lab, const void *data, size_t len, const char *ref)
 
 int test_aes()
 {
-    uint8_t pt[16], ct[16], xt[16], key[32];
-    uint32_t rk[AES256_RK_WORDS];
+    uint8_t pt[16] = { 0 }, ct[16] = { 0 }, xt[16] = { 0 }, key[32] = { 0};
+    uint32_t rk[AES256_RK_WORDS + 1];
     int fail = 0;
 
     //  FIPS 197 test vectors
@@ -162,7 +162,7 @@ int test_aes()
 int test_sm4()
 {
     uint8_t pt[16], ct[16], xt[16], key[16];
-    uint32_t rk[SM4_RK_WORDS];
+    uint32_t rk[SM4_RK_WORDS + 1];
     int fail = 0;
 
     //  the sole test vector in the standard itself
