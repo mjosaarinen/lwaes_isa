@@ -4,9 +4,6 @@
 
 #	Minimal makefile for Icarus verilog
 
-#	export all variables to sub-makefiles
-export				
-
 HDL		= 	$(wildcard *.v)
 SIM		=	sim.vvp
 
