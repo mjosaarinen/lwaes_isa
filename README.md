@@ -15,30 +15,39 @@ as defined in [FIPS 197](doc/NIST.FIPS.197.pdf).
 [(english spec)](doc/sm4en.pdf), also defined in GB/T 32907-2016 and ISO/IEC
 18033-3:2010/DAmd 2. SM4 has only one key size, 128 bits.
 
-A single instruction, `ENC1S` is used for encryption, decryption, and key
+A single instruction, ENC1S is used for encryption, decryption, and key
 schedule for both ciphers. For design rationale and some analysis, see the 
 short report [A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
 
 A more complex ISA extension may be appropriate for higher-end CPUs. The
-primary goal of lwaes is to eliminate timing-side vulnerabilities. The 
-speed-up over pure software table-based implementations is roughly 500 %.
+primary goal of ENC1S / lweas is to eliminate timing-side vulnerabilities.
+Speed-up over pure software table-based implementations is roughly 500 %.
 
-This directory contains a mock implementation of the instruction together
-with full encryption, decryption, and key schedule pseudocode of
-AES-128/192/256 and SM4-128, intended for instruction counts and other 
-evaluation. Assembler listings for the same functions (with a hacky
+
+### Software and Hardware 
+
+This directory contains an "emulator" C implementation of the instruction
+together with runnable pseudocode for full encryption, decryption, and
+key schedule of AES-128/192/256 and SM4-128. These are intended for
+instruction counts, test vector generation, and other such evaluation.
+Real assembler listings for the same functions (using a seriously hacky
 macro instruction encoding) can be found under the [asm](asm) directory.
-Furthermore the [hdl](hdl) directory contains Verilog combinatorial logic
-for the core instruction. The assembler and HDL have been tested on a an
-RV32 emulator and the "Pluto" core on an FPGA target.
 
-The assembler and C implementations use the same AES and SM4 API,
-specified in [aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
+The assembler and C code use the same AES and SM4 API, specified in 
+[aes_enc.h](aes_enc.h) (AES-128/192/256 encryption), 
 [aes_dec.h](aes_dec.h) (AES-128/192/256 decryption) and
 [sm4_encdec.h](sm4_encdec.h) (SM4-128 encryption and decryption).
 The API is split in pieces since AES and SM4 are independent of
 each other and some designers may additionally want to save space by not
 implementing inverse AES (not required for decryption in may modes).
+
+The [hdl](hdl) directory contains Verilog combinatorial logic for the core
+instruction. Simulator and basic CMOS gate count synthesis scripts are
+provided for Icarus Verilog and Yosys open source tools. The same assembler
+and HDL have been additionally tested with PQShield's proprietary RISC-V
+emulator and the "Pluto" core on a live FPGA target, although source
+code for those is not provided here.
+
 
 ### Technical Details
 
