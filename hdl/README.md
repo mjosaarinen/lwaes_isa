@@ -53,7 +53,7 @@ depth / gate delay measure.
 (Currently the weights are such that transistors = 4*GE, but this can be
 tuned in the [yoparse.py](yoparse.py) script.)
 
-Yosys version used: 
+[Yosys](http://www.clifford.at/yosys/) version: 
 `Yosys 0.9+1706 (git sha1 cd60f079, clang 6.0.0-1ubuntu2 -fPIC -Os)`
 
 
