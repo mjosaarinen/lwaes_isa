@@ -61,9 +61,9 @@ Yosys version used:
 
 No output from `make test` implies that output matches with 
 [tbref.txt](tbref.txt). More test cases can be generated using the 
-C emulator code (in parent directory). The same testbench output is
-generated with `./xtest tb`. Just expand the ` test_hwtb()` function
-[../test_main.c](../test_main.c) if you need more test cases.
+C emulator code (in parent directory). Matching [enc1s_tb.v](enc1s_tb.v) 
+output is generated with argument `./xtest tb`. Just expand the 
+` test_hwtb()`  function in [../test_main.c](../test_main.c) to your needs.
 
 ```console
 $ make
