@@ -2,37 +2,68 @@
 
 2020-01-29  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v) has 
-s-box implementations for AES (forward and reverse) and SM4.
-The thing is 100 lines + sboxes. Perhaps timing can be improved with a 
-better implementation, but this one is pretty compact as can be seen.
+2020-02-28	Updated with gate counts.
 
-I've tested this into our Pluto RV32 core as a Custom0 (encoded as an r-type in 
-an obvious way, with fn going into funct7), wrote wrappers for inline assembly
-and ran the test code first in a simulator, and then on FPGA. It seems to work 
-fine. (Our SoC also has a hardware AES module, can run against it too.)
+The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v)
+has S-box implementations for AES and SM4. As can be seen, the entire thing
+is only about 100 lines + sboxes. Timing can be significantly further 
+improved. 
+
+If your design doesn't need both AES and SM4, or you just need the forward
+AES, you can use macros `E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to 
+disable forward AES, inverse AES, or SM4 respectively.
 
 A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
-layers for the Boyar-Peralta AES S-Box to demonstrate the fact that all 
-three s-box types can share circuitry. That file has some commentary on this.
+layers for the [Boyar-Peralta](https://eprint.iacr.org/2011/332.pdf) AES
+S-Box to demonstrate the fact that all three s-box types can share circuitry.
+The [sboxes.v](sboxes.v) file has some commentary on this.
 
-However, I didn't mux it as the mux logic would be relatively large. 
-Of course, all of that is irrelevant for FPGAs where it's probably a table 
-anyway -- the purpose was just wanted to demonstrate the relationship 
-between the S-Boxes.
+Currently the code does not mux the middle layer, which would reduce gate
+count. Also note that the the 21->8 bit bottom layers (which are linear) 
+can be merged ("collapsed into") the 8->32 bit output layers since they are 
+also linear. This would reduce timing and possibly gate count too. The
+present code prioritizes readability over these considerations.
 
-There's a super-simplistic [Makefile](Makefile) and a testbench for Icarus 
-Verilog (which is freely available for Debian/Ubuntu etc). I have also tried 
-this on Xilinx xsim and vivado with the C language test suite (the same
-one as in the parent).
+There's a simple [Makefile](Makefile) and a testbench for Icarus 
+Verilog (which is freely available for Debian/Ubuntu etc). 
 
-##	Testing
+I have also tested this on Xilinx xsim and vivado with the C and Assembler
+language test suites (see parent directory). PQShield's Pluto RV32 core 
+(on an Artix-7 FPGA) was used, although build files are not provided for
+that.
+
+
+##	CMOS Area and Latency Estimate
+
+There's a [Yosys](http://www.clifford.at/yosys/) script to make area
+estimates against a mock CMOS ASIC cell library. Running `make rep` will
+perform synthesis and report gate and transistor counts on four separate
+"feature sets" of the instruction:
+
+| **Target**           | **Gate Equivalents** | **Transistors** | **LTP** |
+|----------------------|--------:|-------:|----:|
+| AES Encrypt (only)   |  642.0  |  2568  |  25 |
+| AES                  | 1240.0  |  4960  |  28 |
+| SM4                  |  766.5  |  3066  |  25 |
+| AES + SM4 (full)     | 1678.5  |  6714  |  28 |
+
+LTP is the reported *Longest Topological Path* and essentially a circuit
+depth / gate delay measure.
+
+(Currently the weights are such that transistors = 4*GE, but this can be
+tuned in the (yoparse.py)[yoparse.py] script.)
+
+Yosys version used: 
+`Yosys 0.9+1706 (git sha1 cd60f079, clang 6.0.0-1ubuntu2 -fPIC -Os)`
+
+
+##	Testing with a Simulator
 
 No output from `make test` implies that output matches with 
-[tbref.txt](tbref.txt). More test output can be generated using the C
-emulator code (in parent directory); the same testbench output can be 
-generated with `./xtest tb`; just modify the ` test_hwtb()` function
-in [../main.c](../main.c) to generate more test cases.
+[tbref.txt](tbref.txt). More test outpust can be generated using the 
+C emulator code (in parent directory); the same testbench output can be 
+generated with `./xtest tb`; just modify the ` test_hwtb()` function in 
+[../main.c](../main.c) to generate more test cases.
 
 ```console
 $ make
@@ -68,25 +99,9 @@ vvp -n sim.vvp | grep "[TB]" | diff - tbref.txt
 $
 ```
 
-##	Gate Counts
-
-There's a [Yosys](http://www.clifford.at/yosys/) script to make simple gate
-counts against a mock ASIC cell library. Running `make rep` will perform
-synthesis and report counts on four synthesis feature sets of the instruction:
-
-| **Target**           | **Gate Equivalents** | **Transistors** | **LTP** |
-|----------------------|--------:|-------:|----:|
-| AES, Encrypt only    |  644.0  |  2576  |  24 |
-| AES                  | 1215.0  |  4860  |  29 |
-| SM4                  |  757.0  |  3028  |  27 |
-| AES + SM4 (Full)     | 1629.5  |  6518  |  29 |
-
-If your design doesn't need both AES and SM4, then you can just define macros
-`E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to disable forward AES, inverse
-AES, or SM4 respectively.
-
-LTP is the reported *Longest Topological Path* and essentially a circuit
-depth / gate delay measure.
+Icarus Verilog verions:
+`Icarus Verilog Parser/Elaborator version 11.0 (devel) (s20150603-796-g875431a3)`
+`Icarus Verilog runtime version 11.0 (devel) (s20150603-796-g875431a3)`
 
 Cheers,
 - markku

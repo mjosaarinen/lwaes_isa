@@ -27,12 +27,12 @@ wt["$_MUX_"]	= 3.0
 
 for fn in sys.argv[1:]:
 
-	print(f"=== summary from {fn}")
+	print(f"=== Summary for {fn} ===")
 
 	with open(fn, 'r') as f:
 		lns = f.readlines()
 
-	circ = {}
+	tb = {}
 	li = 0
 	targ = ""
 	ge = 0.0
@@ -66,10 +66,10 @@ for fn in sys.argv[1:]:
 
 		# update it
 		if targ != "":
-			circ[targ] = ( ge, tr, ltp )
+			tb[targ] = ( ge, tr, ltp )
 
 	# print the counts
 
-	for x in circ:
-		print(f"{x:20}  ge={circ[x][0]:7}  tr={circ[x][1]:5}  ltp={circ[x][2]:3}")
+	for x in tb:
+		print(f"{x:20}  ge={tb[x][0]:7}  tr={tb[x][1]:5}  ltp={tb[x][2]:3}")
 

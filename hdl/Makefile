@@ -18,6 +18,7 @@ $(SIM):	$(HDL)
 #	synthesis and reporting
 
 synth.tmp:	$(HDL) synth.ys
+	rm -f synth.tmp
 	yosys -v1 synth.ys
 
 rep:	synth.tmp
