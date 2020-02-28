@@ -59,7 +59,7 @@ Yosys version used:
 
 ##	Testing with a Simulator
 
-No output from `make test` implies that output matches with 
+No output from `make test` implies that simulator output matches with 
 [tbref.txt](tbref.txt). More test cases can be generated using the 
 C emulator code (in parent directory). Matching [enc1s_tb.v](enc1s_tb.v) 
 output is generated with argument `./xtest tb`. Just expand the 
