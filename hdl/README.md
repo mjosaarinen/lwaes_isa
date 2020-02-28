@@ -60,10 +60,10 @@ Yosys version used:
 ##	Testing with a Simulator
 
 No output from `make test` implies that output matches with 
-[tbref.txt](tbref.txt). More test outpust can be generated using the 
-C emulator code (in parent directory); the same testbench output can be 
-generated with `./xtest tb`; just modify the ` test_hwtb()` function in 
-[../main.c](../main.c) to generate more test cases.
+[tbref.txt](tbref.txt). More test cases can be generated using the 
+C emulator code (in parent directory). The same testbench output is
+generated with `./xtest tb`. Just expand the ` test_hwtb()` function
+[../main.c](../main.c) if you need more test cases.
 
 ```console
 $ make
