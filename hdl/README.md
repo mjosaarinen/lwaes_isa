@@ -46,8 +46,8 @@ and transistor counts on four separate "feature sets" of the instruction:
 | SM4                  |  766.5  |  3066  |  25 |
 | AES + SM4 (full)     | 1678.5  |  6714  |  28 |
 
-LTP is the reported *Longest Topological Path* and essentially a circuit
-depth / gate delay measure.
+LTP is the reported *Longest Topological Path* and is a circuit depth / 
+gate delay measure.
 
 (Currently the weights are such that transistors = 4*GE, but this can be
 tuned in the [yoparse.py](yoparse.py) script.)
