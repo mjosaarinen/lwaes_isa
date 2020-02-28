@@ -99,7 +99,7 @@ vvp -n sim.vvp | grep "[TB]" | diff - tbref.txt
 $
 ```
 
-Icarus Verilog verions:
+[Icarus Verilog](https://github.com/steveicarus/iverilog) versions:
 `Icarus Verilog Parser/Elaborator version 11.0 (devel) (s20150603-796-g875431a3)`
 `Icarus Verilog runtime version 11.0 (devel) (s20150603-796-g875431a3)`
 
