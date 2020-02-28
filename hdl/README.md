@@ -51,7 +51,7 @@ LTP is the reported *Longest Topological Path* and essentially a circuit
 depth / gate delay measure.
 
 (Currently the weights are such that transistors = 4*GE, but this can be
-tuned in the (yoparse.py)[yoparse.py] script.)
+tuned in the [yoparse.py] script.)
 
 Yosys version used: 
 `Yosys 0.9+1706 (git sha1 cd60f079, clang 6.0.0-1ubuntu2 -fPIC -Os)`
