@@ -35,10 +35,9 @@ that.
 
 ##	CMOS Area and Latency Estimate
 
-There's a [Yosys](http://www.clifford.at/yosys/) script to make area
-estimates against a mock CMOS ASIC cell library. Running `make rep` will
-perform synthesis and report gate and transistor counts on four separate
-"feature sets" of the instruction:
+There's a Yosys script to make area estimates against a mock CMOS ASIC
+cell library. Running `make rep` will perform synthesis and report gate
+and transistor counts on four separate "feature sets" of the instruction:
 
 | **Target**           | **Gate Equivalents** | **Transistors** | **LTP** |
 |----------------------|--------:|-------:|----:|
