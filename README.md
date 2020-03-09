@@ -17,7 +17,7 @@ as defined in [FIPS 197](doc/NIST.FIPS.197.pdf).
 
 A single instruction, ENC1S is used for encryption, decryption, and key
 schedule for both ciphers. For design rationale and some analysis, see the 
-short report [A Lightweight ISA Extension for AES and SM4](doc/lwaes.pdf).
+short report [A Lightweight ISA Extension for AES and SM4](https://arxiv.org/abs/2002.07041) (to appear at SECRISC-V 2020).
 
 A more complex ISA extension may be appropriate for higher-end CPUs. The
 primary goal of ENC1S / lweas is to eliminate timing-side vulnerabilities.
