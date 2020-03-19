@@ -215,9 +215,6 @@ $
 *   Despite being proposed in a personal capacity, this proposal
     constitutes a "contribution" as defined in Section 1.4 of the
     RISC-V foundation membership agreement.
-*   This distribution is offered under MIT license agreement, so you're free
-    to use the pseudocode to build actual cipher implementations (that's
-    what it's for).
 
 Cheers,
 - markku
