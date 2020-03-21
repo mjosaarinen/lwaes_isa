@@ -26,11 +26,21 @@ uint32_t rv_unshfl(uint32_t rs1, uint32_t rs2);
 
 //  === RV32/RV64 ===
 
+//  carryless multiply
+uint32_t rv_clmul(uint32_t rs1, uint32_t rs2);
+uint32_t rv_clmulh(uint32_t rs1, uint32_t rs2);
+uint32_t rv_clmulr(uint32_t rs1, uint32_t rs2);
+
 //  and with negate ANDN
 uint64_t rv_andn(uint64_t rs1, uint64_t rs2);
 
 
 //  === RV64 ===
+
+//  carryless multiply
+uint64_t rv_clmulw(uint64_t rs1, uint64_t rs2);
+uint64_t rv_clmulhw(uint64_t rs1, uint64_t rs2);
+uint64_t rv_clmulrw(uint64_t rs1, uint64_t rs2);
 
 //  rotate right RORW / RORIW
 uint64_t rv_rorw(uint64_t rs1, uint64_t rs2);

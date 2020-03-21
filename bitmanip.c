@@ -6,6 +6,62 @@
 
 #include "bitmanip.h"
 
+//  carryless multiply
+
+uint32_t rv_clmul(uint32_t rs1, uint32_t rs2)
+{
+	uint32_t x = 0;
+	for (int i = 0; i < 32; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 << i;
+	return x;
+}
+
+uint32_t rv_clmulh(uint32_t rs1, uint32_t rs2)
+{
+	uint32_t x = 0;
+	for (int i = 1; i < 32; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 >> (32 - i);
+	return x;
+}
+
+uint32_t rv_clmulr(uint32_t rs1, uint32_t rs2)
+{
+	uint32_t x = 0;
+	for (int i = 0; i < 32; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 >> (32 - i - 1);
+	return x;
+}
+
+uint64_t rv_clmulw(uint64_t rs1, uint64_t rs2)
+{
+	uint64_t x = 0;
+	for (int i = 0; i < 64; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 << i;
+	return x;
+}
+
+uint64_t rv_clmulhw(uint64_t rs1, uint64_t rs2)
+{
+	uint64_t x = 0;
+	for (int i = 1; i < 64; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 >> (64 - i);
+	return x;
+}
+
+uint64_t rv_clmulrw(uint64_t rs1, uint64_t rs2)
+{
+	uint64_t x = 0;
+	for (int i = 0; i < 64; i++)
+		if ((rs2 >> i) & 1)
+			x ^= rs1 >> (64 - i - 1);
+	return x;
+}
+
 //  rotate right ROR / RORI
 
 uint32_t rv_ror(uint32_t rs1, uint32_t rs2)
