@@ -1,0 +1,24 @@
+#	.editorconfig
+#	2019-09-02	Markku-Juhani O. Saarinen <mjos@pqshield.com>
+#	Works on GitHub. See: https://EditorConfig.org
+
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{c,h,s,S,v}]
+charset = latin1
+indent_style = tab
+indent_size = 4
+
+[*.{txt,md,tex}]
+charset = utf-8
+indent_style = space
+ident_size = 4
+
+[Makefile]
+indent_style = tab
+ident_size = 4
+

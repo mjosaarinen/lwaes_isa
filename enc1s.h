@@ -11,12 +11,12 @@
 
 //  Function codes -- see enc1s.c
 
-#define AES_FN_ENC  (0 << 2)
-#define AES_FN_FWD  (1 << 2)
-#define AES_FN_DEC  (2 << 2)
-#define AES_FN_REV  (3 << 2)
-#define SM4_FN_ENC  (4 << 2)
-#define SM4_FN_KEY  (5 << 2)
+#define AES_FN_ENC	(0 << 2)
+#define AES_FN_FWD	(1 << 2)
+#define AES_FN_DEC	(2 << 2)
+#define AES_FN_REV	(3 << 2)
+#define SM4_FN_ENC	(4 << 2)
+#define SM4_FN_KEY	(5 << 2)
 // #define AES_FN_RMC   (6 << 2)
 
 //  ENC1S: Instruction for a byte select, single S-box, and linear operation.
@@ -27,5 +27,4 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
 
 uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn);
 
-#endif /* _ENC1S_H_ */
-
+#endif										/* _ENC1S_H_ */
