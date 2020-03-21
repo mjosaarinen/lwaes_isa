@@ -11,9 +11,6 @@
 
 //  === RV32 ===
 
-//  rotate right ROR / RORI
-uint32_t rv_ror(uint32_t rs1, uint32_t rs2);
-
 //  generalized reverse GREV / GREVI
 uint32_t rv_grev(uint32_t rs1, uint32_t rs2);
 
@@ -23,17 +20,18 @@ uint32_t rv_shfl(uint32_t rs1, uint32_t rs2);
 //  generalized unshuffle UNSHFL / UNSHFLI
 uint32_t rv_unshfl(uint32_t rs1, uint32_t rs2);
 
-
-//  === RV32/RV64 ===
+//  === 32/64 ===
 
 //  carryless multiply
 uint32_t rv_clmul(uint32_t rs1, uint32_t rs2);
 uint32_t rv_clmulh(uint32_t rs1, uint32_t rs2);
 uint32_t rv_clmulr(uint32_t rs1, uint32_t rs2);
 
+//  rotate right ROR / RORI
+uint32_t rv_ror(uint32_t rs1, uint32_t rs2);
+
 //  and with negate ANDN
 uint64_t rv_andn(uint64_t rs1, uint64_t rs2);
-
 
 //  === RV64 ===
 
