@@ -39,11 +39,15 @@ int test_hwtb()
 	return 0;
 }
 
+int kek();
+
 //  stub main: run unit tests
 
 int main(int argc, char **argv)
 {
 	int fail = 0;
+
+	return kek();
 
 	//  generate hardware testbench data ?
 	if (argc > 1 && strcmp(argv[1], "tb") == 0) {
