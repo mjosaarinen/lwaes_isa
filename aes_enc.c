@@ -144,7 +144,7 @@ void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
 		rk += 4;							//  step pointer by one subkey
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rvb_ror(t3, 8);					//  rotate 8 bits (little endian!)
+		tr = rvb_ror(t3, 8);				//  rotate 8 bits (little endian!)
 		t0 = enc4s(t0, tr, AES_FN_FWD);		//  SubWord()
 		t1 ^= t0;
 		t2 ^= t1;

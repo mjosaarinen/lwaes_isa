@@ -12,10 +12,10 @@
 #include "aes_enc.h"
 #include "aes_gcm.h"
 
-//	disable shift reduction
+//  disable shift reduction
 #define NO_SHIFTRED
 
-//	disable karatsuba multiplication
+//  disable karatsuba multiplication
 #define NO_KARATSUBA
 
 #ifndef GETU32_BE
@@ -79,15 +79,6 @@ static void gf128mul(uint8_t z[16], const uint8_t x[16], const uint8_t y[16])
 	PUTU32_BE(z + 12, z0);
 }
 
-static void gf128mul(uint8_t z[16], const uint8_t x[16], const uint8_t y[16])
-{
-	uint64_t x0, x1, y0, y1, z0, z1;
-
-
-
-}
-
-
 int kek()
 {
 	uint8_t a[16] = { 0 };
@@ -118,14 +109,14 @@ int kek()
 	prt128(r);
 	printf(" = r\n");
 
-	a0 = rvb_grevw( ((uint64_t *) a)[0], 7 );
-	a1 = rvb_grevw( ((uint64_t *) a)[1], 7 );
+	a0 = rvb_grevw(((uint64_t *) a)[0], 7);
+	a1 = rvb_grevw(((uint64_t *) a)[1], 7);
 
-	b0 = rvb_grevw( ((uint64_t *) b)[0], 7 );
-	b1 = rvb_grevw( ((uint64_t *) b)[1], 7 );
+	b0 = rvb_grevw(((uint64_t *) b)[0], 7);
+	b1 = rvb_grevw(((uint64_t *) b)[1], 7);
 
 
-	//	Top and bottom words: 2 x CLMULHW, 2 x CLMULW
+	//  Top and bottom words: 2 x CLMULHW, 2 x CLMULW
 	x1 = rvb_clmulhw(a0, b0);
 	x0 = rvb_clmulw(a0, b0);
 
@@ -133,19 +124,19 @@ int kek()
 	z0 = rvb_clmulw(a1, b1);
 
 #ifdef NO_SHIFTRED
-	//	Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
+	//  Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
 	t1 = rvb_clmulhw(z1, 0x87);
 	t0 = rvb_clmulw(z1, 0x87);
 	t1 = t1 ^ z0;
 #else
-	//	With shift reduction: 6 x SHIFT, 8 x XOR 
+	//  With shift reduction: 6 x SHIFT, 8 x XOR 
 	t1 = (z1 >> 63) ^ (z1 >> 62) ^ (z1 >> 57) ^ z0;
 	t0 = z1 ^ (z1 << 1) ^ (z1 << 2) ^ (z1 << 7);
 #endif
 
 #ifdef NO_KARATSUBA
 
-	//	Without Karatsuba; 2 x CLMULHW, 2 x CLMULW, 4 * XOR
+	//  Without Karatsuba; 2 x CLMULHW, 2 x CLMULW, 4 * XOR
 	y1 = rvb_clmulhw(a0, b1);
 	y0 = rvb_clmulw(a0, b1);
 	t1 = t1 ^ y1;
@@ -157,7 +148,7 @@ int kek()
 
 #else
 
-	//	With Karatsuba; 1 x CLMULHW, 1 x CLMULW, 8 * XOR
+	//  With Karatsuba; 1 x CLMULHW, 1 x CLMULW, 8 * XOR
 	t1 = t1 ^ x1 ^ z1;
 	t0 = t0 ^ x0 ^ z0;
 	z0 = a0 ^ a1;
@@ -170,23 +161,23 @@ int kek()
 #endif
 
 #ifdef NO_SHIFTRED
-	//	Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
+	//  Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
 	t1 = rvb_clmulhw(y1, 0x87);
 	t0 = rvb_clmulw(y1, 0x87);
 	t1 = t1 ^ y0;
 #else
-	//	With shift reduction: 6 x SHIFT, 8 x XOR 
+	//  With shift reduction: 6 x SHIFT, 8 x XOR 
 	t1 = (y1 >> 63) ^ (y1 >> 62) ^ (y1 >> 57) ^ y0;
 	t0 = y1 ^ (y1 << 1) ^ (y1 << 2) ^ (y1 << 7);
 #endif
 
-	//	Low word; 2 x XOR
+	//  Low word; 2 x XOR
 	x1 = x1 ^ t1;
 	x0 = x0 ^ t0;
 
-	((uint64_t *) s)[0] = rvb_grevw( x0, 7 );
-	((uint64_t *) s)[1] = rvb_grevw( x1, 7 );
-	
+	((uint64_t *) s)[0] = rvb_grevw(x0, 7);
+	((uint64_t *) s)[1] = rvb_grevw(x1, 7);
+
 	prt128(s);
 	printf(" = s\n");
 
