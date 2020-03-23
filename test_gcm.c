@@ -111,14 +111,19 @@ int test_ghash()
 {
 	int fail = 0;
 
+	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
+	ghash_rev = rv64_ghash_rev;
+	ghash_mul = rv64_ghash_mul;
+	fail += test_gcm();
+
 	printf("[INFO] === GCM using rv32_ghash_mul() ===\n");
 	ghash_rev = rv32_ghash_rev;
 	ghash_mul = rv32_ghash_mul;
 	fail += test_gcm();
 
-	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
-	ghash_rev = rv64_ghash_rev;
-	ghash_mul = rv64_ghash_mul;
+	printf("[INFO] === GCM using rv32_ghash_mul_kar() ===\n");
+	ghash_rev = rv32_ghash_rev;
+	ghash_mul = rv32_ghash_mul_kar;
 	fail += test_gcm();
 
 	return fail;

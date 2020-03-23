@@ -41,7 +41,7 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	a0 = a0 ^ t0;
 	a1 = a1 ^ t1;
 
-	//  Top and bottom words: 2 x CLMULHW, 2 x CLMULW
+	//  Top and bottom, witha and w/o Karatsuba: 2 x CLMULHW, 2 x CLMULW
 	x3 = rvb_clmulhw(a1, b1);
 	x2 = rvb_clmulw(a1, b1);
 	x1 = rvb_clmulhw(a0, b0);

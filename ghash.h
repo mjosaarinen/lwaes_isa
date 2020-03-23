@@ -27,7 +27,10 @@ extern void (*ghash_mul)(gf128_t * z, const gf128_t * x, const gf128_t * h);
 
 //  32-bit variants: rv32_ghash.c
 void rv32_ghash_rev(gf128_t * z);
+//  compact version
 void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
+//  karatsuba version
+void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h);
 
 //  64-bit variants: rv64_ghash.c
 void rv64_ghash_rev(gf128_t * z);
