@@ -36,7 +36,7 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	b0 = h->d[0];							//  h value already reversed
 	b1 = h->d[1];
 
-	t0 = rvb_grevw(t0, 7);					//  Reverse input x only
+	t0 = rvb_grevw(t0, 7);					//  reverse input x only
 	t1 = rvb_grevw(t1, 7);
 	a0 = a0 ^ t0;
 	a1 = a1 ^ t1;
@@ -53,7 +53,7 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	t0 = rvb_clmulw(x3, 0x87);
 	t1 = t1 ^ x2;
 #else
-	//  Shift reduction: 6 x SHIFT, 8 x XOR 
+	//  Shift reduction: 6 x SHIFT, 6 x XOR 
 	t1 = (x3 >> 63) ^ (x3 >> 62) ^ (x3 >> 57) ^ x2;
 	t0 = x3 ^ (x3 << 1) ^ (x3 << 2) ^ (x3 << 7);
 #endif
