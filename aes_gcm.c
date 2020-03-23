@@ -12,109 +12,46 @@
 #include "aes_enc.h"
 #include "aes_gcm.h"
 
+//	just for alignment and to avoid casts
+
+typedef union {
+	uint8_t b[16];
+	uint32_t w[4];
+	uint64_t d[2];
+} gf128_t;
+
 //  disable shift reduction
-#define NO_SHIFTRED
+//#define NO_SHIFTRED
 
 //  disable karatsuba multiplication
-#define NO_KARATSUBA
+//#define NO_KARATSUBA
 
-#ifndef GETU32_BE
-#define GETU32_BE(v) \
-		(((uint32_t)(v)[0] << 24) ^	((uint32_t)(v)[1] << 16) ^ \
-		((uint32_t)(v)[2] <<  8)  ^ ((uint32_t)(v)[3]))
-#endif										/* !GETU32_BE */
 
-#ifndef PUTU32_BE
-#define PUTU32_BE(v, x) {\
-	(v)[0] = (uint8_t)((x) >> 24);	(v)[1] = (uint8_t)((x) >> 16); \
-	(v)[2] = (uint8_t)((x) >>  8);  (v)[3] = (uint8_t)(x);  }
-#endif										/* !PUTU32_BE */
+//	reverse bits in bytes of a 128-bit block; do this for h and final value
 
-#include <stdio.h>
-
-void prt128(const uint8_t v[16])
+void ghash_rev(gf128_t *z)
 {
-	size_t i;
-
-	for (i = 0; i < 16; i++)
-		printf("%02X", v[i]);
+	z->d[0] = rvb_grevw(z->d[0], 7);
+	z->d[1] = rvb_grevw(z->d[1], 7);
 }
 
-//  slow galois field multiplication ("constant time")
+//	multiply z = ( z ^ rev(x) ) * h
 
-static void gf128mul(uint8_t z[16], const uint8_t x[16], const uint8_t y[16])
+void ghash_mul(gf128_t *z, const gf128_t *x, const gf128_t *h)
 {
-	int i;
-	uint32_t z0, z1, z2, z3, x0, x1, x2, x3, f;
-
-	x3 = GETU32_BE(x);
-	x2 = GETU32_BE(x + 4);
-	x1 = GETU32_BE(x + 8);
-	x0 = GETU32_BE(x + 12);
-
-	f = -(y[15] & 1);
-	z0 = f & x0;
-	z1 = f & x1;
-	z2 = f & x2;
-	z3 = f & x3;
-
-	for (i = 1; i < 128; i++) {
-
-		f = -(z0 & 1);
-		z0 = (z0 >> 1) ^ (z1 << 31);
-		z1 = (z1 >> 1) ^ (z2 << 31);
-		z2 = (z2 >> 1) ^ (z3 << 31);
-		z3 = (z3 >> 1) ^ (0xE1000000 & f);
-
-		f = -((y[15 - (i >> 3)] >> (i & 7)) & 1);
-		z0 ^= x0 & f;
-		z1 ^= x1 & f;
-		z2 ^= x2 & f;
-		z3 ^= x3 & f;
-	}
-
-	PUTU32_BE(z, z3);
-	PUTU32_BE(z + 4, z2);
-	PUTU32_BE(z + 8, z1);
-	PUTU32_BE(z + 12, z0);
-}
-
-int kek()
-{
-	uint8_t a[16] = { 0 };
-	uint8_t b[16] = { 0 };
-	uint8_t r[16] = { 0 };
-	uint8_t s[16] = { 0 };
-
-	uint64_t a0, a1, b0, b1;
-	uint64_t t0, t1;
-
+	uint64_t a0, a1, b0, b1, t0, t1;
 	uint64_t x0, x1, y0, y1, z0, z1;
 
-	int i;
+/*
+	a0 = z->d[0];							//	inline to avoid these loads
+	a1 = z->d[1];
+*/
+	b0 = h->d[0];
+	b1 = h->d[1];
 
-	srandom(time(NULL));
-
-	for (i = 0; i < 16; i++) {
-		a[i] = random();
-		b[i] = random();
-	}
-
-	gf128mul(r, a, b);
-
-	prt128(a);
-	printf(" = a\n");
-	prt128(b);
-	printf(" = b\n");
-	prt128(r);
-	printf(" = r\n");
-
-	a0 = rvb_grevw(((uint64_t *) a)[0], 7);
-	a1 = rvb_grevw(((uint64_t *) a)[1], 7);
-
-	b0 = rvb_grevw(((uint64_t *) b)[0], 7);
-	b1 = rvb_grevw(((uint64_t *) b)[1], 7);
-
+	//	Reverse input x only
+	a0 = /*a0 ^*/ rvb_grevw(x->d[0], 7);
+	a1 = /*a1 ^*/ rvb_grevw(x->d[1], 7);
 
 	//  Top and bottom words: 2 x CLMULHW, 2 x CLMULW
 	x1 = rvb_clmulhw(a0, b0);
@@ -124,12 +61,12 @@ int kek()
 	z0 = rvb_clmulw(a1, b1);
 
 #ifdef NO_SHIFTRED
-	//  Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
+	//  Mul reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
 	t1 = rvb_clmulhw(z1, 0x87);
 	t0 = rvb_clmulw(z1, 0x87);
 	t1 = t1 ^ z0;
 #else
-	//  With shift reduction: 6 x SHIFT, 8 x XOR 
+	//  Shift reduction: 6 x SHIFT, 8 x XOR 
 	t1 = (z1 >> 63) ^ (z1 >> 62) ^ (z1 >> 57) ^ z0;
 	t0 = z1 ^ (z1 << 1) ^ (z1 << 2) ^ (z1 << 7);
 #endif
@@ -161,12 +98,12 @@ int kek()
 #endif
 
 #ifdef NO_SHIFTRED
-	//  Without shift reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
+	//	Mul reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
 	t1 = rvb_clmulhw(y1, 0x87);
 	t0 = rvb_clmulw(y1, 0x87);
 	t1 = t1 ^ y0;
 #else
-	//  With shift reduction: 6 x SHIFT, 8 x XOR 
+	//  Shift reduction: 6 x SHIFT, 8 x XOR 
 	t1 = (y1 >> 63) ^ (y1 >> 62) ^ (y1 >> 57) ^ y0;
 	t0 = y1 ^ (y1 << 1) ^ (y1 << 2) ^ (y1 << 7);
 #endif
@@ -175,14 +112,27 @@ int kek()
 	x1 = x1 ^ t1;
 	x0 = x0 ^ t0;
 
-	((uint64_t *) s)[0] = rvb_grevw(x0, 7);
-	((uint64_t *) s)[1] = rvb_grevw(x1, 7);
-
-	prt128(s);
-	printf(" = s\n");
-
-	return 0;
+	z->d[0] = x0;							//	inline to avoid these stores
+	z->d[1] = x1;
 }
+
+void gf128mul(uint8_t z[16], const uint8_t x[16], const uint8_t y[16])
+{
+	gf128_t bz, bx, bh;
+
+	memcpy(bx.b, x, 16);
+	memcpy(bh.b, y, 16);
+
+	ghash_rev(&bz);
+	ghash_rev(&bh);
+
+	ghash_mul(&bz, &bx, &bh);
+
+	ghash_rev(&bz);
+
+	memcpy(z, bz.b, 16);
+}
+
 
 //  the same "body" for encryption/decryption, different key lengths
 
@@ -191,12 +141,10 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 						 const uint8_t iv[12], const uint32_t rk[], int nr,
 						 int enc_flag)
 {
-	uint8_t ctr[16], blk[16], sum[16];
+	uint8_t ctr[16], sum[16], blk[16], h[16];
 	size_t i, j, k;
 
-	uint8_t h[16];
-
-	memset(h, 0, 16);						// h = 0
+	memset(h, 0, 16);						// h = AES(0)
 	aes_enc_rounds(h, h, rk, nr);
 
 	memcpy(ctr, iv, 12);					// J0

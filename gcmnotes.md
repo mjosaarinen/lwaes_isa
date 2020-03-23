@@ -14,7 +14,7 @@ constant 7 ("rev") accomplishes this.
 The multiplication itself can be sped up with the Karatsuba method,
 which applies even more easily binary fields as it done to integers.
 This reduces the number of CMULW/CMULHW pairs from 4 to 3 with the
-cost of four XORs.
+cost of fourz XORs.
 
 The best way of doing reduction depends on how fast the carry-less
 multiplication instructions CMUL[H][W] are in relation to shifts and XORs.
