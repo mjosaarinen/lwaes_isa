@@ -14,8 +14,9 @@
 //  unit tests
 
 int test_aes();								//  test_aes.c
-int test_gcm();								//  test_gcm.c
 int test_sm4();								//  test_sm4.c
+int test_gcm();								//  test_gcm.c
+int test_ghash();							//  test_gcm.c
 
 //  generate "reference" hw testbench data for the instruction
 //  output should match with hdl/enc1s_tb.v
@@ -39,15 +40,11 @@ int test_hwtb()
 	return 0;
 }
 
-//int kek();
-
 //  stub main: run unit tests
 
 int main(int argc, char **argv)
 {
 	int fail = 0;
-
-//	return kek();
 
 	//  generate hardware testbench data ?
 	if (argc > 1 && strcmp(argv[1], "tb") == 0) {
@@ -56,7 +53,7 @@ int main(int argc, char **argv)
 	//  algorithm tests
 	fail += test_aes();
 	fail += test_sm4();
-	fail += test_gcm();
+	fail += test_ghash();
 
 	if (fail == 0) {
 		printf("[PASS] all tests passed.\n");

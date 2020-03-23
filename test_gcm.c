@@ -11,8 +11,9 @@
 
 #include "test_hex.h"
 #include "aes_gcm.h"
+#include "ghash.h"
 
-//  Test AES
+//  A GCM test
 
 int test_gcm()
 {
@@ -100,6 +101,25 @@ int test_gcm()
 	printf("[%s] GCM AES-256 verify / corrupt test\n", flag ? "FAIL" : "PASS");
 	if (flag)
 		fail++;
+
+	return fail;
+}
+
+//  Test both GHASH implementations via the GCM test
+
+int test_ghash()
+{
+	int fail = 0;
+
+	printf("[INFO] === GCM using rv32_ghash_mul() ===\n");
+	ghash_rev = rv32_ghash_rev;
+	ghash_mul = rv32_ghash_mul;
+	fail += test_gcm();
+
+	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
+	ghash_rev = rv64_ghash_rev;
+	ghash_mul = rv64_ghash_mul;
+	fail += test_gcm();
 
 	return fail;
 }

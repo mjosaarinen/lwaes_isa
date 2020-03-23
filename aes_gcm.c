@@ -5,195 +5,104 @@
 //  A basic (limited!) AES-GCM interface for testing purposes.
 
 #include <string.h>
-#include <stdlib.h>
-#include <time.h>
 
 #include "bitmanip.h"
 #include "aes_enc.h"
 #include "aes_gcm.h"
+#include "ghash.h"
 
-//	just for alignment and to avoid casts
+//  function pointers are here
 
-typedef union {
-	uint8_t b[16];
-	uint32_t w[4];
-	uint64_t d[2];
-} gf128_t;
+void (*ghash_rev)(gf128_t *) = rv64_ghash_rev;
+void (*ghash_mul)(gf128_t *, const gf128_t *, const gf128_t *) =
+	rv64_ghash_mul;
 
-//  disable shift reduction
-//#define NO_SHIFTRED
-
-//  disable karatsuba multiplication
-//#define NO_KARATSUBA
-
-
-//	reverse bits in bytes of a 128-bit block; do this for h and final value
-
-void ghash_rev(gf128_t *z)
-{
-	z->d[0] = rvb_grevw(z->d[0], 7);
-	z->d[1] = rvb_grevw(z->d[1], 7);
-}
-
-//	multiply z = ( z ^ rev(x) ) * h
-
-void ghash_mul(gf128_t *z, const gf128_t *x, const gf128_t *h)
-{
-	uint64_t a0, a1, b0, b1, t0, t1;
-	uint64_t x0, x1, y0, y1, z0, z1;
-
-/*
-	a0 = z->d[0];							//	inline to avoid these loads
-	a1 = z->d[1];
-*/
-	b0 = h->d[0];
-	b1 = h->d[1];
-
-	//	Reverse input x only
-	a0 = /*a0 ^*/ rvb_grevw(x->d[0], 7);
-	a1 = /*a1 ^*/ rvb_grevw(x->d[1], 7);
-
-	//  Top and bottom words: 2 x CLMULHW, 2 x CLMULW
-	x1 = rvb_clmulhw(a0, b0);
-	x0 = rvb_clmulw(a0, b0);
-
-	z1 = rvb_clmulhw(a1, b1);
-	z0 = rvb_clmulw(a1, b1);
-
-#ifdef NO_SHIFTRED
-	//  Mul reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
-	t1 = rvb_clmulhw(z1, 0x87);
-	t0 = rvb_clmulw(z1, 0x87);
-	t1 = t1 ^ z0;
-#else
-	//  Shift reduction: 6 x SHIFT, 8 x XOR 
-	t1 = (z1 >> 63) ^ (z1 >> 62) ^ (z1 >> 57) ^ z0;
-	t0 = z1 ^ (z1 << 1) ^ (z1 << 2) ^ (z1 << 7);
-#endif
-
-#ifdef NO_KARATSUBA
-
-	//  Without Karatsuba; 2 x CLMULHW, 2 x CLMULW, 4 * XOR
-	y1 = rvb_clmulhw(a0, b1);
-	y0 = rvb_clmulw(a0, b1);
-	t1 = t1 ^ y1;
-	t0 = t0 ^ y0;
-	y1 = rvb_clmulhw(a1, b0);
-	y0 = rvb_clmulw(a1, b0);
-	y1 = y1 ^ t1;
-	y0 = y0 ^ t0;
-
-#else
-
-	//  With Karatsuba; 1 x CLMULHW, 1 x CLMULW, 8 * XOR
-	t1 = t1 ^ x1 ^ z1;
-	t0 = t0 ^ x0 ^ z0;
-	z0 = a0 ^ a1;
-	z1 = b0 ^ b1;
-	y1 = rvb_clmulhw(z0, z1);
-	y0 = rvb_clmulw(z0, z1);
-	y1 = y1 ^ t1;
-	y0 = y0 ^ t0;
-
-#endif
-
-#ifdef NO_SHIFTRED
-	//	Mul reduction: 1 x CLMULHW, 1 x CLMULW, 1 x XOR
-	t1 = rvb_clmulhw(y1, 0x87);
-	t0 = rvb_clmulw(y1, 0x87);
-	t1 = t1 ^ y0;
-#else
-	//  Shift reduction: 6 x SHIFT, 8 x XOR 
-	t1 = (y1 >> 63) ^ (y1 >> 62) ^ (y1 >> 57) ^ y0;
-	t0 = y1 ^ (y1 << 1) ^ (y1 << 2) ^ (y1 << 7);
-#endif
-
-	//  Low word; 2 x XOR
-	x1 = x1 ^ t1;
-	x0 = x0 ^ t0;
-
-	z->d[0] = x0;							//	inline to avoid these stores
-	z->d[1] = x1;
-}
-
-void gf128mul(uint8_t z[16], const uint8_t x[16], const uint8_t y[16])
-{
-	gf128_t bz, bx, bh;
-
-	memcpy(bx.b, x, 16);
-	memcpy(bh.b, y, 16);
-
-	ghash_rev(&bz);
-	ghash_rev(&bh);
-
-	ghash_mul(&bz, &bx, &bh);
-
-	ghash_rev(&bz);
-
-	memcpy(z, bz.b, 16);
-}
-
-
-//  the same "body" for encryption/decryption, different key lengths
+//  the same "body" for encryption/decryption and various key lengths
 
 static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 						 const uint8_t * src, size_t len,
 						 const uint8_t iv[12], const uint32_t rk[], int nr,
 						 int enc_flag)
 {
-	uint8_t ctr[16], sum[16], blk[16], h[16];
-	size_t i, j, k;
+	size_t i, ctr;
+	gf128_t b, c, z, h, t, p;
 
-	memset(h, 0, 16);						// h = AES(0)
-	aes_enc_rounds(h, h, rk, nr);
+	h.d[0] = 0;								//  h = AES_k(0)
+	h.d[1] = 0;
+	aes_enc_rounds(h.b, h.b, rk, nr);
+	ghash_rev(&h);
 
-	memcpy(ctr, iv, 12);					// J0
-	ctr[12] = 0x00;
-	ctr[13] = 0x00;
-	ctr[14] = 0x00;
-	ctr[15] = 0x01;
-	aes_enc_rounds(tag, ctr, rk, nr);
+	ctr = 0;								//  counter value
+	memcpy(p.b, iv, 12);					//  J0
+	p.w[3] = rvb_grev(++ctr, 0x18);			//  rev8.w; big-endian counter
+	aes_enc_rounds(t.b, p.b, rk, nr);		//  first AES_k(IV | 1) for tag
 
-	memset(sum, 0, 16);
+	z.d[0] = 0;								//  initialize GHASH result
+	z.d[1] = 0;
 
-	for (i = 0; i < len; i += 16) {
+	if (enc_flag) {							//  == encrypt / generate tag ==
 
-		for (j = 15; j >= 12; j--) {		// inc counter
-			ctr[j]++;
-			if (ctr[j] != 0)
-				break;
+		i = len;
+		while (i >= 16) {					//  full block
+			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			aes_enc_rounds(c.b, p.b, rk, nr);
+			memcpy(b.b, src, 16);			//  load plaintext
+			c.d[0] ^= b.d[0];
+			c.d[1] ^= b.d[1];
+			memcpy(dst, c.b, 16);			//  store ciphertext
+			ghash_mul(&z, &c, &h);			//  GHASH the block
+			src += 16;
+			dst += 16;
+			i -= 16;
 		}
 
-		aes_enc_rounds(blk, ctr, rk, nr);	// xor mask
-		k = len - i;
-		if (k > 16)
-			k = 16;
-
-		if (enc_flag) {
-			for (j = 0; j < k; j++) {		// encrypt block
-				dst[i + j] = src[i + j] ^ blk[j];
-				sum[j] ^= dst[i + j];
-			}
-		} else {
-			for (j = 0; j < k; j++) {		// decrypt block
-				sum[j] ^= src[i + j];
-				dst[i + j] = src[i + j] ^ blk[j];
-			}
+		if (i > 0) {						//  partial block
+			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			aes_enc_rounds(c.b, p.b, rk, nr);
+			memcpy(b.b, src, i);			//  load plaintext
+			c.d[0] ^= b.d[0];
+			c.d[1] ^= b.d[1];
+			memcpy(dst, c.b, i);
+			memset(&c.b[i], 0, 16 - i);		//  zero pad input
+			ghash_mul(&z, &c, &h);			//  GHASH last block
 		}
 
-		gf128mul(sum, sum, h);				// mult by h
+	} else {								//  == decrypt / verify tag ==
+
+		i = len;
+		while (i >= 16) {					//  full block
+			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			aes_enc_rounds(b.b, p.b, rk, nr);
+			memcpy(c.b, src, 16);			//  load ciphertext
+			b.d[0] ^= c.d[0];
+			b.d[1] ^= c.d[1];
+			memcpy(dst, b.b, 16);			//  store plaintext
+			ghash_mul(&z, &c, &h);			//  GHASH the block
+			src += 16;
+			dst += 16;
+			i -= 16;
+		}
+
+		if (i > 0) {						//  partial block
+			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			aes_enc_rounds(b.b, p.b, rk, nr);
+			memcpy(c.b, src, i);
+			b.d[0] ^= c.d[0];
+			b.d[1] ^= c.d[1];
+			memcpy(dst, b.b, i);
+			memset(&c.b[i], 0, 16 - i);		//  zero pad input
+			ghash_mul(&z, &c, &h);			//  GHASH last block
+		}
 	}
 
-	i = len << 3;							// pad tag with bit length
-	j = 15;
-	while (i > 0) {
-		sum[j--] ^= i & 0xFF;
-		i >>= 8;
-	}
-	gf128mul(sum, sum, h);
-
-	for (i = 0; i < 16; i++)				// write tag
-		tag[i] ^= sum[i];
+	c.d[0] = 0;								//  pad with bit length
+	c.w[2] = rvb_grev(len >> 29, 0x18);
+	c.w[3] = rvb_grev(len << 3, 0x18);
+	ghash_mul(&z, &c, &h);					//  last GHASH block
+	ghash_rev(&z);							//  flip result bits
+	t.d[0] = t.d[0] ^ z.d[0];				//  XOR with AES_k(IV | 1)
+	t.d[1] = t.d[1] ^ z.d[1];
+	memcpy(tag, t.b, 16);					//  write tag
 }
 
 //  verify it
@@ -210,10 +119,11 @@ static int aes_gcm_vfy(uint8_t * m,
 
 	aes_gcm_body(m, tag, c, clen - 16, iv, rk, nr, 0);
 	x = 0;
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 16; i++) {
 		x |= tag[i] ^ c[clen - 16 + i];
+	}
 
-	return x == 0 ? 0 : -2;
+	return x == 0 ? 0 : 1;
 }
 
 //  AES128-GCM
