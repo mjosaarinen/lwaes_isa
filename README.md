@@ -183,32 +183,32 @@ as is done with `MULH`/`MUL`, although there is no carry-over advantage.
 Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
 and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
 
-| **Arch** | **Karatsuba**	| **ShiftRed**	| `GREV` | `XOR` | `S[L/R]L` | `CLMUL` | `CLMULH` |
+| **Arch** | **Karatsuba**	| **Reduce**	| `GREV` | `XOR` | `S[L/R]L` | `CLMUL` | `CLMULH` |
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| RV32B	|	❌	|	❌	|	4	|	36	|	0	|	20	|	20	|
-| RV32B	|	❌	|	✅	|	4	|	56	|	24	|	16	|	16	|
-| RV32B	|	✅	|	❌	| 	4	|	52	|	0	|	13	|	13	|
-| RV32B	| 	✅	|	✅	|	4	|	72	|	24	|	9	|	9	|
-| RV64B	|	❌	|	❌	|	2	|	10	|	0	|	6	|	6	|
-| RV64B	|	❌	|	✅	|	2	|	20	|	12	|	4	|	4	|
-| RV64B	|	✅	|	❌	|	2	|	14	|	0	|	5	|	5	|
-| RV64B	| 	✅	|	✅	|	2	|	24	|	12	|	3	|	3	|
+| RV32B	|	no	|	mul	|	4	|	36	|	0	|	20	|	20	|
+| RV32B	|	no	| shift	|	4	|	56	|	24	|	16	|	16	|
+| RV32B	|	yes	|	mul	| 	4	|	52	|	0	|	13	|	13	|
+| RV32B	| 	yes	| shift	|	4	|	72	|	24	|	9	|	9	|
+| RV64B	|	no	|	mul	|	2	|	10	|	0	|	6	|	6	|
+| RV64B	|	no	| shift	|	2	|	20	|	12	|	4	|	4	|
+| RV64B	|	yes	|	mul	|	2	|	14	|	0	|	5	|	5	|
+| RV64B	| 	yes	| shift	|	2	|	24	|	12	|	3	|	3	|
 
 
 We can see that the best selection of method indeed depends on the relative
 cost of multiplication. Assuming other instructions to have unit cost and
 the cost multiplication instructions is a multiple of them, we have:
 
-| **Arch** | **Karatsuba**	| **ShiftRed**	| **MUL=1** | **MUL=2** | **MUL=3** | **MUL=6** |  
+| **Arch** | **Karatsuba**	| **Reduce**	| **MUL=1** | **MUL=2** | **MUL=3** | **MUL=6** |  
 |:-----:|:-----:|:-----:|:---------:|:---------:|:---------:|:---------:|
-| RV32B	|	❌	|	❌	| **80**	|	120		|	160		| 280		|
-| RV32B	|	❌	|	✅	|	116		|	148		|	180		| 276		|
-| RV32B	|	✅	|	❌	|	82		|	**108**	| **134**	| 212		|
-| RV32B	|	✅	|	✅	|	118		|	136		|	154		| **208**	|
-| RV32B	|	❌	|	❌	| **24**	|	**36**	|	48		| 84		|
-| RV32B	|	❌	|	✅	|	42		|	50		|	58		| 82		|
-| RV32B	|	✅	|	❌	|	26		|	**36**	| **46**	| 76		|
-| RV32B	|	✅	|	✅	|	44		|	50		|	56		| **74**	|
+| RV32B	|	no	|	mul	| **80**	|	120		|	160		| 280		|
+| RV32B	|	no	| shift	|	116		|	148		|	180		| 276		|
+| RV32B	|	yes	|	mul	|	82		|	**108**	| **134**	| 212		|
+| RV32B	|	yes	| shift	|	118		|	136		|	154		| **208**	|
+| RV64B	|	no	|	mul	| **24**	|	**36**	|	48		| 84		|
+| RV64B	|	no	| shift	|	42		|	50		|	58		| 82		|
+| RV64B	|	yes	|	mul	|	26		|	**36**	| **46**	| 76		|
+| RV64B	|	yes	| shift	|	44		|	50		|	56		| **74**	|
 
 We see that if `CLMUL[H][W]` is three times slower than XOR and shifts, 
 or more, then Karatsuba is worthwhile. If it is six times slower, or more,
