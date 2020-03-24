@@ -187,10 +187,10 @@ The second arithmetic step to consider is the polynomial reduction of the
 doing reduction depends on *how fast* the carry-less multiplication
 instructions `CMUL[H][W]` are in relation to shifts and XORs.
 
-I'll call these *shift reduction* (ShiftRed) and *multiplication reduction*. 
-Some sources see analogues to Montgomery and Barrett methods, but those 
-terms are really not appropriate when working in characteristic 2 since 
-at no point is the computation of a multiplicative inverse required.
+I'll call these *shift reduction* (based on the low Hamming weight of the
+polynomial R) and *multiplication reduction* (which is analogous to
+Montgomery and Barrett methods -- albeit simpler because we're working 
+in characteristic 2.)
 
 
 ####	Estimating the Fastest Method
