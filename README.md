@@ -130,7 +130,7 @@ Authenticated Encryption with Associated Data (AEAD) mechanism and
 is mandated in all [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446.html)
 implementations. 
 
-Here we'll briefly discuss implementation aspects
+Here I'll briefly discuss implementation aspects
 of AES-GCM using the [bitmanip](https://github.com/riscv/riscv-bitmanip)
 (B) extension. Pseudocode for a relevant subset of instructions is contained
 in source file [bitmanip.c](bitmanip.c), with prototypes in 
@@ -138,7 +138,13 @@ in source file [bitmanip.c](bitmanip.c), with prototypes in
 the current draft specification. The instructions relevant to GCM
 are the Carry-Less Multiply instructions `CMUL[H][W]` and also the Generalized
 Reverse `GREV[W]`. The `[W]` suffix indicates a 64-bit word size variant 
-that is available only in RV64B
+that is available only in RV64.
+
+The low-level functions that use these instructions are emulated by 
+[rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c). I've verified
+their correctness against full AES-GCM test vectors in the framework.
+There may be further room for improvement but this stage is hopefully
+very helpful for final assembly language implementation.
 
 An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
 as is done with `MULH`/`MUL`, although there is no carry-over advantage.
