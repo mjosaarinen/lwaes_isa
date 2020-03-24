@@ -147,7 +147,8 @@ There may be further room for improvement but this stage is hopefully
 very helpful for final assembly language implementation.
 
 An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
-as is done with `MULH`/`MUL`, although there is no carry-over advantage.
+as is done with `MULH`/`MUL`, although there is less of a performance
+advantage in this case.
 
 
 ####	Finite Field Arithmetic
