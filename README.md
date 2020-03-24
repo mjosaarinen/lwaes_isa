@@ -24,7 +24,7 @@ primary goal of ENC1S / lweas is to eliminate timing-side vulnerabilities.
 Speed-up over pure software table-based implementations is roughly 500 %.
 
 
-### Software and Hardware 
+## Software and Hardware 
 
 This directory contains an "emulator" C implementation of the instruction
 together with runnable pseudocode for full encryption, decryption, and
@@ -49,7 +49,7 @@ emulator and the "Pluto" core on a live FPGA target, although source
 code for those is not provided here.
 
 
-### Technical Details
+## Technical Details
 
 The instruction is encapsulated in a single emulator function in
 [enc1s.c](enc1s.c):
@@ -122,8 +122,115 @@ six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
 Current assembler code only uses `ENC1S`.
 
+##	Galois/Counter Mode (GCM): AES-GCM with Bitmanip
 
-### Discussion
+The Galois/Counter Mode (GCM) specified in 
+[NIST SP 800-38D](https://doi.org/10.6028/NIST.SP.800-38D) is a prominent
+Authenticated Encryption with Associated Data (AEAD) mechanism. It is
+the only cipher mode mandated as "MUST" for all 
+[TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446.html) implementations. 
+
+Here I'll briefly discuss implementation aspects
+of AES-GCM using the [bitmanip](https://github.com/riscv/riscv-bitmanip)
+(B) extension. Pseudocode for a relevant subset of instructions is contained
+in source file [bitmanip.c](bitmanip.c), with prototypes in 
+[bitmanip.h](bitmanip.h). These are almost directly lifted from the current
+draft specification. The instructions relevant to GCM are the Carry-Less
+Multiply instructions `CMUL[H][W]` and also the Generalized Reverse `GREV[W]`.
+The `[W]` suffix indicates a 64-bit word size variant that is available
+only in RV64.
+
+The low-level functions that use these instructions are emulated by 
+[rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c). I've verified
+their correctness against full AES-GCM test vectors in the framework.
+There may be further room for improvement but this stage is hopefully
+very helpful for final assembly language implementation.
+
+An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
+as is done with `MULH`/`MUL`, although there is less of a performance
+advantage in this case.
+
+
+####	Finite Field Arithmetic
+
+While message confidentiality in GCM is provided by a block cipher (AES)
+in counter mode (a CTR variant), authentication is based on a GHASH, a 
+universal hash defined over the binary field GF(2<sup>128</sup>).
+Without custom instruction support GCM, just like AES itself, is either
+very slow or susceptible to cache timing attacks.
+
+Whether or not authenticating ciphertext or associated data, the main
+operation of GCM is the GHASH multiplication between a block of
+authentication data and a secret generator "H". The addition in the
+field is trivial; just two or four XORs, depending on whether RV32 or RV64
+implementation is used.
+
+The finite field is defined to be the ring of binary polynomials modulo
+the primitive pentanomial
+R(x) = x<sup>128</sup> + x<sup>7</sup> + x<sup>2</sup> + x + 1. 
+The field encoding is slightly unusual, with the multiplicative identity
+(i.e. one -- "1") being encoded as as byte sequence `0x80, 0x00, .., 0x00`. 
+Converting to little-endian encoding involves inverting bits in each byte;
+the `GREV[W]` instruction with constant 7 (pseudo-instruction `rev`)
+accomplishes this.
+
+The multiplication itself can be asymptotically sped up with the Karatsuba
+method, which works even better in binary fields than it does with integers.
+This reduces the number of `CMULW`/`CMULHW` (RV64) pairs from 4 to 3 with 
+and the number of `CMUL`/`CMULH` (RV32) pairs from 16 to 9, with the
+cost of many XORs.
+
+####	Reduction via Shifts or via Multiplication
+
+The second arithmetic step to consider is the polynomial reduction of the
+255-bit ring product down to 128 bits (the field) again. The best way of
+doing reduction depends on *how fast* the carry-less multiplication
+instructions `CMUL[H][W]` are in relation to shifts and XORs.
+
+I'll call these *shift reduction* (ShiftRed) and *multiplication reduction*. 
+Some sources see analogues to Montgomery and Barrett methods, but those 
+terms are really not appropriate when working in characteristic 2 since 
+at no point is the computation of a multiplicative inverse required.
+
+
+####	Estimating the Fastest Method
+
+Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
+and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
+
+| **Arch** | **Karatsuba**	| **Reduce**	| `GREV` | `XOR` | `S[L/R]L` | `CLMUL` | `CLMULH` |
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| RV32B	|	no	|	mul	|	4	|	36	|	0	|	20	|	20	|
+| RV32B	|	no	| shift	|	4	|	56	|	24	|	16	|	16	|
+| RV32B	|	yes	|	mul	| 	4	|	52	|	0	|	13	|	13	|
+| RV32B	| 	yes	| shift	|	4	|	72	|	24	|	9	|	9	|
+| RV64B	|	no	|	mul	|	2	|	10	|	0	|	6	|	6	|
+| RV64B	|	no	| shift	|	2	|	20	|	12	|	4	|	4	|
+| RV64B	|	yes	|	mul	|	2	|	14	|	0	|	5	|	5	|
+| RV64B	| 	yes	| shift	|	2	|	24	|	12	|	3	|	3	|
+
+
+We can see that the best selection of method indeed depends on the relative
+cost of multiplication. Assuming that other instructions to have unit cost
+and ignoring loops etc, we have:
+
+| **Arch** | **Karatsuba**	| **Reduce**	| **MUL=1** | **MUL=2** | **MUL=3** | **MUL=6** |  
+|:-----:|:-----:|:-----:|:---------:|:---------:|:---------:|:---------:|
+| RV32B	|	no	|	mul	| **80**	|	120		|	160		| 280		|
+| RV32B	|	no	| shift	|	116		|	148		|	180		| 276		|
+| RV32B	|	yes	|	mul	|	82		|	**108**	| **134**	| 212		|
+| RV32B	|	yes	| shift	|	118		|	136		|	154		| **208**	|
+| RV64B	|	no	|	mul	| **24**	|	**36**	|	48		| 84		|
+| RV64B	|	no	| shift	|	42		|	50		|	58		| 82		|
+| RV64B	|	yes	|	mul	|	26		|	**36**	| **46**	| 76		|
+| RV64B	|	yes	| shift	|	44		|	50		|	56		| **74**	|
+
+We see that if `CLMUL[H][W]` takes twice the time of XOR and shifts, 
+or more, then Karatsuba is worthwhile. If these multiplication instructions 
+are six times slower, or more, then it is worthwhile to convert the reduction multiplications to shifts and XORs.
+
+
+##	AES Notes 
 
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
@@ -161,9 +268,6 @@ Current assembler code only uses `ENC1S`.
     polynomial bases are used by AES and SM4, finite fields are affine
     equivalent, so much of the circuitry of the three is shared.
     SM4 does not need an inverse S-Box for decryption.
-*   **Question:** Should we also support Russian GOST R 34.12-2015 Kuznyechik?
-    It has a different type of S-Box construction, but it is also 8-8 bit
-    and the instruction could be quite similar.
 
 
 ### Testing
@@ -202,6 +306,7 @@ $ ./xtest
 [PASS] SM4 Decrypt D294D879A1F02C7C5906D6C2D0C54D9F
 [PASS] SM4 Encrypt 94CFE3F59E8507FEC41DBE738CCD53E1
 [PASS] SM4 Decrypt A27EE076E48E6F389710EC7B5E8A3BE5
+< .. GCM tests here .. >
 [PASS] all tests passed.
 $
 ```

@@ -13,7 +13,7 @@
 #include <string.h>
 
 //  read a hex string of "maxbytes", return byte length
-size_t readhex(uint8_t *buf, size_t maxbytes, const char *str);
+size_t readhex(uint8_t * buf, size_t maxbytes, const char *str);
 
 //  print hexadecimal "data", length "len", with label "lab"
 void prthex(const char *lab, const void *data, size_t len);
