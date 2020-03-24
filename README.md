@@ -126,9 +126,9 @@ Current assembler code only uses `ENC1S`.
 
 The Galois/Counter Mode (GCM) specified in 
 [NIST SP 800-38D](https://doi.org/10.6028/NIST.SP.800-38D) is a prominent
-Authenticated Encryption with Associated Data (AEAD) mechanism and
-is mandated in all [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446.html)
-implementations. 
+Authenticated Encryption with Associated Data (AEAD) mechanism. It is
+the only cipher mandated as "MUST" in all 
+[TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446.html) implementations. 
 
 Here I'll briefly discuss implementation aspects
 of AES-GCM using the [bitmanip](https://github.com/riscv/riscv-bitmanip)
