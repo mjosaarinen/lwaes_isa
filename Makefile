@@ -11,7 +11,7 @@ OBJS	= $(CSRC:.c=.o)
 CC		= gcc
 CFLAGS	?= -g -Wall -Wshadow -fsanitize=address,undefined -O2
 #CFLAGS	= -Wall -march=native -O3
-LIBS    = -lcrypto
+LIBS    =
 
 $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJS) $(LIBS)

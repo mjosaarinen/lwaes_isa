@@ -122,7 +122,7 @@ six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
 Current assembler code only uses `ENC1S`.
 
-##	Galois/Counter (GCM): AES-GCM with Bitmanip
+##	Galois/Counter Mode (GCM): AES-GCM with Bitmanip
 
 The Galois/Counter Mode (GCM) specified in 
 [NIST SP 800-38D](https://doi.org/10.6028/NIST.SP.800-38D) is a prominent
@@ -168,20 +168,51 @@ and the number of `CMUL`/`CMULH` (RV32) pairs from 16 to 9, with the
 cost of many XORs.
 
 Second arithmetic step is the polynomial reduction of the 255-bit ring product
-down to 128 bits (the field) again.
-The best way of doing reduction depends on *how fast* the carry-less
-multiplication instructions `CMUL[H][W]` are in relation to shifts and XORs.
-If one `MULH[W]`/`MUL[W]` pair is faster than six rotations and XORs, then
-it's worthwhile to use it. I'll call these *shift reduction* (ShiftRed) and
-*multiplication reduction* (MultRed). Some sources see analogues to Montgomery
-and Barrett methods, but those terms are really appropriate when working
-in characteristic 2 since at no point is the computation of inverse required.
+down to 128 bits (the field) again. The best way of doing reduction depends on
+*how fast* the carry-less multiplication instructions `CMUL[H][W]` are in
+relation to shifts and XORs.
+
+I'll call these *shift reduction* (ShiftRed) and *multiplication reduction*. 
+Some sources see analogues to Montgomery and Barrett methods, but those 
+terms are really not appropriate when working in characteristic 2 since 
+at no point is the computation of a multiplicative inverse required.
 
 An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
 as is done with `MULH`/`MUL`, although there is no carry-over advantage.
 
-RV32 Compact Code, Shift
+Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
+and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
 
+| **Arch** | **Karatsuba**	| **ShiftRed**	| `GREV` | `XOR` | `S[L/R]L`	| `CLMUL`	| `CLMULH` |
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| RV32B	| [	]	| [ ]	|	4	|	36	|	0	|	20	|	20	|
+| RV32B	| [ ]	| [x]	|	4	|	56	|	24	|	16	|	16	|
+| RV32B	| [x]	| [ ]	| 	4	|	52	|	0	|	13	|	13	|
+| RV32B	| [x]	| [x]	|	4	|	72	|	24	|	9	|	9	|
+| RV64B	| [	]	| [ ]	|	2	|	10	|	0	|	6	|	6	|
+| RV64B	| [ ]	| [x]	|	2	|	20	|	12	|	4	|	4	|
+| RV64B	| [x]	| [ ]	|	2	|	14	|	0	|	5	|	5	|
+| RV64B	| [x]	| [x]	|	2	|	24	|	12	|	3	|	3	|
+
+
+We can see that the best selection of method indeed depends on the relative
+cost of multiplication. Assuming other instructions to have unit cost we have
+
+| **Arch** | **Karatsuba**	| **ShiftRed**	| **MUL=1** | **MUL=3** | **MUL=6** |  
+|:-----:|:-----:|:-----:|:---------:|:---------:|:---------:|
+| RV32B	| [	]	| [ ]	| **80**	|	160		| 280		|
+| RV32B	| [	]	| [x]	|	116		|	180		| 276		|
+| RV32B	| [x]	| [ ]	|	82		| **134**	| 212		|
+| RV32B	| [x]	| [x]	|	118		|	154		| **208**	|
+| RV32B	| [	]	| [ ]	| **24**	|	48		| 84		|
+| RV32B	| [	]	| [x]	|	42		|	58		| 82		|
+| RV32B	| [x]	| [ ]	|	26		| **46**	| 76		|
+| RV32B	| [x]	| [x]	|	44		|	56		| **74**	|
+
+We see that if `CLMUL[H][W]` is three times slower than XOR and shifts, 
+or more, then Karatsuba is worthwhile. If it is six times slower, or more,
+then it is worthwhile to convert the reduction multiplications to shifts
+and XORs.
 
 ## Discussion
 

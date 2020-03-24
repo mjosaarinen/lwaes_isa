@@ -7,9 +7,6 @@
 #include "ghash.h"
 #include "bitmanip.h"
 
-#include <stdio.h>
-#include <string.h>
-
 //  disable shift reduction
 #define NO_SHIFTRED
 
@@ -43,11 +40,13 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	z2 = z->w[2];
 	z3 = z->w[3];
 
+	//  4 x GREV
 	x0 = rvb_grev(x0, 7);					//  reverse input x only
 	x1 = rvb_grev(x1, 7);
 	x2 = rvb_grev(x2, 7);
 	x3 = rvb_grev(x3, 7);
 
+	//  4 x XOR
 	x0 = x0 ^ z0;							//  z is kept unreversed
 	x1 = x1 ^ z1;
 	x2 = x2 ^ z2;
@@ -84,7 +83,7 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 
 		y = h->w[i];						//  unroll this if you like
 
-		//  4 x CLMULH, 4 x CLMUL, 2 x XOR
+		//  4 x CLMULH, 4 x CLMUL, 7 x XOR
 		t1 = rvb_clmulh(x3, y);
 		t0 = rvb_clmul(x3, y);
 		z4 = z3 ^ t1;
@@ -137,20 +136,22 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	z2 = z->w[2];
 	z3 = z->w[3];
 
+	y0 = h->w[0];							//  y is untouched
+	y1 = h->w[1];
+	y2 = h->w[2];
+	y3 = h->w[3];
+
+	//  4 x GREV
 	x0 = rvb_grev(x0, 7);					//  reverse input x only
 	x1 = rvb_grev(x1, 7);
 	x2 = rvb_grev(x2, 7);
 	x3 = rvb_grev(x3, 7);
 
+	//  4 x XOR
 	x0 = x0 ^ z0;							//  z is updated
 	x1 = x1 ^ z1;
 	x2 = x2 ^ z2;
 	x3 = x3 ^ z3;
-
-	y0 = h->w[0];							//  y is untouched
-	y1 = h->w[1];
-	y2 = h->w[2];
-	y3 = h->w[3];
 
 	//  2-level Karatsuba multiplication
 	//  9 x CLMULH, 9 x CLMUL, 40 x XOR
