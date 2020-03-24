@@ -144,7 +144,7 @@ The low-level functions that use these instructions are emulated by
 [rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c). I've verified
 their correctness against full AES-GCM test vectors in the framework.
 There may be further room for improvement but this stage is hopefully
-very helpful for final assembly language implementation.
+highly usedul for final assembly language implementation.
 
 An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
 as is done with `MULH`/`MUL`, although there is less of a performance
