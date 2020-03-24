@@ -225,11 +225,9 @@ and ignoring loops etc, we have:
 | RV64B	|	yes	|	mul	|	26		|	**36**	| **46**	| 76		|
 | RV64B	|	yes	| shift	|	44		|	50		|	56		| **74**	|
 
-We see that if `CLMUL[H][W]` is two times slower than XOR and shifts, 
-or more, then Karatsuba is worthwhile. If it is six times slower, or more,
-then it is worthwhile to convert the reduction multiplications to shifts
-and XORs.
-
+We see that if `CLMUL[H][W]` takes twice the time of XOR and shifts, 
+or more, then Karatsuba is worthwhile. If these multiplication instructions 
+are six times slower, or more, then it is worthwhile to convert the reduction multiplications to shifts and XORs.
 
 
 ##	AES Notes 
