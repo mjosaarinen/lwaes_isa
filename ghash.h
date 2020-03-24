@@ -17,23 +17,27 @@ typedef union {
 	uint64_t d[2];
 } gf128_t;
 
-//  Function pointers so that different versions can be tested: in aes_gcm.c
+//  bit reversal, 32-bit variants (rv32_ghash.c)
+void rv32_ghash_rev(gf128_t * z);
+
+//  32-bit compact version (rv32_ghash.c)
+void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
+
+//  32-bit karatsuba version (rv32_ghash.c)
+void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h);
+
+//  bit reversal, 64-bit variant (rv64_ghash.c)
+void rv64_ghash_rev(gf128_t * z);
+
+//  64-bit version (Karatsuba optional) (rv64_ghash.c)
+void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
+
+//  Function pointers so that different versions can be tested. (aes_gcm.c)
 
 //  reverse bits in bytes of a 128-bit block; do this for h and final value
 extern void (*ghash_rev)(gf128_t * z);
 
-//  finitie field multiply z = ( z ^ rev(x) ) * h
+//  finite field multiply z = ( z ^ rev(x) ) * h
 extern void (*ghash_mul)(gf128_t * z, const gf128_t * x, const gf128_t * h);
-
-//  32-bit variants: rv32_ghash.c
-void rv32_ghash_rev(gf128_t * z);
-//  compact version
-void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
-//  karatsuba version
-void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h);
-
-//  64-bit variants: rv64_ghash.c
-void rv64_ghash_rev(gf128_t * z);
-void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
 
 #endif										/* _GHASH_H_ */
