@@ -211,8 +211,8 @@ and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
 
 
 We can see that the best selection of method indeed depends on the relative
-cost of multiplication. Assuming other instructions to have unit cost and
-the cost multiplication instructions is a multiple of them, we have:
+cost of multiplication. Assuming that other instructions to have unit cost
+and ignoring loops etc, we have:
 
 | **Arch** | **Karatsuba**	| **Reduce**	| **MUL=1** | **MUL=2** | **MUL=3** | **MUL=6** |  
 |:-----:|:-----:|:-----:|:---------:|:---------:|:---------:|:---------:|
