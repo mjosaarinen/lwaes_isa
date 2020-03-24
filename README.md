@@ -169,7 +169,7 @@ The finite field is defined to be the ring of binary polynomials modulo
 the primitive pentanomial
 R(x) = x<sup>128</sup> + x<sup>7</sup> + x<sup>2</sup> + x + 1. 
 The field encoding is slightly unusual, with the multiplicative identity
-(i.e. one -- "1") being encoded as as byte sequence `0x80, 0x00, .., 0x00`. 
+(i.e. one -- "1") being encoded as a byte sequence `0x80, 0x00, .., 0x00`. 
 Converting to little-endian encoding involves inverting bits in each byte;
 the `GREV[W]` instruction with constant 7 (pseudo-instruction `rev`)
 accomplishes this.
@@ -210,8 +210,8 @@ and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
 | RV64B	| 	yes	| shift	|	2	|	24	|	12	|	3	|	3	|
 
 
-We can see that the best selection of method indeed depends on the relative
-cost of multiplication. Assuming that other instructions to have unit cost
+We can see that the best selection of algorithms depends on the relative
+cost of multiplication. Assuming that other instructions have unit cost
 and ignoring loops etc, we have:
 
 | **Arch** | **Karatsuba**	| **Reduce**	| **MUL=1** | **MUL=2** | **MUL=3** | **MUL=6** |  
