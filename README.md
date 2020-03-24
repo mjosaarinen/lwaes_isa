@@ -134,11 +134,11 @@ Here I'll briefly discuss implementation aspects
 of AES-GCM using the [bitmanip](https://github.com/riscv/riscv-bitmanip)
 (B) extension. Pseudocode for a relevant subset of instructions is contained
 in source file [bitmanip.c](bitmanip.c), with prototypes in 
-[bitmanip.h](bitmanip.h). These are almost directly lifted directly from
-the current draft specification. The instructions relevant to GCM
-are the Carry-Less Multiply instructions `CMUL[H][W]` and also the Generalized
-Reverse `GREV[W]`. The `[W]` suffix indicates a 64-bit word size variant 
-that is available only in RV64.
+[bitmanip.h](bitmanip.h). These are almost directly lifted from the current
+draft specification. The instructions relevant to GCM are the Carry-Less
+Multiply instructions `CMUL[H][W]` and also the Generalized Reverse `GREV[W]`.
+The `[W]` suffix indicates a 64-bit word size variant that is available
+only in RV64.
 
 The low-level functions that use these instructions are emulated by 
 [rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c). I've verified
