@@ -193,7 +193,7 @@ terms are really not appropriate when working in characteristic 2 since
 at no point is the computation of a multiplicative inverse required.
 
 
-####	Fastest Method
+####	Estimating the Fastest Method
 
 Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
 and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
