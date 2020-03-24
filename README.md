@@ -140,6 +140,12 @@ are the Carry-Less Multiply instructions `CMUL[H][W]` and also the Generalized
 Reverse `GREV[W]`. The `[W]` suffix indicates a 64-bit word size variant 
 that is available only in RV64B
 
+An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
+as is done with `MULH`/`MUL`, although there is no carry-over advantage.
+
+
+####	Finite Field Arithmetic
+
 While message confidentiality in GCM is provided by a block cipher (AES)
 in counter mode (a CTR variant), authentication is based on a GHASH, a 
 universal hash defined over the binary field GF(2<sup>128</sup>).
@@ -167,6 +173,8 @@ This reduces the number of `CMULW`/`CMULHW` (RV64) pairs from 4 to 3 with
 and the number of `CMUL`/`CMULH` (RV32) pairs from 16 to 9, with the
 cost of many XORs.
 
+####	Reduction via Shifts or via Multiplication
+
 The second arithmetic step to consider is the polynomial reduction of the
 255-bit ring product down to 128 bits (the field) again. The best way of
 doing reduction depends on *how fast* the carry-less multiplication
@@ -177,8 +185,8 @@ Some sources see analogues to Montgomery and Barrett methods, but those
 terms are really not appropriate when working in characteristic 2 since 
 at no point is the computation of a multiplicative inverse required.
 
-An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
-as is done with `MULH`/`MUL`, although there is no carry-over advantage.
+
+####	Fastest Method
 
 Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
 and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
@@ -210,12 +218,14 @@ the cost multiplication instructions is a multiple of them, we have:
 | RV64B	|	yes	|	mul	|	26		|	**36**	| **46**	| 76		|
 | RV64B	|	yes	| shift	|	44		|	50		|	56		| **74**	|
 
-We see that if `CLMUL[H][W]` is three times slower than XOR and shifts, 
+We see that if `CLMUL[H][W]` is two times slower than XOR and shifts, 
 or more, then Karatsuba is worthwhile. If it is six times slower, or more,
 then it is worthwhile to convert the reduction multiplications to shifts
 and XORs.
 
-## Discussion
+
+
+##	AES Notes 
 
 *   AES code density is 16 instructions per round (+ round key fetch), despite
     only requiring a single S-box in hardware. The initial
