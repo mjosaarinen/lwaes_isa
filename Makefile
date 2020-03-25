@@ -9,9 +9,9 @@ BIN		= xtest
 CSRC	= $(wildcard *.c)
 OBJS	= $(CSRC:.c=.o)
 CC		= gcc
-CFLAGS	?= -g -Wall -Wshadow -fsanitize=address,undefined -O2
+CFLAGS	= -Wall -Wextra -Wshadow -fsanitize=address,undefined -O2 -g
 #CFLAGS	= -Wall -march=native -O3
-LIBS    =
+LIBS    +=
 
 $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJS) $(LIBS)
