@@ -1,39 +1,39 @@
-# HDL for the AES / SM4 instruction 
+# HDL for the AES / SM4 instruction
 
 2020-01-29  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-2020-02-28	Updated with gate counts.
+2020-02-28  Updated with gate counts.
 
 The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v)
 has S-box implementations for AES and SM4. As can be seen, the entire thing
-is only about 100 lines + sboxes. Timing can be significantly further 
-improved. 
+is only about 100 lines + sboxes. Timing can be significantly further
+improved.
 
 If your design doesn't need both AES and SM4, or you just need the forward
-AES, you can use macros `E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to 
+AES, you can use macros `E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to
 disable forward AES, inverse AES, or SM4 respectively.
 
-A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom" 
+A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom"
 layers for the [Boyar-Peralta](https://eprint.iacr.org/2011/332.pdf) AES
 S-Box to demonstrate the fact that all three s-box types can share circuitry.
 The [sboxes.v](sboxes.v) file has some commentary on this.
 
 Currently the code does not mux the middle layer, which would reduce gate
-count. Also note that the the 21->8 bit bottom layers (which are linear) 
-can be merged ("collapsed into") the 8->32 bit output layers since they are 
+count. Also note that the the 21->8 bit bottom layers (which are linear)
+can be merged ("collapsed into") the 8->32 bit output layers since they are
 also linear. This would reduce timing and possibly gate count too. The
 present code prioritizes readability over these considerations.
 
-There's a simple [Makefile](Makefile) and a testbench for Icarus 
-Verilog (which is freely available for Debian/Ubuntu etc). 
+There's a simple [Makefile](Makefile) and a testbench for Icarus
+Verilog (which is freely available for Debian/Ubuntu etc).
 
 I have also tested this on Xilinx xsim and vivado with the C and Assembler
-language test suites (see parent directory). PQShield's Pluto RV32 core 
+language test suites (see parent directory). PQShield's Pluto RV32 core
 (on an Artix-7 FPGA) was used, although build files are not provided for
 that.
 
 
-##	CMOS Area and Latency Estimate
+##  CMOS Area and Latency Estimate
 
 There's a Yosys script to make area estimates against a mock CMOS ASIC
 cell library. Running `make rep` will perform synthesis and report gate
@@ -46,22 +46,22 @@ and transistor counts on four separate "feature sets" of the instruction:
 | SM4                  |  766.5  |  3066  |  25 |
 | AES + SM4 (full)     | 1678.5  |  6714  |  28 |
 
-LTP is the reported *Longest Topological Path* and is a circuit depth / 
+LTP is the reported *Longest Topological Path* and is a circuit depth /
 gate delay measure.
 
 (Currently the weights are such that transistors = 4*GE, but this can be
 tuned in the [yoparse.py](yoparse.py) script.)
 
-[Yosys](http://www.clifford.at/yosys/) version: 
+[Yosys](http://www.clifford.at/yosys/) version:
 `Yosys 0.9+1706 (git sha1 cd60f079, clang 6.0.0-1ubuntu2 -fPIC -Os)`
 
 
-##	Testing with a Simulator
+##  Testing with a Simulator
 
-No output from `make test` implies that simulator output matches with 
-[tbref.txt](tbref.txt). More test cases can be generated using the 
-C emulator code (in parent directory). Matching [enc1s_tb.v](enc1s_tb.v) 
-output is generated with argument `./xtest tb`. Just expand the 
+No output from `make test` implies that simulator output matches with
+[tbref.txt](tbref.txt). More test cases can be generated using the
+C emulator code (in parent directory). Matching [enc1s_tb.v](enc1s_tb.v)
+output is generated with argument `./xtest tb`. Just expand the
 ` test_hwtb()`  function in [../test_main.c](../test_main.c) to your needs.
 
 ```console
