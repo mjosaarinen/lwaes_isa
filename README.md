@@ -24,7 +24,7 @@ primary goal of ENC1S / lweas is to eliminate timing-side vulnerabilities.
 Speed-up over pure software table-based implementations is roughly 500 %.
 
 
-## Software and Hardware
+## Software and Hardware Source Code
 
 This directory contains an "emulator" C implementation of the instruction
 together with runnable pseudocode for full encryption, decryption, and
@@ -39,7 +39,8 @@ The assembler and C code use the same AES and SM4 API, specified in
 [sm4_encdec.h](sm4_encdec.h) (SM4-128 encryption and decryption).
 The API is split in pieces since AES and SM4 are independent of
 each other and some designers may additionally want to save space by not
-implementing inverse AES (not required for decryption in may modes).
+implementing inverse AES (not required for decryption in GCM and many 
+other modes).
 
 The [hdl](hdl) directory contains Verilog combinatorial logic for the core
 instruction. Simulator and basic CMOS gate count synthesis scripts are
@@ -122,6 +123,7 @@ six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
 Current assembler code only uses `ENC1S`.
 
+
 ##  Galois/Counter Mode (GCM): AES-GCM with Bitmanip
 
 The Galois/Counter Mode (GCM) specified in
@@ -179,6 +181,7 @@ method, which works even better in binary fields than it does with integers.
 This reduces the number of `CMULW`/`CMULHW` (RV64) pairs from 4 to 3 with
 and the number of `CMUL`/`CMULH` (RV32) pairs from 16 to 9, with the
 cost of many XORs.
+
 
 ####    Reduction via Shifts or via Multiplication
 
