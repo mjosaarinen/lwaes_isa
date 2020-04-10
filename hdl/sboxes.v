@@ -16,7 +16,7 @@
     The middle layer is common between all; the beneficiality of muxing it
     depends on target. Currently we are not doing it.
 
-    How? Because all of these are "Nyberg S-boxes" [Ny93]; built form a
+    How? Because all of these are "Nyberg S-boxes" [Ny93]; built from a
     multiplicative inverse in GF(256) and are therefore affine isomorphic.
 
     [BoPe12] Boyar J., Peralta R. "A Small Depth-16 Circuit for the AES
