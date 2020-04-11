@@ -73,7 +73,7 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	z1 = z1 ^ t1;
 	z0 = z0 ^ t0;
 #else
-	//  Shift reduction: 6 x SHIFT, 7 x XOR 
+	//  Shift reduction: 6 x SHIFT, 7 x XOR
 	z1 = z1 ^ (z4 >> 31) ^ (z4 >> 30) ^ (z4 >> 25);
 	z0 = z0 ^ z4 ^ (z4 << 1) ^ (z4 << 2) ^ (z4 << 7);
 #endif
@@ -104,7 +104,7 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 		z1 = z1 ^ t1;
 		z0 = t2 ^ t0;
 #else
-		//  Shift reduction: 6 x SHIFT, 7 x XOR 
+		//  Shift reduction: 6 x SHIFT, 7 x XOR
 		z1 = z1 ^ (z4 >> 31) ^ (z4 >> 30) ^ (z4 >> 25);
 		z0 = t2 ^ z4 ^ (z4 << 1) ^ (z4 << 2) ^ (z4 << 7);
 #endif
@@ -187,7 +187,7 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	t1 = x1 ^ x3;
 	t0 = x0 ^ x2;
 
-	x3 = rvb_clmulh(t1, t3);				//  middle 
+	x3 = rvb_clmulh(t1, t3);				//  middle
 	x2 = rvb_clmul(t1, t3);
 	x1 = rvb_clmulh(t0, t2);
 	x0 = rvb_clmul(t0, t2);
