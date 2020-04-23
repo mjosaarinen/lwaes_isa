@@ -1,4 +1,4 @@
-//  enc1s.v
+//  saes32.v
 //  2020-01-29  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -76,7 +76,7 @@ endmodule
 
 //  Combinatorial logic for the "ENC1S instruction" itself
 
-module enc1s(
+module saes32(
     output  [31:0]  rd,                 //  output register (wire!)
     input   [31:0]  rs1,                //  input register 1
     input   [31:0]  rs2,                //  input register 2

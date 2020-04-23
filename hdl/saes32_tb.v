@@ -1,4 +1,4 @@
-//  enc1s_tb.v
+//  saes32_tb.v
 //  2020-01-29  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -6,7 +6,7 @@
 
 `timescale  1 ns / 1 ps
 
-module enc1s_tb;
+module saes32_tb;
 
     //  clock generator
     reg clk = 1;
@@ -22,7 +22,7 @@ module enc1s_tb;
     wire [7:0] box;
 
     //  test instance
-    enc1s uut ( rd, rs1, rs2, fn );
+    saes32 uut ( rd, rs1, rs2, fn );
 
     always @(posedge clk) begin
 

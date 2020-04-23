@@ -2,7 +2,9 @@
 
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
-**Updated** February 17, 2020: flipped rs1 and rs2; rd=rs1 for "compressed".
+**Updated** April 23, 2020: Renamed ENC1S as SAES32 (and SSM4) as per current
+	draft spec where the proposal now resides.
+
 
 ## Description
 
@@ -17,7 +19,8 @@ as defined in [FIPS 197](doc/NIST.FIPS.197.pdf).
 
 A single instruction, SAES32 is used for encryption, decryption, and key
 schedule for both ciphers. For design rationale and some analysis, see the
-short report [A Lightweight ISA Extension for AES and SM4](https://arxiv.org/abs/2002.07041) (to appear at SECRISC-V 2020).
+short report [A Lightweight ISA Extension for AES and SM4](https://arxiv.org/abs/2002.07041) (to appear at SECRISC-V 2020). Note that there the same
+instruction is called "ENC1S".
 
 A more complex ISA extension may be appropriate for higher-end CPUs. The
 primary goal of SAES32 / lweas is to eliminate timing-side vulnerabilities.
@@ -53,7 +56,7 @@ code for those is not provided here.
 ## Technical Details
 
 The instruction is encapsulated in a single emulator function in
-[saes32.c](saes32.c):
+[crypto_saes32.c](crypto_saes32.c):
 ```C
 uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn);
 ```
@@ -95,33 +98,6 @@ is quite compact and the overall software implementation is fast.
 For SM4 the instruction has exactly the same data path with byte selection,
 S-Box lookup, but with different linear operations, depending on whether
 encryption/decryption or key scheduling is being performed.
-
-There is also a secondary primitive `ENC4S`, which may be implemented
-as pseudo-instruction. It can be expressed as:
-```C
-
-uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
-{
-    rs1 = saes32(rs1, rs2, fn);
-    rs1 = saes32(rs1, rs2, fn | 1);
-    rs1 = saes32(rs1, rs2, fn | 2);
-    rs1 = saes32(rs1, rs2, fn | 3);
-
-    return rs1;
-}
-```
-
-Note that `ENC4S` does **not** to speed up AES encryption and decryption
-over `SAES32`, but does speed up SM4 significantly and also helps make AES key
-schedule very fast -- perhaps even faster than fetching the subkeys from
-memory. Since four S-Boxes are required for `ENC4S` in a 1-cycle
-implementation, implementors may consider their priorities regarding these
-two ciphers when deciding if and how to implement `ENC4S`. Some may also
-want to drop AES inverse, as decryption in many modes does not actually
-require it. The selector input `fn[1:0]` is of course zero in for `ENC4S` --
-six code points are required in total and only two for a fast (but large)
-implementation of SM4, if `ENC4S` is implemented as a real instruction.
-Current assembler code only uses `SAES32`.
 
 
 ##  Galois/Counter Mode (GCM): AES-GCM with Bitmanip
