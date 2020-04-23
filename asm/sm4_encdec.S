@@ -5,7 +5,7 @@
 //	AES Encryption and Key Schedule using "lwaes" instructions.
 
 //	macro definitions for the custom instruction
-#include	"enc1s_c0.h"
+#include	"saes32_c0.h"
 
 		.option nopic
 		.text
@@ -35,19 +35,19 @@ sm4_encdec:
 		xor		a1,		a1,		t1
 		xor		a1,		a1,		t4
 
-		enc1s	T0, T0, A1, SM4_FN_ENC | 0
-		enc1s	T0, T0, A1, SM4_FN_ENC | 1
-		enc1s	T0, T0, A1, SM4_FN_ENC | 2
-		enc1s	T0, T0, A1, SM4_FN_ENC | 3
+		ssm4_ed		T0, T0, A1, 0
+		ssm4_ed		T0, T0, A1, 1
+		ssm4_ed		T0, T0, A1, 2
+		ssm4_ed		T0, T0, A1, 3
 
 		lw		a1,		4(a2)
 		xor		a1,		a1,		t0
 		xor		a1,		a1,		t4
 
-		enc1s	T1, T1, A1, SM4_FN_ENC | 0
-		enc1s	T1, T1, A1, SM4_FN_ENC | 1
-		enc1s	T1, T1, A1, SM4_FN_ENC | 2
-		enc1s	T1, T1, A1, SM4_FN_ENC | 3
+		ssm4_ed		T1, T1, A1, 0
+		ssm4_ed		T1, T1, A1, 1
+		ssm4_ed		T1, T1, A1, 2
+		ssm4_ed		T1, T1, A1, 3
 
 		xor		t4,		t0,		t1
 
@@ -55,19 +55,19 @@ sm4_encdec:
 		xor		a1,		a1,		t3
 		xor		a1,		a1,		t4
 
-		enc1s	T2, T2, A1, SM4_FN_ENC | 0
-		enc1s	T2, T2, A1, SM4_FN_ENC | 1
-		enc1s	T2, T2, A1, SM4_FN_ENC | 2
-		enc1s	T2, T2, A1, SM4_FN_ENC | 3
+		ssm4_ed		T2, T2, A1, 0
+		ssm4_ed		T2, T2, A1, 1
+		ssm4_ed		T2, T2, A1, 2
+		ssm4_ed		T2, T2, A1, 3
 
 		lw		a1,		12(a2)
 		xor		a1,		a1,		t2
 		xor		a1,		a1,		t4
 
-		enc1s	T3, T3, A1, SM4_FN_ENC | 0
-		enc1s	T3, T3, A1, SM4_FN_ENC | 1
-		enc1s	T3, T3, A1, SM4_FN_ENC | 2
-		enc1s	T3, T3, A1, SM4_FN_ENC | 3
+		ssm4_ed		T3, T3, A1, 0
+		ssm4_ed		T3, T3, A1, 1
+		ssm4_ed		T3, T3, A1, 2
+		ssm4_ed		T3, T3, A1, 3
 
 		addi	a2,		a2,		16
 		bne		a3,		a2,		.loop
@@ -83,7 +83,7 @@ sm4_encdec:
 
 
 //	Set key for encryption.
-//		void sm4_enc_key(uint32_t rk[32], const uint8_t key[16])
+//		void sm4_enc_key_asm(uint32_t rk[32], const uint8_t key[16])
 //		where:	a0 = rk, a1 = key
 
 		.globl	sm4_enc_key
@@ -137,10 +137,10 @@ sm4_enc_key:
 		add		a3,		a3,		a4
 		and		a3,		a3,		a5
 
-		enc1s	T0, T0, A1, SM4_FN_KEY | 0
-		enc1s	T0, T0, A1, SM4_FN_KEY | 1
-		enc1s	T0, T0, A1, SM4_FN_KEY | 2
-		enc1s	T0, T0, A1, SM4_FN_KEY | 3
+		ssm4_ks		T0, T0, A1, 0
+		ssm4_ks		T0, T0, A1, 1
+		ssm4_ks		T0, T0, A1, 2
+		ssm4_ks		T0, T0, A1, 3
 		sw		t0,		0(a0)
 
 		xor		a1,		a3,		t0
@@ -150,10 +150,10 @@ sm4_enc_key:
 		add		a3,		a3,		a4
 		and		a3,		a3,		a5
 
-		enc1s	T1, T1, A1, SM4_FN_KEY | 0
-		enc1s	T1, T1, A1, SM4_FN_KEY | 1
-		enc1s	T1, T1, A1, SM4_FN_KEY | 2
-		enc1s	T1, T1, A1, SM4_FN_KEY | 3
+		ssm4_ks		T1, T1, A1, 0
+		ssm4_ks		T1, T1, A1, 1
+		ssm4_ks		T1, T1, A1, 2
+		ssm4_ks		T1, T1, A1, 3
 		sw		t1,		4(a0)
 
 		xor		t4,		t0,		t1
@@ -164,10 +164,10 @@ sm4_enc_key:
 		add		a3,		a3,		a4
 		and		a3,		a3,		a5
 
-		enc1s	T2, T2, A1, SM4_FN_KEY | 0
-		enc1s	T2, T2, A1, SM4_FN_KEY | 1
-		enc1s	T2, T2, A1, SM4_FN_KEY | 2
-		enc1s	T2, T2, A1, SM4_FN_KEY | 3
+		ssm4_ks		T2, T2, A1, 0
+		ssm4_ks		T2, T2, A1, 1
+		ssm4_ks		T2, T2, A1, 2
+		ssm4_ks		T2, T2, A1, 3
 		sw		t2,		8(a0)
 
 		xor		a1,		a3,		t2
@@ -177,10 +177,10 @@ sm4_enc_key:
 		add		a3,		a3,		a4
 		and		a3,		a3,		a5
 
-		enc1s	T3, T3, A1, SM4_FN_KEY | 0
-		enc1s	T3, T3, A1, SM4_FN_KEY | 1
-		enc1s	T3, T3, A1, SM4_FN_KEY | 2
-		enc1s	T3, T3, A1, SM4_FN_KEY | 3
+		ssm4_ks		T3, T3, A1, 0
+		ssm4_ks		T3, T3, A1, 1
+		ssm4_ks		T3, T3, A1, 2
+		ssm4_ks		T3, T3, A1, 3
 		sw		t3,		12(a0)
 
 		addi	a0,		a0,		16
@@ -193,7 +193,7 @@ sm4_enc_key:
 
 
 //	Set key for decryption.
-//		void sm4_dec_key(uint32_t rk[32], const uint8_t key[16])
+//		void sm4_dec_key_asm(uint32_t rk[32], const uint8_t key[16])
 //			Where:	a0 = rk, a1 = key
 
 		.globl	sm4_dec_key
