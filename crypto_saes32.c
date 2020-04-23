@@ -1,10 +1,10 @@
-//  enc1s.c
+//  crypto_saes32.c
 //  2020-01-24  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  Running pseudocode for ENC1S (and ENC4S) AES/SM4 instruction.
+//  Running pseudocode for SAES32 (and ENC4S) AES/SM4 instruction.
 
-#include "enc1s.h"
+#include "crypto_rv32.h"
 
 //  Note that these three S-Boxes are affinely related -- they are all
 //  based on multiplicative inverse x^-1 in the finite field GF(256).
@@ -99,9 +99,9 @@ static inline uint8_t aes_xtime(uint8_t x)
 
 //  === THIS IS THE SINGLE LIGHTWEIGHT INSTRUCTION FOR AES AND SM4  ===
 
-//  ENC1S: Instruction for a byte select, single S-box, and linear operation.
+//  SAES32: Instruction for a byte select, single S-box, and linear operation.
 
-uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
+uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 {
 	uint32_t fa, fb, x, x2, x4, x8;
 
@@ -180,17 +180,4 @@ uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn)
 	}
 
 	return x ^ rs1;							//  XOR with rs2
-}
-
-//  ENC4S: Instruction or pseudoinstruction for four ENC1S's.
-//  We may assume that rd == rs1 and fn[1:0] == 2'b00.
-
-uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
-{
-	rs1 = enc1s(rs1, rs2, fn);
-	rs1 = enc1s(rs1, rs2, fn | 1);
-	rs1 = enc1s(rs1, rs2, fn | 2);
-	rs1 = enc1s(rs1, rs2, fn | 3);
-
-	return rs1;
 }

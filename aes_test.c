@@ -1,12 +1,11 @@
-//  test_aes.c
+//  aes_test.c
 //  2020-03-21  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  Unit tests for AES-128/192/256
 
 #include "test_hex.h"
-#include "aes_enc.h"
-#include "aes_dec.h"
+#include "aes_wrap.h"
 
 //  Test AES
 

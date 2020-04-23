@@ -1,4 +1,4 @@
-//  test_gcm.c
+//  gcm_test.c
 //  2020-03-21  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -10,8 +10,8 @@
 #include <stdlib.h>
 
 #include "test_hex.h"
-#include "aes_gcm.h"
-#include "ghash.h"
+#include "gcm_wrap.h"
+#include "gcm_gfmul.h"
 
 //  A GCM test
 

@@ -1,4 +1,4 @@
-//  aes_gcm.c
+//  gcm_wrap.c
 //  2020-03-21  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -7,9 +7,9 @@
 #include <string.h>
 
 #include "bitmanip.h"
-#include "aes_enc.h"
-#include "aes_gcm.h"
-#include "ghash.h"
+#include "aes_wrap.h"
+#include "gcm_wrap.h"
+#include "gcm_gfmul.h"
 
 //  function pointers are here
 

@@ -26,4 +26,4 @@
 	(v)[2] = (uint8_t) ((x) >> 16); (v)[3] = (uint8_t) ((x) >> 24); }
 #endif
 
-#endif										/* _ENDIAN_H_ */
+#endif										//  _ENDIAN_H_

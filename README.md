@@ -15,12 +15,12 @@ as defined in [FIPS 197](doc/NIST.FIPS.197.pdf).
 [(english spec)](doc/sm4en.pdf), also defined in GB/T 32907-2016 and ISO/IEC
 18033-3:2010/DAmd 2. SM4 has only one key size, 128 bits.
 
-A single instruction, ENC1S is used for encryption, decryption, and key
+A single instruction, SAES32 is used for encryption, decryption, and key
 schedule for both ciphers. For design rationale and some analysis, see the
 short report [A Lightweight ISA Extension for AES and SM4](https://arxiv.org/abs/2002.07041) (to appear at SECRISC-V 2020).
 
 A more complex ISA extension may be appropriate for higher-end CPUs. The
-primary goal of ENC1S / lweas is to eliminate timing-side vulnerabilities.
+primary goal of SAES32 / lweas is to eliminate timing-side vulnerabilities.
 Speed-up over pure software table-based implementations is roughly 500 %.
 
 
@@ -53,14 +53,14 @@ code for those is not provided here.
 ## Technical Details
 
 The instruction is encapsulated in a single emulator function in
-[enc1s.c](enc1s.c):
+[saes32.c](saes32.c):
 ```C
-uint32_t enc1s(uint32_t rs1, uint32_t rs2, int fn);
+uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn);
 ```
-The file [hdl/enc1s.v](hdl/enc1s.v) contains Verilog combinatorial
+The file [hdl/saes32.v](hdl/saes32.v) contains Verilog combinatorial
 logic for the instruction that can be used in a RISC-V core.
 ```verilog
-module enc1s(
+module saes32(
     output  [31:0]  rd,                 //  output register (wire!)
     input   [31:0]  rs1,                //  input register 1
     input   [31:0]  rs2,                //  input register 2
@@ -72,7 +72,7 @@ The `fn` immediate "constant" is currently 5 bits, covering encryption,
 decryption, and key schedule for both algorithms. Bits `fn[1:0]` specify
 the input byte and output rotation while `fn[4:2]` specify the operation.
 Appropriate pseudo instruction names for the code points can be proposed;
-current identifiers defined in [enc1s.h](enc1s.h) are:
+current identifiers defined in [saes32.h](saes32.h) are:
 
 | **Identifier** | **fn[4:2]** | **Description or Use**             |
 |----------------|:-----------:|------------------------------------|
@@ -102,17 +102,17 @@ as pseudo-instruction. It can be expressed as:
 
 uint32_t enc4s(uint32_t rs1, uint32_t rs2, int fn)
 {
-    rs1 = enc1s(rs1, rs2, fn);
-    rs1 = enc1s(rs1, rs2, fn | 1);
-    rs1 = enc1s(rs1, rs2, fn | 2);
-    rs1 = enc1s(rs1, rs2, fn | 3);
+    rs1 = saes32(rs1, rs2, fn);
+    rs1 = saes32(rs1, rs2, fn | 1);
+    rs1 = saes32(rs1, rs2, fn | 2);
+    rs1 = saes32(rs1, rs2, fn | 3);
 
     return rs1;
 }
 ```
 
 Note that `ENC4S` does **not** to speed up AES encryption and decryption
-over `ENC1S`, but does speed up SM4 significantly and also helps make AES key
+over `SAES32`, but does speed up SM4 significantly and also helps make AES key
 schedule very fast -- perhaps even faster than fetching the subkeys from
 memory. Since four S-Boxes are required for `ENC4S` in a 1-cycle
 implementation, implementors may consider their priorities regarding these
@@ -121,7 +121,7 @@ want to drop AES inverse, as decryption in many modes does not actually
 require it. The selector input `fn[1:0]` is of course zero in for `ENC4S` --
 six code points are required in total and only two for a fast (but large)
 implementation of SM4, if `ENC4S` is implemented as a real instruction.
-Current assembler code only uses `ENC1S`.
+Current assembler code only uses `SAES32`.
 
 
 ##  Galois/Counter Mode (GCM): AES-GCM with Bitmanip
@@ -285,9 +285,9 @@ $ make
 gcc  -c aes_enc.c -o aes_enc.o
 gcc  -c sm4_encdec.c -o sm4_encdec.o
 gcc  -c aes_dec.c -o aes_dec.o
-gcc  -c enc1s.c -o enc1s.o
+gcc  -c saes32.c -o saes32.o
 gcc  -c test_main.c -o test_main.o
-gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o enc1s.o test_main.o
+gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o saes32.o test_main.o
 $ ./xtest
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A
 [PASS] AES-128 Dec 00112233445566778899AABBCCDDEEFF

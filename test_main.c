@@ -9,17 +9,17 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "enc1s.h"
+#include "crypto_rv32.h"
 
 //  unit tests
 
-int test_aes();								//  test_aes.c
-int test_sm4();								//  test_sm4.c
-int test_gcm();								//  test_gcm.c
-int test_ghash();							//  test_gcm.c
+int test_aes();								//  aes_test.c
+int test_sm4();								//  sm4_test.c
+int test_gcm();								//  gcm_test.c
+int test_ghash();							//  gcm_test.c
 
 //  generate "reference" hw testbench data for the instruction
-//  output should match with hdl/enc1s_tb.v
+//  output should match with hdl/saes32_tb.v
 
 int test_hwtb()
 {
@@ -30,7 +30,7 @@ int test_hwtb()
 
 	for (fn = 0; fn < 24; fn++) {
 
-		rd = enc1s(rs1, rs2, fn);
+		rd = saes32(rs1, rs2, fn);
 
 		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n", rd, rs1, rs2, fn);
 

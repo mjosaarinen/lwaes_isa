@@ -1,13 +1,13 @@
-//  aes_enc.c
+//  aes_rv32_enc.c
 //  2020-01-22  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  "Running pseudocode" for full AES-128/192/256 encryption.
 
-#include "enc1s.h"
-#include "aes_enc.h"
-#include "endian.h"
+#include "crypto_rv32.h"
+#include "aes_wrap.h"
 #include "bitmanip.h"
+#include "endian.h"
 
 //  round constants -- just iterations of the xtime() LFSR
 
@@ -17,8 +17,8 @@ static const uint8_t aes_rcon[] = {
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-void aes_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
-					const uint32_t rk[], int nr)
+void aes_rv32_enc(uint8_t ct[16], const uint8_t pt[16],
+				  const uint32_t rk[], int nr)
 {
 	uint32_t t0, t1, t2, t3;				//  even round state registers
 	uint32_t u0, u1, u2, u3;				//  odd round state registers
@@ -41,25 +41,25 @@ void aes_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 		u2 = rk[6];
 		u3 = rk[7];
 
-		u0 = enc1s(u0, t0, AES_FN_ENC);		//  AES round, 16 instructions
-		u0 = enc1s(u0, t1, AES_FN_ENC | 1);
-		u0 = enc1s(u0, t2, AES_FN_ENC | 2);
-		u0 = enc1s(u0, t3, AES_FN_ENC | 3);
+		u0 = SAES32_ENCS(u0, t0, 0);		//  AES round, 16 instructions
+		u0 = SAES32_ENCS(u0, t1, 1);
+		u0 = SAES32_ENCS(u0, t2, 2);
+		u0 = SAES32_ENCS(u0, t3, 3);
 
-		u1 = enc1s(u1, t1, AES_FN_ENC);
-		u1 = enc1s(u1, t2, AES_FN_ENC | 1);
-		u1 = enc1s(u1, t3, AES_FN_ENC | 2);
-		u1 = enc1s(u1, t0, AES_FN_ENC | 3);
+		u1 = SAES32_ENCS(u1, t1, 0);
+		u1 = SAES32_ENCS(u1, t2, 1);
+		u1 = SAES32_ENCS(u1, t3, 2);
+		u1 = SAES32_ENCS(u1, t0, 3);
 
-		u2 = enc1s(u2, t2, AES_FN_ENC);
-		u2 = enc1s(u2, t3, AES_FN_ENC | 1);
-		u2 = enc1s(u2, t0, AES_FN_ENC | 2);
-		u2 = enc1s(u2, t1, AES_FN_ENC | 3);
+		u2 = SAES32_ENCS(u2, t2, 0);
+		u2 = SAES32_ENCS(u2, t3, 1);
+		u2 = SAES32_ENCS(u2, t0, 2);
+		u2 = SAES32_ENCS(u2, t1, 3);
 
-		u3 = enc1s(u3, t3, AES_FN_ENC);
-		u3 = enc1s(u3, t0, AES_FN_ENC | 1);
-		u3 = enc1s(u3, t1, AES_FN_ENC | 2);
-		u3 = enc1s(u3, t2, AES_FN_ENC | 3);
+		u3 = SAES32_ENCS(u3, t3, 0);
+		u3 = SAES32_ENCS(u3, t0, 1);
+		u3 = SAES32_ENCS(u3, t1, 2);
+		u3 = SAES32_ENCS(u3, t2, 3);
 
 		t0 = rk[8];							//  fetch even subkey
 		t1 = rk[9];
@@ -70,46 +70,46 @@ void aes_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 		if (rk == kp)						//  final round ?
 			break;
 
-		t0 = enc1s(t0, u0, AES_FN_ENC);		//  final encrypt round, 16 ins.
-		t0 = enc1s(t0, u1, AES_FN_ENC | 1);
-		t0 = enc1s(t0, u2, AES_FN_ENC | 2);
-		t0 = enc1s(t0, u3, AES_FN_ENC | 3);
+		t0 = SAES32_ENCS(t0, u0, 0);		//  AES round, 16 instructions
+		t0 = SAES32_ENCS(t0, u1, 1);
+		t0 = SAES32_ENCS(t0, u2, 2);
+		t0 = SAES32_ENCS(t0, u3, 3);
 
-		t1 = enc1s(t1, u1, AES_FN_ENC);
-		t1 = enc1s(t1, u2, AES_FN_ENC | 1);
-		t1 = enc1s(t1, u3, AES_FN_ENC | 2);
-		t1 = enc1s(t1, u0, AES_FN_ENC | 3);
+		t1 = SAES32_ENCS(t1, u1, 0);
+		t1 = SAES32_ENCS(t1, u2, 1);
+		t1 = SAES32_ENCS(t1, u3, 2);
+		t1 = SAES32_ENCS(t1, u0, 3);
 
-		t2 = enc1s(t2, u2, AES_FN_ENC);
-		t2 = enc1s(t2, u3, AES_FN_ENC | 1);
-		t2 = enc1s(t2, u0, AES_FN_ENC | 2);
-		t2 = enc1s(t2, u1, AES_FN_ENC | 3);
+		t2 = SAES32_ENCS(t2, u2, 0);
+		t2 = SAES32_ENCS(t2, u3, 1);
+		t2 = SAES32_ENCS(t2, u0, 2);
+		t2 = SAES32_ENCS(t2, u1, 3);
 
-		t3 = enc1s(t3, u3, AES_FN_ENC);
-		t3 = enc1s(t3, u0, AES_FN_ENC | 1);
-		t3 = enc1s(t3, u1, AES_FN_ENC | 2);
-		t3 = enc1s(t3, u2, AES_FN_ENC | 3);
+		t3 = SAES32_ENCS(t3, u3, 0);
+		t3 = SAES32_ENCS(t3, u0, 1);
+		t3 = SAES32_ENCS(t3, u1, 2);
+		t3 = SAES32_ENCS(t3, u2, 3);
 	}
 
-	t0 = enc1s(t0, u0, AES_FN_FWD);			//  final round is different
-	t0 = enc1s(t0, u1, AES_FN_FWD | 1);
-	t0 = enc1s(t0, u2, AES_FN_FWD | 2);
-	t0 = enc1s(t0, u3, AES_FN_FWD | 3);
+	t0 = SAES32_ENCSM(t0, u0, 0);			//  final round is different
+	t0 = SAES32_ENCSM(t0, u1, 1);
+	t0 = SAES32_ENCSM(t0, u2, 2);
+	t0 = SAES32_ENCSM(t0, u3, 3);
 
-	t1 = enc1s(t1, u1, AES_FN_FWD);
-	t1 = enc1s(t1, u2, AES_FN_FWD | 1);
-	t1 = enc1s(t1, u3, AES_FN_FWD | 2);
-	t1 = enc1s(t1, u0, AES_FN_FWD | 3);
+	t1 = SAES32_ENCSM(t1, u1, 0);
+	t1 = SAES32_ENCSM(t1, u2, 1);
+	t1 = SAES32_ENCSM(t1, u3, 2);
+	t1 = SAES32_ENCSM(t1, u0, 3);
 
-	t2 = enc1s(t2, u2, AES_FN_FWD);
-	t2 = enc1s(t2, u3, AES_FN_FWD | 1);
-	t2 = enc1s(t2, u0, AES_FN_FWD | 2);
-	t2 = enc1s(t2, u1, AES_FN_FWD | 3);
+	t2 = SAES32_ENCSM(t2, u2, 0);
+	t2 = SAES32_ENCSM(t2, u3, 1);
+	t2 = SAES32_ENCSM(t2, u0, 2);
+	t2 = SAES32_ENCSM(t2, u1, 3);
 
-	t3 = enc1s(t3, u3, AES_FN_FWD);
-	t3 = enc1s(t3, u0, AES_FN_FWD | 1);
-	t3 = enc1s(t3, u1, AES_FN_FWD | 2);
-	t3 = enc1s(t3, u2, AES_FN_FWD | 3);
+	t3 = SAES32_ENCSM(t3, u3, 0);
+	t3 = SAES32_ENCSM(t3, u0, 1);
+	t3 = SAES32_ENCSM(t3, u1, 2);
+	t3 = SAES32_ENCSM(t3, u2, 3);
 
 	PUTU32_LE(ct, t0);						//  write ciphertext block
 	PUTU32_LE(ct + 4, t1);
@@ -145,7 +145,10 @@ void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
 		tr = rvb_ror(t3, 8);				//  rotate 8 bits (little endian!)
-		t0 = enc4s(t0, tr, AES_FN_FWD);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 0);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 1);
+		t0 = SAES32_ENCSM(t0, tr, 2);
+		t0 = SAES32_ENCSM(t0, tr, 3);
 		t1 ^= t0;
 		t2 ^= t1;
 		t3 ^= t2;
@@ -181,7 +184,10 @@ void aes192_enc_key(uint32_t rk[52], const uint8_t key[24])
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
 		tr = rvb_ror(t5, 8);				//  rotate 8 bits (little endian!)
-		t0 = enc4s(t0, tr, AES_FN_FWD);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 0);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 1);
+		t0 = SAES32_ENCSM(t0, tr, 2);
+		t0 = SAES32_ENCSM(t0, tr, 3);
 
 		t1 ^= t0;
 		t2 ^= t1;
@@ -223,7 +229,10 @@ void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
 		tr = rvb_ror(t7, 8);				//  rotate 8 bits (little endian!)
-		t0 = enc4s(t0, tr, AES_FN_FWD);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 0);		//  SubWord()
+		t0 = SAES32_ENCSM(t0, tr, 1);
+		t0 = SAES32_ENCSM(t0, tr, 2);
+		t0 = SAES32_ENCSM(t0, tr, 3);
 		t1 ^= t0;
 		t2 ^= t1;
 		t3 ^= t2;
@@ -235,7 +244,10 @@ void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
 		if (rk == rke)						//  end condition
 			return;
 
-		t4 = enc4s(t4, t3, AES_FN_FWD);		//  SubWord() - NO rotation
+		t4 = SAES32_ENCSM(t4, t3, 0);		//  SubWord() - NO rotation
+		t4 = SAES32_ENCSM(t4, t3, 1);
+		t4 = SAES32_ENCSM(t4, t3, 2);
+		t4 = SAES32_ENCSM(t4, t3, 3);
 		t5 ^= t4;
 		t6 ^= t5;
 		t7 ^= t6;
