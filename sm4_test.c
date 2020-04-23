@@ -1,11 +1,11 @@
-//  test_sm4.c
+//  sm4_test.c
 //  2020-03-21  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  Unit tests for SM4
 
 #include "test_hex.h"
-#include "sm4_encdec.h"
+#include "sm4_wrap.h"
 
 //  Test SM4
 

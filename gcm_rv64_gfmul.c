@@ -1,10 +1,10 @@
-//  rv64_ghash.c
+//  gcm_rv64_gfmul.c
 //  2020-03-23  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  64-bit GHASH bit-reverse and multiplication for GCM
 
-#include "ghash.h"
+#include "gcm_gfmul.h"
 #include "bitmanip.h"
 
 //  disable shift reduction

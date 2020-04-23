@@ -1,11 +1,11 @@
-//	aes_dec.S
+//	saes32_dec.S
 //	2020-02-16	Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //	Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //	AES Decryption and Key Schedule using "lwaes" instructions.
 
 //	macro definitions for the custom instruction
-#include	"enc1s_c0.h"
+#include	"saes32_c0.h"
 
 		.option nopic
 		.text
@@ -44,25 +44,25 @@ aes_dec_rounds:
 
 .loop:
 		//	even round
-		enc1s	T0, T0, T4, AES_FN_DEC | 0
-		enc1s	T0, T0, A7, AES_FN_DEC | 1
-		enc1s	T0, T0, T6, AES_FN_DEC | 2
-		enc1s	T0, T0, T5, AES_FN_DEC | 3
+		saes32_decs		T0, T0, T4, 0
+		saes32_decs		T0, T0, A7, 1
+		saes32_decs		T0, T0, T6, 2
+		saes32_decs		T0, T0, T5, 3
 
-		enc1s	T1, T1, T5, AES_FN_DEC | 0
-		enc1s	T1, T1, T4, AES_FN_DEC | 1
-		enc1s	T1, T1, A7, AES_FN_DEC | 2
-		enc1s	T1, T1, T6, AES_FN_DEC | 3
+		saes32_decs		T1, T1, T5, 0
+		saes32_decs		T1, T1, T4, 1
+		saes32_decs		T1, T1, A7, 2
+		saes32_decs		T1, T1, T6, 3
 
-		enc1s	T2, T2, T6, AES_FN_DEC | 0
-		enc1s	T2, T2, T5, AES_FN_DEC | 1
-		enc1s	T2, T2, T4, AES_FN_DEC | 2
-		enc1s	T2, T2, A7, AES_FN_DEC | 3
+		saes32_decs		T2, T2, T6, 0
+		saes32_decs		T2, T2, T5, 1
+		saes32_decs		T2, T2, T4, 2
+		saes32_decs		T2, T2, A7, 3
 
-		enc1s	T3, T3, A7, AES_FN_DEC | 0
-		enc1s	T3, T3, T6, AES_FN_DEC | 1
-		enc1s	T3, T3, T5, AES_FN_DEC | 2
-		enc1s	T3, T3, T4, AES_FN_DEC | 3
+		saes32_decs		T3, T3, A7, 0
+		saes32_decs		T3, T3, T6, 1
+		saes32_decs		T3, T3, T5, 2
+		saes32_decs		T3, T3, T4, 3
 
 .ent:
 		addi	a3,		a3,		-32
@@ -72,25 +72,25 @@ aes_dec_rounds:
 		lw		a7,		28(a3)
 
 		//	odd round
-		enc1s	T4, T4, T0, AES_FN_DEC | 0
-		enc1s	T4, T4, T3, AES_FN_DEC | 1
-		enc1s	T4, T4, T2, AES_FN_DEC | 2
-		enc1s	T4, T4, T1, AES_FN_DEC | 3
+		saes32_decs		T4, T4, T0, 0
+		saes32_decs		T4, T4, T3, 1
+		saes32_decs		T4, T4, T2, 2
+		saes32_decs		T4, T4, T1, 3
 
-		enc1s	T5, T5, T1, AES_FN_DEC | 0
-		enc1s	T5, T5, T0, AES_FN_DEC | 1
-		enc1s	T5, T5, T3, AES_FN_DEC | 2
-		enc1s	T5, T5, T2, AES_FN_DEC | 3
+		saes32_decs		T5, T5, T1, 0
+		saes32_decs		T5, T5, T0, 1
+		saes32_decs		T5, T5, T3, 2
+		saes32_decs		T5, T5, T2, 3
 
-		enc1s	T6, T6, T2, AES_FN_DEC | 0
-		enc1s	T6, T6, T1, AES_FN_DEC | 1
-		enc1s	T6, T6, T0, AES_FN_DEC | 2
-		enc1s	T6, T6, T3, AES_FN_DEC | 3
+		saes32_decs		T6, T6, T2, 0
+		saes32_decs		T6, T6, T1, 1
+		saes32_decs		T6, T6, T0, 2
+		saes32_decs		T6, T6, T3, 3
 
-		enc1s	A7, A7, T3, AES_FN_DEC | 0
-		enc1s	A7, A7, T2, AES_FN_DEC | 1
-		enc1s	A7, A7, T1, AES_FN_DEC | 2
-		enc1s	A7, A7, T0, AES_FN_DEC | 3
+		saes32_decs		A7, A7, T3, 0
+		saes32_decs		A7, A7, T2, 1
+		saes32_decs		A7, A7, T1, 2
+		saes32_decs		A7, A7, T0, 3
 
 		lw		t0,		0(a3)				//	load round key
 		lw		t1,		4(a3)
@@ -99,25 +99,25 @@ aes_dec_rounds:
 		bne		a3,		a2,		.loop
 
 		//	final (output) round
-		enc1s	T0, T0, T4, AES_FN_REV | 0
-		enc1s	T0, T0, A7, AES_FN_REV | 1
-		enc1s	T0, T0, T6, AES_FN_REV | 2
-		enc1s	T0, T0, T5, AES_FN_REV | 3
+		saes32_decsm	T0, T0, T4, 0
+		saes32_decsm	T0, T0, A7, 1
+		saes32_decsm	T0, T0, T6, 2
+		saes32_decsm	T0, T0, T5, 3
 
-		enc1s	T1, T1, T5, AES_FN_REV | 0
-		enc1s	T1, T1, T4, AES_FN_REV | 1
-		enc1s	T1, T1, A7, AES_FN_REV | 2
-		enc1s	T1, T1, T6, AES_FN_REV | 3
+		saes32_decsm	T1, T1, T5, 0
+		saes32_decsm	T1, T1, T4, 1
+		saes32_decsm	T1, T1, A7, 2
+		saes32_decsm	T1, T1, T6, 3
 
-		enc1s	T2, T2, T6, AES_FN_REV | 0
-		enc1s	T2, T2, T5, AES_FN_REV | 1
-		enc1s	T2, T2, T4, AES_FN_REV | 2
-		enc1s	T2, T2, A7, AES_FN_REV | 3
+		saes32_decsm	T2, T2, T6, 0
+		saes32_decsm	T2, T2, T5, 1
+		saes32_decsm	T2, T2, T4, 2
+		saes32_decsm	T2, T2, A7, 3
 
-		enc1s	T3, T3, A7, AES_FN_REV | 0
-		enc1s	T3, T3, T6, AES_FN_REV | 1
-		enc1s	T3, T3, T5, AES_FN_REV | 2
-		enc1s	T3, T3, T4, AES_FN_REV | 3
+		saes32_decsm	T3, T3, A7, 0
+		saes32_decsm	T3, T3, T6, 1
+		saes32_decsm	T3, T3, T5, 2
+		saes32_decsm	T3, T3, T4, 3
 
 		sw		t0,		0(a0)				//	store pt
 		sw		t1,		4(a0)
@@ -134,15 +134,15 @@ aes_dec_rounds:
 .invmc:
 		lw		t0,		0(a0)
 
-		enc1s	T1, 0,	T0, AES_FN_FWD | 0
-		enc1s	T1, T1, T0, AES_FN_FWD | 1
-		enc1s	T1, T1, T0, AES_FN_FWD | 2
-		enc1s	T1, T1, T0, AES_FN_FWD | 3
+		saes32_encsm	T1, 0,	T0, 0
+		saes32_encsm	T1, T1, T0, 1
+		saes32_encsm	T1, T1, T0, 2
+		saes32_encsm	T1, T1, T0, 3
 
-		enc1s	T0, 0,	T1, AES_FN_DEC | 0
-		enc1s	T0, T0, T1, AES_FN_DEC | 1
-		enc1s	T0, T0, T1, AES_FN_DEC | 2
-		enc1s	T0, T0, T1, AES_FN_DEC | 3
+		saes32_decs		T0, 0,	T1, 0
+		saes32_decs		T0, T0, T1, 1
+		saes32_decs		T0, T0, T1, 2
+		saes32_decs		T0, T0, T1, 3
 
 		sw		t0,		0(a0)
 		addi	a0,		a0,		4

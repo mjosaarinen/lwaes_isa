@@ -1,12 +1,30 @@
-//  sm4_encdec.c
+//  sm4_rv32_encdec.c
 //  2020-01-27  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  SM4 (Chinese Encryption Standard) Encryption and Decryption
 
-#include "sm4_encdec.h"
-#include "enc1s.h"
+#include "sm4_wrap.h"
+#include "crypto_rv32.h"
 #include "endian.h"
+
+//  SSM4_ED_X4  is a block of four ssm4.ed instructions:
+
+#define SSM4_ED_X4(rs1, rs2) {		\
+	rs1 = SSM4_ED(rs1, rs2, 0);		\
+	rs1 = SSM4_ED(rs1, rs2, 1);		\
+	rs1 = SSM4_ED(rs1, rs2, 2);		\
+	rs1 = SSM4_ED(rs1, rs2, 3);		\
+}
+
+//  SSM4_KS_X4  is a block of four ssm4.ks instructions:
+
+#define SSM4_KS_X4(rs1, rs2) {		\
+	rs1 = SSM4_KS(rs1, rs2, 0);		\
+	rs1 = SSM4_KS(rs1, rs2, 1);		\
+	rs1 = SSM4_KS(rs1, rs2, 2);		\
+	rs1 = SSM4_KS(rs1, rs2, 3);		\
+}
 
 //  encrypt or decrypt a block, depending on round key ordering
 
@@ -28,24 +46,23 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
 		t = rk[0];							//  subkeys can be inline
 		t ^= u;
 		t ^= x1;
-		x0 = enc4s(x0, t, SM4_FN_ENC);		//  4 x enc4s (or 16 x enc1s) per R
+		SSM4_ED_X4(x0, t);					//  4 x SSM4.ED
 
 		t = rk[1];
 		t ^= u;
 		t ^= x0;
-		x1 = enc4s(x1, t, SM4_FN_ENC);
-
+		SSM4_ED_X4(x1, t);					//  4 x SSM4.ED
 		u = x0 ^ x1;
 
 		t = rk[2];
 		t ^= u;
 		t ^= x3;
-		x2 = enc4s(x2, t, SM4_FN_ENC);
+		SSM4_ED_X4(x2, t);					//  4 x SSM4.ED
 
 		t = rk[3];
 		t ^= u;
 		t ^= x2;
-		x3 = enc4s(x3, t, SM4_FN_ENC);
+		SSM4_ED_X4(x3, t);					//  4 x SSM4.ED
 
 		rk += 4;							//  unroll to taste
 
@@ -98,7 +115,8 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 		u = x2 ^ x3;						//  10 XORs per round
 		t = t ^ u;
 		t = t ^ x1;
-		x0 = enc4s(x0, t, SM4_FN_KEY);		//  4 x ENC4S (or 16 x ENC1S)
+		SSM4_KS_X4(x0, t);					//  4 x SSM4.KS
+
 		rk[0] = x0;							//  four stores per round
 
 		t = ck ^ 0x01000100;
@@ -107,7 +125,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 
 		t = t ^ u;
 		t = t ^ x0;
-		x1 = enc4s(x1, t, SM4_FN_KEY);
+		SSM4_KS_X4(x1, t);					//  4 x SSM4.KS
 		rk[1] = x1;
 
 		t = ck ^ 0x01000100;
@@ -117,7 +135,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 		u = x0 ^ x1;
 		t ^= u;
 		t ^= x3;
-		x2 = enc4s(x2, t, SM4_FN_KEY);
+		SSM4_KS_X4(x2, t);					//  4 x SSM4.KS
 		rk[2] = x2;
 
 		t = ck ^ 0x01000100;
@@ -126,7 +144,7 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 
 		t ^= u;
 		t ^= x2;
-		x3 = enc4s(x3, t, SM4_FN_KEY);
+		SSM4_KS_X4(x3, t);					//  4 x SSM4.KS
 		rk[3] = x3;
 
 		rk += 4;

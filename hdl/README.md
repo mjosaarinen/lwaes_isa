@@ -4,14 +4,14 @@
 
 2020-02-28  Updated with gate counts.
 
-The main instruction is in [enc1s.v](enc1s.v), while [sboxes.v](sboxes.v)
+The main instruction is in [saes32.v](saes32.v), while [sboxes.v](sboxes.v)
 has S-box implementations for AES and SM4. As can be seen, the entire thing
 is only about 100 lines + sboxes. Timing can be significantly further
 improved.
 
 If your design doesn't need both AES and SM4, or you just need the forward
-AES, you can use macros `E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to
-disable forward AES, inverse AES, or SM4 respectively.
+AES, you can use macros `SAES32_NO_AES`, `SAES32_NO_AESI`, or `SAES32_NO_SM4`
+to disable forward AES, inverse AES, or SM4 respectively.
 
 A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom"
 layers for the [Boyar-Peralta](https://eprint.iacr.org/2011/332.pdf) AES
@@ -60,13 +60,13 @@ tuned in the [yoparse.py](yoparse.py) script.)
 
 No output from `make test` implies that simulator output matches with
 [tbref.txt](tbref.txt). More test cases can be generated using the
-C emulator code (in parent directory). Matching [enc1s_tb.v](enc1s_tb.v)
+C emulator code (in parent directory). Matching [saes32_tb.v](saes32_tb.v)
 output is generated with argument `./xtest tb`. Just expand the
 ` test_hwtb()`  function in [../test_main.c](../test_main.c) to your needs.
 
 ```console
 $ make
-iverilog -o sim.vvp enc1s_tb.v sboxes.v enc1s.v
+iverilog -o sim.vvp saes32_tb.v sboxes.v saes32.v
 vvp -N sim.vvp
 [TB] rd=a56363c6 rs1=00000000 rs2=00000000 fn=00
 [TB] rd=6e6edcb2 rs1=00000000 rs2=01234567 fn=01

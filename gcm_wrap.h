@@ -1,4 +1,4 @@
-//  aes_gcm.h
+//  gcm_wrao.h
 //  2020-03-21  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -6,8 +6,8 @@
 //  Ciphertext is always 16 bytes larger than plaintext.
 //  Decrypt/verify routines (aesxxx_dec_vfy_gcm) return nonzero on failure.
 
-#ifndef _AES_GCM_H_
-#define _AES_GCM_H_
+#ifndef _GCM_WRAP_H_
+#define _GCM_WRAP_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -33,4 +33,4 @@ void aes256_enc_gcm(uint8_t * c, const uint8_t * m, size_t mlen,
 int aes256_dec_vfy_gcm(uint8_t * m, const uint8_t * c, size_t clen,
 					   const uint8_t * key, const uint8_t iv[12]);
 
-#endif										/* _AES_GCM_H_ */
+#endif										//  _GCM_WRAP_H_

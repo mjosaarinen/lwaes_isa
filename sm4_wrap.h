@@ -1,4 +1,4 @@
-//  sm4_encdec.h
+//  sm4_wrap.h
 //  2020-01-24  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -7,8 +7,8 @@
 //  The decryption funtion is the same as encryption with the difference
 //  of having a reversed key schedule. Hence we define both functions here.
 
-#ifndef _SM4_ENCDEC_H_
-#define _SM4_ENCDEC_H_
+#ifndef _SM4_WRAP_H_
+#define _SM4_WRAP_H_
 
 #include <stdint.h>
 
@@ -29,4 +29,4 @@ void sm4_dec_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16]);
 #define sm4_enc_ecb(ct, pt, rk) sm4_encdec(ct, pt, rk)
 #define sm4_dec_ecb(pt, ct, rk) sm4_encdec(pt, ct, rk)
 
-#endif										/* _SM4_ENCDEC_H_ */
+#endif										//  _SM4_WRAP_H_

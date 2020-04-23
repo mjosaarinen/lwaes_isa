@@ -1,11 +1,11 @@
-//  ghash.h
+//  gcm_gfmul.h
 //  2020-03-23  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  a minimal interface to core GHASH finite field operations
 
-#ifndef _GHASH_H_
-#define _GHASH_H_
+#ifndef _GCM_GFMUL_H_
+#define _GCM_GFMUL_H_
 
 #include <stdint.h>
 
@@ -40,4 +40,4 @@ extern void (*ghash_rev)(gf128_t * z);
 //  finite field multiply z = ( z ^ rev(x) ) * h
 extern void (*ghash_mul)(gf128_t * z, const gf128_t * x, const gf128_t * h);
 
-#endif										/* _GHASH_H_ */
+#endif										//  _GCM_GFMUL_H_

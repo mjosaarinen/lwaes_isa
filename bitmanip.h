@@ -52,4 +52,4 @@ uint64_t rvb_shflw(uint64_t rs1, uint64_t rs2);
 //  generalized unshuffle UNSHFLW
 uint64_t rvb_unshflw(uint64_t rs1, uint64_t rs2);
 
-#endif
+#endif										//  _BITMANIP_H_
