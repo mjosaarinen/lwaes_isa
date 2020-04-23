@@ -10,8 +10,8 @@ is only about 100 lines + sboxes. Timing can be significantly further
 improved.
 
 If your design doesn't need both AES and SM4, or you just need the forward
-AES, you can use macros `E1S_NO_AES`, `E1S_NO_AESI`, or `E1S_NO_SM4` to
-disable forward AES, inverse AES, or SM4 respectively.
+AES, you can use macros `SAES32_NO_AES`, `SAES32_NO_AESI`, or `SAES32_NO_SM4`
+to disable forward AES, inverse AES, or SM4 respectively.
 
 A note about [sboxes.v](sboxes.v): I created linear SM4 "top" and "bottom"
 layers for the [Boyar-Peralta](https://eprint.iacr.org/2011/332.pdf) AES

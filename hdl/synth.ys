@@ -1,5 +1,5 @@
 design -reset
-read_verilog -D E1S_NO_AESI -D E1S_NO_SM4 -defer saes32.v sboxes.v
+read_verilog -D SAES32_NO_AESI -D SAES32_NO_SM4 -defer saes32.v sboxes.v
 hierarchy -top saes32
 rename saes32 saes32_aes_enc_only
 synth -flatten; abc -dff -g cmos; opt -fast
@@ -7,7 +7,7 @@ tee -a synth.tmp stat -tech cmos
 tee -a synth.tmp ltp -noff
 
 design -reset
-read_verilog -D E1S_NO_SM4 -defer saes32.v sboxes.v
+read_verilog -D SAES32_NO_SM4 -defer saes32.v sboxes.v
 hierarchy -top saes32
 rename saes32 saes32_aes_encdec
 synth -flatten; abc -dff -g cmos; opt -fast
@@ -15,7 +15,7 @@ tee -a synth.tmp stat -tech cmos
 tee -a synth.tmp ltp -noff
 
 design -reset
-read_verilog -D E1S_NO_AES -D E1S_NO_AESI -defer saes32.v sboxes.v
+read_verilog -D SAES32_NO_AES -D SAES32_NO_AESI -defer saes32.v sboxes.v
 hierarchy -top saes32
 rename saes32 saes32_sm4_only
 synth -flatten; abc -dff -g cmos; opt -fast

@@ -36,14 +36,9 @@ instruction counts, test vector generation, and other such evaluation.
 Real assembler listings for the same functions (using a seriously hacky
 macro instruction encoding) can be found under the [asm](asm) directory.
 
-The assembler and C code use the same AES and SM4 API, specified in
-[aes_enc.h](aes_enc.h) (AES-128/192/256 encryption),
-[aes_dec.h](aes_dec.h) (AES-128/192/256 decryption) and
-[sm4_encdec.h](sm4_encdec.h) (SM4-128 encryption and decryption).
-The API is split in pieces since AES and SM4 are independent of
-each other and some designers may additionally want to save space by not
-implementing inverse AES (not required for decryption in GCM and many 
-other modes).
+The assembler and C code use essentially the same api, AES and SM4 API
+(specified in [saes32_wrap.h](saes32_wrap.h)) so that same test code
+can be used with both.
 
 The [hdl](hdl) directory contains Verilog combinatorial logic for the core
 instruction. Simulator and basic CMOS gate count synthesis scripts are
@@ -174,8 +169,9 @@ in characteristic 2.)
 
 ####    Estimating the Fastest Method
 
-Examining the multiplication implementations in [rv32_ghash.c](rv32_ghash.c)
-and [rv64_ghash.c](rv64_ghash.c) we obtain the following arithmetic counts:
+Examining the multiplication implementations in 
+[gcm_rv32_gfmul.c](gcm_rv32_gfmul.c) and [gcm_rv64_gfmul.c](gcm_rv64_gfmul.c)
+we obtain the following arithmetic counts:
 
 | **Arch** | **Karatsuba**  | **Reduce**    | `GREV` | `XOR` | `S[L/R]L` | `CLMUL` | `CLMULH` |
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
