@@ -64,7 +64,7 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
 		t ^= x2;
 		SSM4_ED_X4(x3, t);					//  4 x SSM4.ED
 
-		rk += 4;							//  unroll to taste
+		rk += 4;							//  unroll?
 
 	} while (rk != kp);
 
@@ -159,9 +159,9 @@ void sm4_dec_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 	uint32_t t;
 	int i, j;
 
-	sm4_enc_key(rk, key);					//  create encryption keys
+	sm4_enc_key(rk, key);					//  encryption expansion
 
-	//  simply reverse the order of the key words
+	//  decryption round keys = encryption round keys in reverse order
 	for (i = 0, j = SM4_RK_WORDS - 1; i < j; i++, j--) {
 		t = rk[i];
 		rk[i] = rk[j];
