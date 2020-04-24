@@ -105,7 +105,7 @@ endmodule
 
 //	=== AES (Forward) ===
 
-`ifndef E1S_NO_AES
+`ifndef SAES32_NO_AES
 
 //	top (inner) linear layer for AES
 
@@ -208,7 +208,7 @@ endmodule
 
 //	=== AES^-1 (Inverse) ===
 
-`ifndef E1S_NO_AESI
+`ifndef SAES32_NO_AESI
 
 //	top (inner) linear layer for AES^-1
 
@@ -308,7 +308,7 @@ endmodule
 
 //	=== SM4 ===
 
-`ifndef E1S_NO_SM4
+`ifndef SAES32_NO_SM4
 
 //	top (inner) linear layer for SM4
 
