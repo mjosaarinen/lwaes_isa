@@ -44,61 +44,6 @@ aes_dec_rounds:
 
 .loop:
 		//	even round
-		saes32_decs		T0, T0, T4, 0
-		saes32_decs		T0, T0, A7, 1
-		saes32_decs		T0, T0, T6, 2
-		saes32_decs		T0, T0, T5, 3
-
-		saes32_decs		T1, T1, T5, 0
-		saes32_decs		T1, T1, T4, 1
-		saes32_decs		T1, T1, A7, 2
-		saes32_decs		T1, T1, T6, 3
-
-		saes32_decs		T2, T2, T6, 0
-		saes32_decs		T2, T2, T5, 1
-		saes32_decs		T2, T2, T4, 2
-		saes32_decs		T2, T2, A7, 3
-
-		saes32_decs		T3, T3, A7, 0
-		saes32_decs		T3, T3, T6, 1
-		saes32_decs		T3, T3, T5, 2
-		saes32_decs		T3, T3, T4, 3
-
-.ent:
-		addi	a3,		a3,		-32
-		lw		t4,		16(a3)				//	load round key
-		lw		t5,		20(a3)
-		lw		t6,		24(a3)
-		lw		a7,		28(a3)
-
-		//	odd round
-		saes32_decs		T4, T4, T0, 0
-		saes32_decs		T4, T4, T3, 1
-		saes32_decs		T4, T4, T2, 2
-		saes32_decs		T4, T4, T1, 3
-
-		saes32_decs		T5, T5, T1, 0
-		saes32_decs		T5, T5, T0, 1
-		saes32_decs		T5, T5, T3, 2
-		saes32_decs		T5, T5, T2, 3
-
-		saes32_decs		T6, T6, T2, 0
-		saes32_decs		T6, T6, T1, 1
-		saes32_decs		T6, T6, T0, 2
-		saes32_decs		T6, T6, T3, 3
-
-		saes32_decs		A7, A7, T3, 0
-		saes32_decs		A7, A7, T2, 1
-		saes32_decs		A7, A7, T1, 2
-		saes32_decs		A7, A7, T0, 3
-
-		lw		t0,		0(a3)				//	load round key
-		lw		t1,		4(a3)
-		lw		t2,		8(a3)
-		lw		t3,		12(a3)
-		bne		a3,		a2,		.loop
-
-		//	final (output) round
 		saes32_decsm	T0, T0, T4, 0
 		saes32_decsm	T0, T0, A7, 1
 		saes32_decsm	T0, T0, T6, 2
@@ -119,6 +64,61 @@ aes_dec_rounds:
 		saes32_decsm	T3, T3, T5, 2
 		saes32_decsm	T3, T3, T4, 3
 
+.ent:
+		addi	a3,		a3,		-32
+		lw		t4,		16(a3)				//	load round key
+		lw		t5,		20(a3)
+		lw		t6,		24(a3)
+		lw		a7,		28(a3)
+
+		//	odd round
+		saes32_decsm	T4, T4, T0, 0
+		saes32_decsm	T4, T4, T3, 1
+		saes32_decsm	T4, T4, T2, 2
+		saes32_decsm	T4, T4, T1, 3
+
+		saes32_decsm	T5, T5, T1, 0
+		saes32_decsm	T5, T5, T0, 1
+		saes32_decsm	T5, T5, T3, 2
+		saes32_decsm	T5, T5, T2, 3
+
+		saes32_decsm	T6, T6, T2, 0
+		saes32_decsm	T6, T6, T1, 1
+		saes32_decsm	T6, T6, T0, 2
+		saes32_decsm	T6, T6, T3, 3
+
+		saes32_decsm	A7, A7, T3, 0
+		saes32_decsm	A7, A7, T2, 1
+		saes32_decsm	A7, A7, T1, 2
+		saes32_decsm	A7, A7, T0, 3
+
+		lw		t0,		0(a3)				//	load round key
+		lw		t1,		4(a3)
+		lw		t2,		8(a3)
+		lw		t3,		12(a3)
+		bne		a3,		a2,		.loop
+
+		//	final (output) round
+		saes32_decs		T0, T0, T4, 0
+		saes32_decs		T0, T0, A7, 1
+		saes32_decs		T0, T0, T6, 2
+		saes32_decs		T0, T0, T5, 3
+
+		saes32_decs		T1, T1, T5, 0
+		saes32_decs		T1, T1, T4, 1
+		saes32_decs		T1, T1, A7, 2
+		saes32_decs		T1, T1, T6, 3
+
+		saes32_decs		T2, T2, T6, 0
+		saes32_decs		T2, T2, T5, 1
+		saes32_decs		T2, T2, T4, 2
+		saes32_decs		T2, T2, A7, 3
+
+		saes32_decs		T3, T3, A7, 0
+		saes32_decs		T3, T3, T6, 1
+		saes32_decs		T3, T3, T5, 2
+		saes32_decs		T3, T3, T4, 3
+
 		sw		t0,		0(a0)				//	store pt
 		sw		t1,		4(a0)
 		sw		t2,		8(a0)
@@ -134,15 +134,15 @@ aes_dec_rounds:
 .invmc:
 		lw		t0,		0(a0)
 
-		saes32_encsm	T1, 0,	T0, 0
-		saes32_encsm	T1, T1, T0, 1
-		saes32_encsm	T1, T1, T0, 2
-		saes32_encsm	T1, T1, T0, 3
+		saes32_encs		T1, 0,	T0, 0
+		saes32_encs		T1, T1, T0, 1
+		saes32_encs		T1, T1, T0, 2
+		saes32_encs		T1, T1, T0, 3
 
-		saes32_decs		T0, 0,	T1, 0
-		saes32_decs		T0, T0, T1, 1
-		saes32_decs		T0, T0, T1, 2
-		saes32_decs		T0, T0, T1, 3
+		saes32_decsm	T0, 0,	T1, 0
+		saes32_decsm	T0, T0, T1, 1
+		saes32_decsm	T0, T0, T1, 2
+		saes32_decsm	T0, T0, T1, 3
 
 		sw		t0,		0(a0)
 		addi	a0,		a0,		4

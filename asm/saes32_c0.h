@@ -15,12 +15,12 @@
 
 
 //	function codes
-#define AES_FN_ENC	(0 << 2)
-#define AES_FN_FWD	(1 << 2)
-#define AES_FN_DEC	(2 << 2)
-#define AES_FN_REV	(3 << 2)
-#define SM4_FN_ENC	(4 << 2)
-#define SM4_FN_KEY	(5 << 2)
+#define SAES32_ENCSM_FN		0
+#define SAES32_ENCS_FN		1
+#define SAES32_DECSM_FN		2
+#define SAES32_DECS_FN		3
+#define SSM4_ED_FN			4
+#define SSM4_KS_FN			5
 
 //	SAES32 as funct3=0 -- with a fn in funct7
 
@@ -30,28 +30,29 @@
 
 //	Pseudo-ops for AES and SM4
 
-	.macro	saes32_encs		rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (AES_FN_ENC | (\bs))
-	.endm
-
 	.macro	saes32_encsm	rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (AES_FN_FWD | (\bs))
+	saes32	\rd, \rs1, \rs2, ((SAES32_ENCSM_FN << 2) | (\bs))
 	.endm
 
-	.macro	saes32_decs		rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (AES_FN_DEC | (\bs))
+	.macro	saes32_encs		rd, rs1, rs2, bs
+	saes32	\rd, \rs1, \rs2, ((SAES32_ENCS_FN << 2) | (\bs))
 	.endm
 
 	.macro	saes32_decsm	rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (AES_FN_REV | (\bs))
+	saes32	\rd, \rs1, \rs2, ((SAES32_DECSM_FN << 2) | (\bs))
 	.endm
 
+	.macro	saes32_decs		rd, rs1, rs2, bs
+	saes32	\rd, \rs1, \rs2, ((SAES32_DECS_FN << 2) | (\bs))
+	.endm
+
+
 	.macro	ssm4_ed			rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (SM4_FN_ENC | (\bs))
+	saes32	\rd, \rs1, \rs2, ((SSM4_ED_FN << 2) | (\bs))
 	.endm
 
 	.macro	ssm4_ks			rd, rs1, rs2, bs
-	saes32	\rd, \rs1, \rs2, (SM4_FN_KEY | (\bs))
+	saes32	\rd, \rs1, \rs2, ((SSM4_KS_FN << 2) | (\bs))
 	.endm
 
 

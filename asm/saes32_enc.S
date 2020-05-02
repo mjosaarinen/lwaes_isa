@@ -44,61 +44,6 @@ aes_enc_rounds:
 
 .loop:
 		//	odd round
-		saes32_encs		T0, T0, T4, 0
-		saes32_encs		T0, T0, T5, 1
-		saes32_encs		T0, T0, T6, 2
-		saes32_encs		T0, T0, A7, 3
-
-		saes32_encs		T1, T1, T5, 0
-		saes32_encs		T1, T1, T6, 1
-		saes32_encs		T1, T1, A7, 2
-		saes32_encs		T1, T1, T4, 3
-
-		saes32_encs		T2, T2, T6, 0
-		saes32_encs		T2, T2, A7, 1
-		saes32_encs		T2, T2, T4, 2
-		saes32_encs		T2, T2, T5, 3
-
-		saes32_encs		T3, T3, A7, 0
-		saes32_encs		T3, T3, T4, 1
-		saes32_encs		T3, T3, T5, 2
-		saes32_encs		T3, T3, T6, 3
-
-.ent:
-		lw		t4,		16(a2)				//	load round key
-		lw		t5,		20(a2)
-		lw		t6,		24(a2)
-		lw		a7,		28(a2)
-
-		//	even round
-		saes32_encs		T4, T4, T0, 0
-		saes32_encs		T4, T4, T1, 1
-		saes32_encs		T4, T4, T2, 2
-		saes32_encs		T4, T4, T3, 3
-
-		saes32_encs		T5, T5, T1, 0
-		saes32_encs		T5, T5, T2, 1
-		saes32_encs		T5, T5, T3, 2
-		saes32_encs		T5, T5, T0, 3
-
-		saes32_encs		T6, T6, T2, 0
-		saes32_encs		T6, T6, T3, 1
-		saes32_encs		T6, T6, T0, 2
-		saes32_encs		T6, T6, T1, 3
-
-		saes32_encs		A7, A7, T3, 0
-		saes32_encs		A7, A7, T0, 1
-		saes32_encs		A7, A7, T1, 2
-		saes32_encs		A7, A7, T2, 3
-
-		addi	a2,		a2,		32
-		lw		t0,		0(a2)				//	load round key
-		lw		t1,		4(a2)
-		lw		t2,		8(a2)
-		lw		t3,		12(a2)
-		bne		a3,		a2,		.loop
-
-		//	final (output) round
 		saes32_encsm	T0, T0, T4, 0
 		saes32_encsm	T0, T0, T5, 1
 		saes32_encsm	T0, T0, T6, 2
@@ -118,6 +63,61 @@ aes_enc_rounds:
 		saes32_encsm	T3, T3, T4, 1
 		saes32_encsm	T3, T3, T5, 2
 		saes32_encsm	T3, T3, T6, 3
+
+.ent:
+		lw		t4,		16(a2)				//	load round key
+		lw		t5,		20(a2)
+		lw		t6,		24(a2)
+		lw		a7,		28(a2)
+
+		//	even round
+		saes32_encsm	T4, T4, T0, 0
+		saes32_encsm	T4, T4, T1, 1
+		saes32_encsm	T4, T4, T2, 2
+		saes32_encsm	T4, T4, T3, 3
+
+		saes32_encsm	T5, T5, T1, 0
+		saes32_encsm	T5, T5, T2, 1
+		saes32_encsm	T5, T5, T3, 2
+		saes32_encsm	T5, T5, T0, 3
+
+		saes32_encsm	T6, T6, T2, 0
+		saes32_encsm	T6, T6, T3, 1
+		saes32_encsm	T6, T6, T0, 2
+		saes32_encsm	T6, T6, T1, 3
+
+		saes32_encsm	A7, A7, T3, 0
+		saes32_encsm	A7, A7, T0, 1
+		saes32_encsm	A7, A7, T1, 2
+		saes32_encsm	A7, A7, T2, 3
+
+		addi	a2,		a2,		32
+		lw		t0,		0(a2)				//	load round key
+		lw		t1,		4(a2)
+		lw		t2,		8(a2)
+		lw		t3,		12(a2)
+		bne		a3,		a2,		.loop
+
+		//	final (output) round
+		saes32_encs		T0, T0, T4, 0
+		saes32_encs		T0, T0, T5, 1
+		saes32_encs		T0, T0, T6, 2
+		saes32_encs		T0, T0, A7, 3
+
+		saes32_encs		T1, T1, T5, 0
+		saes32_encs		T1, T1, T6, 1
+		saes32_encs		T1, T1, A7, 2
+		saes32_encs		T1, T1, T4, 3
+
+		saes32_encs		T2, T2, T6, 0
+		saes32_encs		T2, T2, A7, 1
+		saes32_encs		T2, T2, T4, 2
+		saes32_encs		T2, T2, T5, 3
+
+		saes32_encs		T3, T3, A7, 0
+		saes32_encs		T3, T3, T4, 1
+		saes32_encs		T3, T3, T5, 2
+		saes32_encs		T3, T3, T6, 3
 
 		sw		t0,		0(a0)				//	store ct
 		sw		t1,		4(a0)
@@ -166,10 +166,10 @@ aes128_enc_key:
 		srli	a1,		t3,		8
 		or		a1,		a1,		a4
 
-		saes32_encsm	T0, T0, A1, 0
-		saes32_encsm	T0, T0, A1, 1
-		saes32_encsm	T0, T0, A1, 2
-		saes32_encsm	T0, T0, A1, 3
+		saes32_encs		T0, T0, A1, 0
+		saes32_encs		T0, T0, A1, 1
+		saes32_encs		T0, T0, A1, 2
+		saes32_encs		T0, T0, A1, 3
 
 		xor		t1,		t1,		t0
 		xor		t2,		t2,		t1
@@ -228,10 +228,10 @@ aes192_enc_key:
 		srli	a1,		t5,		8
 		or		a1,		a1,		a4
 
-		saes32_encsm	T0, T0, A1, 0
-		saes32_encsm	T0, T0, A1, 1
-		saes32_encsm	T0, T0, A1, 2
-		saes32_encsm	T0, T0, A1, 3
+		saes32_encs		T0, T0, A1, 0
+		saes32_encs		T0, T0, A1, 1
+		saes32_encs		T0, T0, A1, 2
+		saes32_encs		T0, T0, A1, 3
 
 		xor		t1,		t1,		t0
 		xor		t2,		t2,		t1
@@ -283,10 +283,10 @@ aes256_enc_key:
 		xori	t0,		t0,		1			//	first round constant
 		j		.nl2
 
-.ekl2:	saes32_encsm	T4, T4, T3, 0	//	no rotate
-		saes32_encsm	T4, T4, T3, 1
-		saes32_encsm	T4, T4, T3, 2
-		saes32_encsm	T4, T4, T3, 3
+.ekl2:	saes32_encs		T4, T4, T3, 0	//	no rotate
+		saes32_encs		T4, T4, T3, 1
+		saes32_encs		T4, T4, T3, 2
+		saes32_encs		T4, T4, T3, 3
 
 		xor		t5,		t5,		t4
 		xor		t6,		t6,		t5
@@ -305,10 +305,10 @@ aes256_enc_key:
 		srli	a1,		a7,		8
 		or		a1,		a1,		a4
 
-		saes32_encsm	T0, T0, A1, 0
-		saes32_encsm	T0, T0, A1, 1
-		saes32_encsm	T0, T0, A1, 2
-		saes32_encsm	T0, T0, A1, 3
+		saes32_encs		T0, T0, A1, 0
+		saes32_encs		T0, T0, A1, 1
+		saes32_encs		T0, T0, A1, 2
+		saes32_encs		T0, T0, A1, 3
 
 		xor		t1,		t1,		t0
 		xor		t2,		t2,		t1

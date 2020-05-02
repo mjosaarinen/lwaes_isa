@@ -74,12 +74,12 @@ current identifiers defined in [crypto_saes32.h](crypto_saes32.h) are:
 
 | **Identifier** 	| **fn[4:2]** | **Description or Use**             |
 |-------------------|:-----------:|------------------------------------|
-| `SAES32_ENCSM_FN`	| 0    | AES Encrypt main body with *MixColumns*.  |
-| `SAES32_ENCS_FN`	| 1    | AES Encrypt final round / Key Schedule.   |
-| `SAES32_DECSM_FN`	| 2    | AES Decrypt main body with *MixColumns*.  |
-| `SAES32_DECS_FN`	| 3    | AES Decrypt final round.                  |
-| `SSM4_ED_FN`   	| 4    | SM4 Encrypt and Decrypt.                  |
-| `SSM4_KS_FN`   	| 5    | SM4 Key Schedule.                         |
+| `SAES32_ENCSM`	| 0    | AES Encrypt main body with *MixColumns*.  |
+| `SAES32_ENCS`		| 1    | AES Encrypt final round / Key Schedule.   |
+| `SAES32_DECSM`	| 2    | AES Decrypt main body with *MixColumns*.  |
+| `SAES32_DECS`		| 3    | AES Decrypt final round.                  |
+| `SSM4_ED` 	  	| 4    | SM4 Encrypt and Decrypt.                  |
+| `SSM4_KS` 	  	| 5    | SM4 Key Schedule.                         |
 |                	| 6-7  | *Unused. 4x6=24 points currently used.*   |
 
 For AES the instruction selects a byte from `rs2`, performs a single S-box
@@ -92,6 +92,7 @@ is quite compact and the overall software implementation is fast.
 For SM4 the instruction has exactly the same data path with byte selection,
 S-Box lookup, but with different linear operations, depending on whether
 encryption/decryption or key scheduling is being performed.
+
 
 ##  Galois/Counter Mode (GCM): AES-GCM with Bitmanip
 

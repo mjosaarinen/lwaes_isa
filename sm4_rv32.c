@@ -11,19 +11,19 @@
 //  SSM4_ED_X4  is a block of four ssm4.ed instructions:
 
 #define SSM4_ED_X4(rs1, rs2) {		\
-	rs1 = SSM4_ED(rs1, rs2, 0);		\
-	rs1 = SSM4_ED(rs1, rs2, 1);		\
-	rs1 = SSM4_ED(rs1, rs2, 2);		\
-	rs1 = SSM4_ED(rs1, rs2, 3);		\
+	rs1 = ssm4_ed(rs1, rs2, 0);		\
+	rs1 = ssm4_ed(rs1, rs2, 1);		\
+	rs1 = ssm4_ed(rs1, rs2, 2);		\
+	rs1 = ssm4_ed(rs1, rs2, 3);		\
 }
 
 //  SSM4_KS_X4  is a block of four ssm4.ks instructions:
 
 #define SSM4_KS_X4(rs1, rs2) {		\
-	rs1 = SSM4_KS(rs1, rs2, 0);		\
-	rs1 = SSM4_KS(rs1, rs2, 1);		\
-	rs1 = SSM4_KS(rs1, rs2, 2);		\
-	rs1 = SSM4_KS(rs1, rs2, 3);		\
+	rs1 = ssm4_ks(rs1, rs2, 0);		\
+	rs1 = ssm4_ks(rs1, rs2, 1);		\
+	rs1 = ssm4_ks(rs1, rs2, 2);		\
+	rs1 = ssm4_ks(rs1, rs2, 3);		\
 }
 
 //  encrypt or decrypt a block, depending on round key ordering

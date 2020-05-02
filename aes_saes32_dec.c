@@ -34,25 +34,25 @@ void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
 		u2 = kp[6];
 		u3 = kp[7];
 
-		u0 = SAES32_DECSM(u0, t0, 0);		//  AES decryption round, 16 instr
-		u0 = SAES32_DECSM(u0, t3, 1);
-		u0 = SAES32_DECSM(u0, t2, 2);
-		u0 = SAES32_DECSM(u0, t1, 3);
+		u0 = saes32_decsm(u0, t0, 0);		//  AES decryption round, 16 instr
+		u0 = saes32_decsm(u0, t3, 1);
+		u0 = saes32_decsm(u0, t2, 2);
+		u0 = saes32_decsm(u0, t1, 3);
 
-		u1 = SAES32_DECSM(u1, t1, 0);
-		u1 = SAES32_DECSM(u1, t0, 1);
-		u1 = SAES32_DECSM(u1, t3, 2);
-		u1 = SAES32_DECSM(u1, t2, 3);
+		u1 = saes32_decsm(u1, t1, 0);
+		u1 = saes32_decsm(u1, t0, 1);
+		u1 = saes32_decsm(u1, t3, 2);
+		u1 = saes32_decsm(u1, t2, 3);
 
-		u2 = SAES32_DECSM(u2, t2, 0);
-		u2 = SAES32_DECSM(u2, t1, 1);
-		u2 = SAES32_DECSM(u2, t0, 2);
-		u2 = SAES32_DECSM(u2, t3, 3);
+		u2 = saes32_decsm(u2, t2, 0);
+		u2 = saes32_decsm(u2, t1, 1);
+		u2 = saes32_decsm(u2, t0, 2);
+		u2 = saes32_decsm(u2, t3, 3);
 
-		u3 = SAES32_DECSM(u3, t3, 0);
-		u3 = SAES32_DECSM(u3, t2, 1);
-		u3 = SAES32_DECSM(u3, t1, 2);
-		u3 = SAES32_DECSM(u3, t0, 3);
+		u3 = saes32_decsm(u3, t3, 0);
+		u3 = saes32_decsm(u3, t2, 1);
+		u3 = saes32_decsm(u3, t1, 2);
+		u3 = saes32_decsm(u3, t0, 3);
 
 		t0 = kp[0];							//  fetch even subkey
 		t1 = kp[1];
@@ -63,46 +63,46 @@ void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
 			break;
 		kp -= 8;
 
-		t0 = SAES32_DECSM(t0, u0, 0);		//  AES decryption round, 16 instr
-		t0 = SAES32_DECSM(t0, u3, 1);
-		t0 = SAES32_DECSM(t0, u2, 2);
-		t0 = SAES32_DECSM(t0, u1, 3);
+		t0 = saes32_decsm(t0, u0, 0);		//  AES decryption round, 16 instr
+		t0 = saes32_decsm(t0, u3, 1);
+		t0 = saes32_decsm(t0, u2, 2);
+		t0 = saes32_decsm(t0, u1, 3);
 
-		t1 = SAES32_DECSM(t1, u1, 0);
-		t1 = SAES32_DECSM(t1, u0, 1);
-		t1 = SAES32_DECSM(t1, u3, 2);
-		t1 = SAES32_DECSM(t1, u2, 3);
+		t1 = saes32_decsm(t1, u1, 0);
+		t1 = saes32_decsm(t1, u0, 1);
+		t1 = saes32_decsm(t1, u3, 2);
+		t1 = saes32_decsm(t1, u2, 3);
 
-		t2 = SAES32_DECSM(t2, u2, 0);
-		t2 = SAES32_DECSM(t2, u1, 1);
-		t2 = SAES32_DECSM(t2, u0, 2);
-		t2 = SAES32_DECSM(t2, u3, 3);
+		t2 = saes32_decsm(t2, u2, 0);
+		t2 = saes32_decsm(t2, u1, 1);
+		t2 = saes32_decsm(t2, u0, 2);
+		t2 = saes32_decsm(t2, u3, 3);
 
-		t3 = SAES32_DECSM(t3, u3, 0);
-		t3 = SAES32_DECSM(t3, u2, 1);
-		t3 = SAES32_DECSM(t3, u1, 2);
-		t3 = SAES32_DECSM(t3, u0, 3);
+		t3 = saes32_decsm(t3, u3, 0);
+		t3 = saes32_decsm(t3, u2, 1);
+		t3 = saes32_decsm(t3, u1, 2);
+		t3 = saes32_decsm(t3, u0, 3);
 	}
 
-	t0 = SAES32_DECS(t0, u0, 0);			//  final decryption round, 16 ins.
-	t0 = SAES32_DECS(t0, u3, 1);
-	t0 = SAES32_DECS(t0, u2, 2);
-	t0 = SAES32_DECS(t0, u1, 3);
+	t0 = saes32_decs(t0, u0, 0);			//  final decryption round, 16 ins.
+	t0 = saes32_decs(t0, u3, 1);
+	t0 = saes32_decs(t0, u2, 2);
+	t0 = saes32_decs(t0, u1, 3);
 
-	t1 = SAES32_DECS(t1, u1, 0);
-	t1 = SAES32_DECS(t1, u0, 1);
-	t1 = SAES32_DECS(t1, u3, 2);
-	t1 = SAES32_DECS(t1, u2, 3);
+	t1 = saes32_decs(t1, u1, 0);
+	t1 = saes32_decs(t1, u0, 1);
+	t1 = saes32_decs(t1, u3, 2);
+	t1 = saes32_decs(t1, u2, 3);
 
-	t2 = SAES32_DECS(t2, u2, 0);
-	t2 = SAES32_DECS(t2, u1, 1);
-	t2 = SAES32_DECS(t2, u0, 2);
-	t2 = SAES32_DECS(t2, u3, 3);
+	t2 = saes32_decs(t2, u2, 0);
+	t2 = saes32_decs(t2, u1, 1);
+	t2 = saes32_decs(t2, u0, 2);
+	t2 = saes32_decs(t2, u3, 3);
 
-	t3 = SAES32_DECS(t3, u3, 0);
-	t3 = SAES32_DECS(t3, u2, 1);
-	t3 = SAES32_DECS(t3, u1, 2);
-	t3 = SAES32_DECS(t3, u0, 3);
+	t3 = saes32_decs(t3, u3, 0);
+	t3 = saes32_decs(t3, u2, 1);
+	t3 = saes32_decs(t3, u1, 2);
+	t3 = saes32_decs(t3, u0, 3);
 
 	PUTU32_LE(pt, t0);						//  write plaintext block
 	PUTU32_LE(pt + 4, t1);
@@ -122,15 +122,15 @@ void rv32_aes_dec_invmc(uint32_t * v, size_t len)
 	for (i = 0; i < len; i++) {
 		x = v[i];
 
-		y = SAES32_ENCS(0, x, 0);			//  SubWord()
-		y = SAES32_ENCS(y, x, 1);
-		y = SAES32_ENCS(y, x, 2);
-		y = SAES32_ENCS(y, x, 3);
+		y = saes32_encs(0, x, 0);			//  SubWord()
+		y = saes32_encs(y, x, 1);
+		y = saes32_encs(y, x, 2);
+		y = saes32_encs(y, x, 3);
 
-		x = SAES32_DECSM(0, y, 0);			//  Just want inv MixCol()
-		x = SAES32_DECSM(x, y, 1);
-		x = SAES32_DECSM(x, y, 2);
-		x = SAES32_DECSM(x, y, 3);
+		x = saes32_decsm(0, y, 0);			//  Just want inv MixCol()
+		x = saes32_decsm(x, y, 1);
+		x = saes32_decsm(x, y, 2);
+		x = saes32_decsm(x, y, 3);
 
 		v[i] = x;
 	}
