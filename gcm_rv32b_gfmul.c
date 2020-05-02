@@ -1,4 +1,4 @@
-//  gcm_rv32_gfmul.c
+//  gcm_rv32b_gfmul.c
 //  2020-03-23  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 

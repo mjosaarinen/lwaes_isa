@@ -9,14 +9,16 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "aes_wrap.h"
 #include "crypto_rv32.h"
+#include "gcm_wrap.h"
+#include "gcm_gfmul.h"
 
 //  unit tests
 
 int test_aes();								//  aes_test.c
 int test_sm4();								//  sm4_test.c
 int test_gcm();								//  gcm_test.c
-int test_ghash();							//  gcm_test.c
 
 //  generate "reference" hw testbench data for the instruction
 //  output should match with hdl/saes32_tb.v
@@ -51,9 +53,28 @@ int main(int argc, char **argv)
 		return test_hwtb();
 	}
 	//  algorithm tests
+	printf("[INFO] === AES using SAES32 ===\n");
+	aes_enc_rounds = aes_saes32_enc;
+	aes_dec_rounds = aes_saes32_dec;
 	fail += test_aes();
+
+	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
+	ghash_rev = rv64_ghash_rev;
+	ghash_mul = rv64_ghash_mul;
+	fail += test_gcm();
+
+	printf("[INFO] === GCM using rv32_ghash_mul() ===\n");
+	ghash_rev = rv32_ghash_rev;
+	ghash_mul = rv32_ghash_mul;
+	fail += test_gcm();
+
+	printf("[INFO] === GCM using rv32_ghash_mul_kar() ===\n");
+	ghash_rev = rv32_ghash_rev;
+	ghash_mul = rv32_ghash_mul_kar;
+	fail += test_gcm();
+
+	printf("[INFO] === SM4 test ===\n");
 	fail += test_sm4();
-	fail += test_ghash();
 
 	if (fail == 0) {
 		printf("[PASS] all tests passed.\n");
