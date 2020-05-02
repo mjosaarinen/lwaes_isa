@@ -1,4 +1,4 @@
-//  aes_saes32_enc.c
+//  saes32_enc.c
 //  2020-01-22  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -121,7 +121,7 @@ void aes_saes32_enc(uint8_t ct[16], const uint8_t pt[16],
 
 //  Key schedule for AES-128 Encryption.
 
-void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
+void saes32_128_enc_key(uint32_t rk[44], const uint8_t key[16])
 {
 	uint32_t t0, t1, t2, t3, tr;			//  subkey registers
 	const uint32_t *rke = &rk[44 - 4];		//  end pointer
@@ -157,7 +157,7 @@ void aes128_enc_key(uint32_t rk[44], const uint8_t key[16])
 
 //  Key schedule for AES-192 encryption.
 
-void aes192_enc_key(uint32_t rk[52], const uint8_t key[24])
+void saes32_192_enc_key(uint32_t rk[52], const uint8_t key[24])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, tr;	//  subkey registers
 	const uint32_t *rke = &rk[52 - 4];		//  end pointer
@@ -199,7 +199,7 @@ void aes192_enc_key(uint32_t rk[52], const uint8_t key[24])
 
 //  Key schedule for AES-256 encryption.
 
-void aes256_enc_key(uint32_t rk[60], const uint8_t key[32])
+void saes32_256_enc_key(uint32_t rk[60], const uint8_t key[32])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, t6, t7, tr;	// subkey registers
 	const uint32_t *rke = &rk[60 - 4];		//  end pointer

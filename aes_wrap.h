@@ -20,18 +20,25 @@
 #define AES192_RK_WORDS (4 * (AES192_ROUNDS + 1))
 #define AES256_RK_WORDS (4 * (AES256_ROUNDS + 1))
 
-//  === ENCRYPT ===
+//  === ENCRYPT UUT ===
 
 //  set encryption key
-void aes128_enc_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void aes192_enc_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void aes256_enc_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+extern void (*aes128_enc_key)(uint32_t rk[AES128_RK_WORDS],
+							  const uint8_t key[16]);
+extern void (*aes192_enc_key)(uint32_t rk[AES192_RK_WORDS],
+							  const uint8_t key[24]);
+extern void (*aes256_enc_key)(uint32_t rk[AES256_RK_WORDS],
+							  const uint8_t key[32]);
 
-//  pointer to uut
+//  encrypt a block
 extern void (*aes_enc_rounds)(uint8_t ct[16], const uint8_t pt[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations 
+void saes32_128_enc_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_192_enc_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_256_enc_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+
 void aes_saes32_enc(uint8_t ct[16], const uint8_t pt[16],
 					const uint32_t rk[], int nr);
 void aes_saes64_enc(uint8_t ct[16], const uint8_t pt[16],
@@ -45,15 +52,22 @@ void aes_saes64_enc(uint8_t ct[16], const uint8_t pt[16],
 //  === DECRYPT ===
 
 //  set decryption key
-void aes128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void aes192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void aes256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+extern void (*aes128_dec_key)(uint32_t rk[AES128_RK_WORDS],
+							  const uint8_t key[16]);
+extern void (*aes192_dec_key)(uint32_t rk[AES192_RK_WORDS],
+							  const uint8_t key[24]);
+extern void (*aes256_dec_key)(uint32_t rk[AES256_RK_WORDS],
+							  const uint8_t key[32]);
 
 //  pointer to uut
 extern void (*aes_dec_rounds)(uint8_t pt[16], const uint8_t ct[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations
+void saes32_128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+
 void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
 					const uint32_t rk[], int nr);
 void aes_saes64_dec(uint8_t pt[16], const uint8_t ct[16],

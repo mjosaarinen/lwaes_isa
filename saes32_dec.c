@@ -1,4 +1,4 @@
-//  aes_saes32_dec.c
+//  saes32_dec.c
 //  2020-01-22  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
@@ -114,7 +114,7 @@ void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
 //  If decryption keys are computed in the fly (inverse key schedule), there's
 //  no need for the encryption instruction (but you need final subkey).
 
-void rv32_aes_dec_invmc(uint32_t * v, size_t len)
+void saes32_dec_invmc(uint32_t * v, size_t len)
 {
 	size_t i;
 	uint32_t x, y;
@@ -138,27 +138,27 @@ void rv32_aes_dec_invmc(uint32_t * v, size_t len)
 
 //  Key schedule for AES-128 decryption.
 
-void aes128_dec_key(uint32_t rk[44], const uint8_t key[16])
+void saes32_128_dec_key(uint32_t rk[44], const uint8_t key[16])
 {
 	//  create an encryption key and modify middle rounds
 	aes128_enc_key(rk, key);
-	rv32_aes_dec_invmc(rk + 4, AES128_RK_WORDS - 8);
+	saes32_dec_invmc(rk + 4, AES128_RK_WORDS - 8);
 }
 
 //  Key schedule for AES-192 decryption.
 
-void aes192_dec_key(uint32_t rk[52], const uint8_t key[24])
+void saes32_192_dec_key(uint32_t rk[52], const uint8_t key[24])
 {
 	//  create an encryption key and modify middle rounds
 	aes192_enc_key(rk, key);
-	rv32_aes_dec_invmc(rk + 4, AES192_RK_WORDS - 8);
+	saes32_dec_invmc(rk + 4, AES192_RK_WORDS - 8);
 }
 
 //  Key schedule for AES-256 decryption.
 
-void aes256_dec_key(uint32_t rk[60], const uint8_t key[32])
+void saes32_256_dec_key(uint32_t rk[60], const uint8_t key[32])
 {
 	//  create an encryption key and modify middle rounds
 	aes256_enc_key(rk, key);
-	rv32_aes_dec_invmc(rk + 4, AES256_RK_WORDS - 8);
+	saes32_dec_invmc(rk + 4, AES256_RK_WORDS - 8);
 }
