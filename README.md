@@ -70,18 +70,17 @@ The `fn` immediate "constant" is currently 5 bits, covering encryption,
 decryption, and key schedule for both algorithms. Bits `fn[1:0]` specify
 the input byte and output rotation while `fn[4:2]` specify the operation.
 Appropriate pseudo instruction names for the code points can be proposed;
-current identifiers defined in [saes32.h](saes32.h) are:
+current identifiers defined in [crypto_saes32.h](crypto_saes32.h) are:
 
-| **Identifier** | **fn[4:2]** | **Description or Use**             |
-|----------------|:-----------:|------------------------------------|
-| `AES_FN_ENC`   | 0    | AES Encrypt main body with *MixColumns*.  |
-| `AES_FN_FWD`   | 1    | AES Encrypt final round / Key Schedule.   |
-| `AES_FN_DEC`   | 2    | AES Decrypt main body with *MixColumns*.  |
-| `AES_FN_REV`   | 3    | AES Decrypt final round.                  |
-| `SM4_FN_ENC`   | 4    | SM4 Encrypt and Decrypt.                  |
-| `SM4_FN_KEY`   | 5    | SM4 Key Schedule.                         |
-|                | 6-7  | *Unused. 4x6=24 points currently used.*   |
-
+| **Identifier** 	| **fn[4:2]** | **Description or Use**             |
+|-------------------|:-----------:|------------------------------------|
+| `SAES32_ENCSM_FN`	| 0    | AES Encrypt main body with *MixColumns*.  |
+| `SAES32_ENCS_FN`	| 1    | AES Encrypt final round / Key Schedule.   |
+| `SAES32_DECSM_FN`	| 2    | AES Decrypt main body with *MixColumns*.  |
+| `SAES32_DECS_FN`	| 3    | AES Decrypt final round.                  |
+| `SSM4_ED_FN`   	| 4    | SM4 Encrypt and Decrypt.                  |
+| `SSM4_KS_FN`   	| 5    | SM4 Key Schedule.                         |
+|                	| 6-7  | *Unused. 4x6=24 points currently used.*   |
 
 For AES the instruction selects a byte from `rs2`, performs a single S-box
 lookup (*SubBytes* or its inverse), evaluates a part of the MDS matrix
@@ -93,7 +92,6 @@ is quite compact and the overall software implementation is fast.
 For SM4 the instruction has exactly the same data path with byte selection,
 S-Box lookup, but with different linear operations, depending on whether
 encryption/decryption or key scheduling is being performed.
-
 
 ##  Galois/Counter Mode (GCM): AES-GCM with Bitmanip
 
@@ -170,8 +168,9 @@ in characteristic 2.)
 ####    Estimating the Fastest Method
 
 Examining the multiplication implementations in 
-[gcm_rv32_gfmul.c](gcm_rv32_gfmul.c) and [gcm_rv64_gfmul.c](gcm_rv64_gfmul.c)
-we obtain the following arithmetic counts:
+[gcm_rv32b_gfmul.c](gcm_rv32b_gfmul.c) and 
+[gcm_rv64b_gfmul.c](gcm_rv64b_gfmul.c) we obtain the following 
+arithmetic counts:
 
 | **Arch** | **Karatsuba**  | **Reduce**    | `GREV` | `XOR` | `S[L/R]L` | `CLMUL` | `CLMULH` |
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
@@ -259,8 +258,10 @@ gcc  -c sm4_encdec.c -o sm4_encdec.o
 gcc  -c aes_dec.c -o aes_dec.o
 gcc  -c saes32.c -o saes32.o
 gcc  -c test_main.c -o test_main.o
+[..]
 gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o saes32.o test_main.o
 $ ./xtest
+[INFO] === AES using SAES32 ===
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A
 [PASS] AES-128 Dec 00112233445566778899AABBCCDDEEFF
 [PASS] AES-192 Enc DDA97CA4864CDFE06EAF70A0EC0D7191
@@ -273,14 +274,6 @@ $ ./xtest
 [PASS] AES-192 Dec AE2D8A571E03AC9C9EB76FAC45AF8E51
 [PASS] AES-256 Enc B6ED21B99CA6F4F9F153E7B1BEAFED1D
 [PASS] AES-256 Dec 30C81C46A35CE411E5FBC1191A0A52EF
-[PASS] SM4 Encrypt 681EDF34D206965E86B3E94F536E4246
-[PASS] SM4 Decrypt 0123456789ABCDEFFEDCBA9876543210
-[PASS] SM4 Encrypt F766678F13F01ADEAC1B3EA955ADB594
-[PASS] SM4 Decrypt 000102030405060708090A0B0C0D0E0F
-[PASS] SM4 Encrypt 865DE90D6B6E99273E2D44859D9C16DF
-[PASS] SM4 Decrypt D294D879A1F02C7C5906D6C2D0C54D9F
-[PASS] SM4 Encrypt 94CFE3F59E8507FEC41DBE738CCD53E1
-[PASS] SM4 Decrypt A27EE076E48E6F389710EC7B5E8A3BE5
 < .. GCM tests here .. >
 [PASS] all tests passed.
 $

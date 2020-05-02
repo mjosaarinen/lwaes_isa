@@ -116,18 +116,18 @@ uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 
 	switch (fb) {
 
-	case 0:								//  0 : AES Forward + MC
-	case 1:								//  1 : AES Forward "key"
+	case SAES32_ENCSM_FN:					//  0 : AES Forward + MC
+	case SAES32_ENCS_FN:					//  1 : AES Forward "key"
 		x = aes_sbox[x];
 		break;
 
-	case 2:								//  1 : AES Inverse + MC
-	case 3:								//  2 : AES Inverse "key"
+	case SAES32_DECSM_FN:					//  1 : AES Inverse + MC
+	case SAES32_DECS_FN:					//  2 : AES Inverse "key"
 		x = aes_isbox[x];
 		break;
 
-	case 4:								//  3 : SM4 encrypt/decrypt
-	case 5:								//  4 : SM4 key schedule
+	case SSM4_ED_FN:						//  3 : SM4 encrypt/decrypt
+	case SSM4_KS_FN:						//  4 : SM4 key schedule
 		x = sm4_sbox[x];
 		break;
 
@@ -139,7 +139,7 @@ uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 
 	switch (fb) {
 
-	case 0:								//  0 : AES Forward MixCol
+	case SAES32_ENCSM_FN:					//  0 : AES Forward MixCol
 		x2 = aes_xtime(x);					//  double x
 		x = ((x ^ x2) << 24) |				//  0x03    MixCol MDS Matrix
 			(x << 16) |						//  0x01
@@ -147,7 +147,7 @@ uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 			x2;								//  0x02
 		break;
 
-	case 2:								//  2 : AES Inverse MixCol
+	case SAES32_DECSM_FN:					//  2 : AES Inverse MixCol
 //    ( case 6:     //  6 : AES Inverse MixCol *only* )
 		x2 = aes_xtime(x);					//  double x
 		x4 = aes_xtime(x2);					//  double to 4*x
@@ -158,12 +158,12 @@ uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 			(x2 ^ x4 ^ x8);					//  0x0E
 		break;
 
-	case 4:								//  4 : SM4 linear transform L (encrypt / decrypt)
+	case SSM4_ED_FN:						//  4 : SM4 linear transform L 
 		x = x ^ (x << 8) ^ (x << 2) ^ (x << 18) ^
 			((x & 0x3F) << 26) ^ ((x & 0xC0) << 10);
 		break;
 
-	case 5:								//  5 : SM4 linear transform L' (key schedule)
+	case SSM4_KS_FN:						//  5 : SM4 transform L' (key)
 		x = x ^ ((x & 0x07) << 29) ^ ((x & 0xFE) << 7) ^
 			((x & 1) << 23) ^ ((x & 0xF8) << 13);
 		break;
