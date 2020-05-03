@@ -1,12 +1,12 @@
-//  sm4_rv32_encdec.c
+//  ssm4_encdec.c
 //  2020-01-27  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  SM4 (Chinese Encryption Standard) Encryption and Decryption
 
 #include "sm4_wrap.h"
-#include "crypto_rv32.h"
-#include "endian.h"
+#include "crypto_saes32.h"
+#include "rv_endian.h"
 
 //  SSM4_ED_X4  is a block of four ssm4.ed instructions:
 
@@ -34,10 +34,10 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
 	uint32_t x0, x1, x2, x3, t, u;
 	const uint32_t *kp = &rk[SM4_RK_WORDS];
 
-	x0 = GETU32_LE(in);						//  little endian (native)
-	x1 = GETU32_LE(in + 4);
-	x2 = GETU32_LE(in + 8);
-	x3 = GETU32_LE(in + 12);
+	x0 = get32u_le(in);						//  little endian (native)
+	x1 = get32u_le(in + 4);
+	x2 = get32u_le(in + 8);
+	x3 = get32u_le(in + 12);
 
 	do {
 
@@ -68,10 +68,10 @@ void sm4_encdec(uint8_t out[16], const uint8_t in[16],
 
 	} while (rk != kp);
 
-	PUTU32_LE(out, x3);
-	PUTU32_LE(out + 4, x2);
-	PUTU32_LE(out + 8, x1);
-	PUTU32_LE(out + 12, x0);
+	put32u_le(out, x3);
+	put32u_le(out + 4, x2);
+	put32u_le(out + 8, x1);
+	put32u_le(out + 12, x0);
 }
 
 //  set key for encryption
@@ -82,10 +82,10 @@ void sm4_enc_key(uint32_t rk[SM4_RK_WORDS], const uint8_t key[16])
 	uint32_t x0, x1, x2, x3;
 	uint32_t t, u, ck;
 
-	x0 = GETU32_LE(key);					//  fetch key words
-	x1 = GETU32_LE(key + 4);
-	x2 = GETU32_LE(key + 8);
-	x3 = GETU32_LE(key + 12);
+	x0 = get32u_le(key);					//  fetch key words
+	x1 = get32u_le(key + 4);
+	x2 = get32u_le(key + 8);
+	x3 = get32u_le(key + 12);
 
 	x0 ^= 0xC6BAB1A3;						//  "FK" constants, little-endian
 	x1 ^= 0x5033AA56;						//  (note: seems pointless?)

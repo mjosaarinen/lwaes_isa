@@ -4,7 +4,7 @@
 
 //  Running pseudocode for SAES32 (and ENC4S) AES/SM4 instruction.
 
-#include "crypto_rv32.h"
+#include "crypto_saes32.h"
 
 //  Note that these three S-Boxes are affinely related -- they are all
 //  based on multiplicative inverse x^-1 in the finite field GF(256).

@@ -1,115 +1,78 @@
-//  saes32_enc.c
-//  2020-01-22  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
+//  saes64_enc.c
+//  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  "Running pseudocode" for full AES-128/192/256 encryption.
 
-#include "crypto_saes32.h"
 #include "aes_wrap.h"
 #include "bitmanip.h"
 #include "rv_endian.h"
+#include "crypto_saes64.h"
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
+void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 					   const uint32_t rk[], int nr)
 {
-	uint32_t t0, t1, t2, t3;				//  even round state registers
-	uint32_t u0, u1, u2, u3;				//  odd round state registers
-	const uint32_t *kp = &rk[4 * nr];		//  key pointer as loop condition
+	//  key pointer
+	const uint64_t *kp = (const uint64_t *) rk;
 
-	t0 = rk[0];								//  fetch even subkey
-	t1 = rk[1];
-	t2 = rk[2];
-	t3 = rk[3];
+	//  end pointer as loop condition
+	const uint64_t *ep = &kp[2 * (nr - 2)];
 
-	t0 ^= get32u_le(pt);					//  xor with plaintext block
-	t1 ^= get32u_le(pt + 4);
-	t2 ^= get32u_le(pt + 8);
-	t3 ^= get32u_le(pt + 12);
+	uint64_t t0, t1, u0, u1, k0, k1;
 
-	while (1) {								//  double round
+	t0 = ((const uint64_t *) pt)[0];		//  get plaintext
+	t1 = ((const uint64_t *) pt)[1];
 
-		u0 = rk[4];							//  fetch odd subkey
-		u1 = rk[5];
-		u2 = rk[6];
-		u3 = rk[7];
+	k0 = kp[0];								//  first round key
+	k1 = kp[1];
+	t0 = t0 ^ k0;
+	t1 = t1 ^ k1;
 
-		u0 = saes32_encsm(u0, t0, 0);		//  AES round, 16 instructions
-		u0 = saes32_encsm(u0, t1, 1);
-		u0 = saes32_encsm(u0, t2, 2);
-		u0 = saes32_encsm(u0, t3, 3);
+	u0 = saes64_encsm(t0, t1);				//  first round
+	u1 = saes64_encsm(t1, t0);
+	k0 = kp[2];
+	k1 = kp[3];
+	u0 = u0 ^ k0;
+	u1 = u1 ^ k1;
 
-		u1 = saes32_encsm(u1, t1, 0);
-		u1 = saes32_encsm(u1, t2, 1);
-		u1 = saes32_encsm(u1, t3, 2);
-		u1 = saes32_encsm(u1, t0, 3);
+	do {
 
-		u2 = saes32_encsm(u2, t2, 0);
-		u2 = saes32_encsm(u2, t3, 1);
-		u2 = saes32_encsm(u2, t0, 2);
-		u2 = saes32_encsm(u2, t1, 3);
+		kp += 4;							//  advance by two rounds
 
-		u3 = saes32_encsm(u3, t3, 0);
-		u3 = saes32_encsm(u3, t0, 1);
-		u3 = saes32_encsm(u3, t1, 2);
-		u3 = saes32_encsm(u3, t2, 3);
+		t0 = saes64_encsm(u0, u1);			//  six instructions per round
+		t1 = saes64_encsm(u1, u0);
+		k0 = kp[0];
+		k1 = kp[1];
+		t0 = t0 ^ k0;
+		t1 = t1 ^ k1;
 
-		t0 = rk[8];							//  fetch even subkey
-		t1 = rk[9];
-		t2 = rk[10];
-		t3 = rk[11];
+		u0 = saes64_encsm(t0, t1);			//  (double round in loop)  
+		u1 = saes64_encsm(t1, t0);
+		k0 = kp[2];
+		k1 = kp[3];
+		u0 = u0 ^ k0;
+		u1 = u1 ^ k1;
 
-		rk += 8;							//  step key pointer
-		if (rk == kp)						//  final round ?
-			break;
+	} while (kp != ep);
 
-		t0 = saes32_encsm(t0, u0, 0);		//  AES round, 16 instructions
-		t0 = saes32_encsm(t0, u1, 1);
-		t0 = saes32_encsm(t0, u2, 2);
-		t0 = saes32_encsm(t0, u3, 3);
+	t0 = saes64_encs(u0, u1);
+	t1 = saes64_encs(u1, u0);
+	k0 = kp[4];								//  last round key
+	k1 = kp[5];
+	t0 = t0 ^ k0;
+	t1 = t1 ^ k1;
 
-		t1 = saes32_encsm(t1, u1, 0);
-		t1 = saes32_encsm(t1, u2, 1);
-		t1 = saes32_encsm(t1, u3, 2);
-		t1 = saes32_encsm(t1, u0, 3);
+	((uint64_t *) ct)[0] = t0;				//  store ciphertext
+	((uint64_t *) ct)[1] = t1;
 
-		t2 = saes32_encsm(t2, u2, 0);
-		t2 = saes32_encsm(t2, u3, 1);
-		t2 = saes32_encsm(t2, u0, 2);
-		t2 = saes32_encsm(t2, u1, 3);
+	return;
 
-		t3 = saes32_encsm(t3, u3, 0);
-		t3 = saes32_encsm(t3, u0, 1);
-		t3 = saes32_encsm(t3, u1, 2);
-		t3 = saes32_encsm(t3, u2, 3);
-	}
-
-	t0 = saes32_encs(t0, u0, 0);			//  final round is different
-	t0 = saes32_encs(t0, u1, 1);
-	t0 = saes32_encs(t0, u2, 2);
-	t0 = saes32_encs(t0, u3, 3);
-
-	t1 = saes32_encs(t1, u1, 0);
-	t1 = saes32_encs(t1, u2, 1);
-	t1 = saes32_encs(t1, u3, 2);
-	t1 = saes32_encs(t1, u0, 3);
-
-	t2 = saes32_encs(t2, u2, 0);
-	t2 = saes32_encs(t2, u3, 1);
-	t2 = saes32_encs(t2, u0, 2);
-	t2 = saes32_encs(t2, u1, 3);
-
-	t3 = saes32_encs(t3, u3, 0);
-	t3 = saes32_encs(t3, u0, 1);
-	t3 = saes32_encs(t3, u1, 2);
-	t3 = saes32_encs(t3, u2, 3);
-
-	put32u_le(ct, t0);						//  write ciphertext block
-	put32u_le(ct + 4, t1);
-	put32u_le(ct + 8, t2);
-	put32u_le(ct + 12, t3);
 }
+
+
+#include "crypto_saes32.h"
 
 //  round constants -- just iterations of the xtime() LFSR
 
@@ -117,11 +80,13 @@ static const uint8_t aes_rcon[] = {
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
 };
 
-//  ( Note: RISC-V has enough registers to compute subkeys on the fly. )
+//  XXXXXXX THIS PART IS STILL MISSING
+
+uint64_t saes64_ks1(uint64_t rs1, uint8_t i);
 
 //  Key schedule for AES-128 Encryption.
 
-void saes32_enc_key128(uint32_t rk[44], const uint8_t key[16])
+void saes64_enc_key128(uint32_t rk[44], const uint8_t key[16])
 {
 	uint32_t t0, t1, t2, t3, tr;			//  subkey registers
 	const uint32_t *rke = &rk[44 - 4];		//  end pointer
@@ -157,7 +122,7 @@ void saes32_enc_key128(uint32_t rk[44], const uint8_t key[16])
 
 //  Key schedule for AES-192 encryption.
 
-void saes32_enc_key192(uint32_t rk[52], const uint8_t key[24])
+void saes64_enc_key192(uint32_t rk[52], const uint8_t key[24])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, tr;	//  subkey registers
 	const uint32_t *rke = &rk[52 - 4];		//  end pointer
@@ -199,7 +164,7 @@ void saes32_enc_key192(uint32_t rk[52], const uint8_t key[24])
 
 //  Key schedule for AES-256 encryption.
 
-void saes32_enc_key256(uint32_t rk[60], const uint8_t key[32])
+void saes64_enc_key256(uint32_t rk[60], const uint8_t key[32])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, t6, t7, tr;	// subkey registers
 	const uint32_t *rke = &rk[60 - 4];		//  end pointer

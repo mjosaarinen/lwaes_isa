@@ -34,7 +34,7 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 
 	ctr = 0;								//  counter value
 	memcpy(p.b, iv, 12);					//  J0
-	p.w[3] = rvb_grev(++ctr, 0x18);			//  rev8.w; big-endian counter
+	p.w[3] = rv32b_grev(++ctr, 0x18);		//  big-endian counter
 	aes_enc_rounds(t.b, p.b, rk, nr);		//  first AES_k(IV | 1) for tag
 
 	z.d[0] = 0;								//  initialize GHASH result
@@ -44,7 +44,7 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 
 		i = len;
 		while (i >= 16) {					//  full block
-			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			p.w[3] = rv32b_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
 			aes_enc_rounds(c.b, p.b, rk, nr);
 			memcpy(b.b, src, 16);			//  load plaintext
 			c.d[0] ^= b.d[0];
@@ -57,7 +57,7 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 		}
 
 		if (i > 0) {						//  partial block
-			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			p.w[3] = rv32b_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
 			aes_enc_rounds(c.b, p.b, rk, nr);
 			memcpy(b.b, src, i);			//  load plaintext
 			c.d[0] ^= b.d[0];
@@ -71,7 +71,7 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 
 		i = len;
 		while (i >= 16) {					//  full block
-			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			p.w[3] = rv32b_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
 			aes_enc_rounds(b.b, p.b, rk, nr);
 			memcpy(c.b, src, 16);			//  load ciphertext
 			b.d[0] ^= c.d[0];
@@ -84,7 +84,7 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 		}
 
 		if (i > 0) {						//  partial block
-			p.w[3] = rvb_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
+			p.w[3] = rv32b_grev(++ctr, 0x18);	//  rev8.w; big-endian counter
 			aes_enc_rounds(b.b, p.b, rk, nr);
 			memcpy(c.b, src, i);
 			b.d[0] ^= c.d[0];
@@ -96,8 +96,8 @@ static void aes_gcm_body(uint8_t * dst, uint8_t tag[16],
 	}
 
 	c.d[0] = 0;								//  pad with bit length
-	c.w[2] = rvb_grev(len >> 29, 0x18);
-	c.w[3] = rvb_grev(len << 3, 0x18);
+	c.w[2] = rv32b_grev(len >> 29, 0x18);
+	c.w[3] = rv32b_grev(len << 3, 0x18);
 	ghash_mul(&z, &c, &h);					//  last GHASH block
 	ghash_rev(&z);							//  flip result bits
 	t.d[0] = t.d[0] ^ z.d[0];				//  XOR with AES_k(IV | 1)

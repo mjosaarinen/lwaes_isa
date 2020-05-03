@@ -16,8 +16,8 @@
 
 void rv64_ghash_rev(gf128_t * z)
 {
-	z->d[0] = rvb_grevw(z->d[0], 7);
-	z->d[1] = rvb_grevw(z->d[1], 7);
+	z->d[0] = rv64b_grev(z->d[0], 7);
+	z->d[1] = rv64b_grev(z->d[1], 7);
 }
 
 //  multiply z = ( z ^ rev(x) ) * h
@@ -37,8 +37,8 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	y1 = h->d[1];
 
 	//  2 x GREVW, 2 x XOR
-	x0 = rvb_grevw(x0, 7);					//  reverse input x only
-	x1 = rvb_grevw(x1, 7);
+	x0 = rv64b_grev(x0, 7);					//  reverse input x only
+	x1 = rv64b_grev(x1, 7);
 	x0 = x0 ^ z0;							//  z is updated
 	x1 = x1 ^ z1;
 
@@ -46,31 +46,31 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 
 	(void) t2;								//  unused
 
-	//  Without Karatsuba; 4 x CLMULHW, 4 x CLMULW, 4 x XOR
-	z3 = rvb_clmulhw(x1, y1);
-	z2 = rvb_clmulw(x1, y1);
-	t1 = rvb_clmulhw(x0, y1);
-	z1 = rvb_clmulw(x0, y1);
+	//  Without Karatsuba; 4 x CLMULH, 4 x CLMUL, 4 x XOR
+	z3 = rv64b_clmulh(x1, y1);
+	z2 = rv64b_clmul(x1, y1);
+	t1 = rv64b_clmulh(x0, y1);
+	z1 = rv64b_clmul(x0, y1);
 	z2 = z2 ^ t1;
-	t1 = rvb_clmulhw(x1, y0);
-	t0 = rvb_clmulw(x1, y0);
+	t1 = rv64b_clmulh(x1, y0);
+	t0 = rv64b_clmul(x1, y0);
 	z2 = z2 ^ t1;
 	z1 = z1 ^ t0;
-	t1 = rvb_clmulhw(x0, y0);
-	z0 = rvb_clmulw(x0, y0);
+	t1 = rv64b_clmulh(x0, y0);
+	z0 = rv64b_clmul(x0, y0);
 	z1 = z1 ^ t1;
 
 #else
 
-	//  With Karatsuba; 3 x CLMULHW, 3 x CLMULW, 8 x XOR
-	z3 = rvb_clmulhw(x1, y1);
-	z2 = rvb_clmulw(x1, y1);
-	z1 = rvb_clmulhw(x0, y0);
-	z0 = rvb_clmulw(x0, y0);
+	//  With Karatsuba; 3 x CLMULH, 3 x CLMUL, 8 x XOR
+	z3 = rv64b_clmulh(x1, y1);
+	z2 = rv64b_clmul(x1, y1);
+	z1 = rv64b_clmulh(x0, y0);
+	z0 = rv64b_clmul(x0, y0);
 	t0 = x0 ^ x1;
 	t2 = y0 ^ y1;
-	t1 = rvb_clmulhw(t0, t2);
-	t0 = rvb_clmulw(t0, t2);
+	t1 = rv64b_clmulh(t0, t2);
+	t0 = rv64b_clmul(t0, t2);
 	t1 = t1 ^ z1 ^ z3;
 	t0 = t0 ^ z0 ^ z2;
 	z2 = z2 ^ t1;
@@ -80,13 +80,13 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 
 #ifdef NO_SHIFTRED
 
-	//  Mul reduction: 2 x CLMULHW, 2 x CLMULW, 4 x XOR
-	t1 = rvb_clmulhw(z3, 0x87);
-	t0 = rvb_clmulw(z3, 0x87);
+	//  Mul reduction: 2 x CLMULH, 2 x CLMUL, 4 x XOR
+	t1 = rv64b_clmulh(z3, 0x87);
+	t0 = rv64b_clmul(z3, 0x87);
 	z2 = z2 ^ t1;
 	z1 = z1 ^ t0;
-	t1 = rvb_clmulhw(z2, 0x87);
-	t0 = rvb_clmulw(z2, 0x87);
+	t1 = rv64b_clmulh(z2, 0x87);
+	t0 = rv64b_clmul(z2, 0x87);
 	z1 = z1 ^ t1;
 	z0 = z0 ^ t0;
 
