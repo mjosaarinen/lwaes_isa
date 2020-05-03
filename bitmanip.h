@@ -27,8 +27,8 @@ uint32_t rv32b_clmulr(uint32_t rs1, uint32_t rs2);
 uint32_t rv32b_ror(uint32_t rs1, uint32_t rs2);
 
 //  and with negate ANDN
-uint64_t rvb32_andn(uint64_t rs1, uint64_t rs2);
-uint64_t rvb64_andn(uint64_t rs1, uint64_t rs2);
+uint64_t rv32b_andn(uint32_t rs1, uint32_t rs2);
+uint64_t rv64b_andn(uint64_t rs1, uint64_t rs2);
 
 //  carryless multiply
 uint64_t rv64b_clmul(uint64_t rs1, uint64_t rs2);

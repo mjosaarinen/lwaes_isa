@@ -21,7 +21,7 @@
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define GREV_BE64(x) (x)
 #else
-//  RISC-V: grevw(x, 0x38) or rev8(x)
+//  RISC-V: grev(x, 0x38) or rev8(x)
 #define GREV_BE64(x) (						\
 	(((x) & 0xFF00000000000000LL) >> 56) | 	\
 	(((x) & 0x00FF000000000000LL) >> 40) | 	\
