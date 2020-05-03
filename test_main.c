@@ -53,6 +53,13 @@ int main(int argc, char **argv)
 		return test_hwtb();
 	}
 	//  algorithm tests
+	printf("[INFO] === AES using SAES64 ===\n");
+	aes_enc_rounds = aes_saes64_enc;
+	aes_dec_rounds = aes_saes32_dec;
+	fail += test_aes();
+
+	return fail;
+
 	printf("[INFO] === AES using SAES32 ===\n");
 	aes_enc_rounds = aes_saes32_enc;
 	aes_dec_rounds = aes_saes32_dec;
