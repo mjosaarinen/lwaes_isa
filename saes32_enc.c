@@ -4,10 +4,10 @@
 
 //  "Running pseudocode" for full AES-128/192/256 encryption.
 
-#include "crypto_rv32.h"
+#include "crypto_saes32.h"
 #include "aes_wrap.h"
 #include "bitmanip.h"
-#include "endian.h"
+#include "rv_endian.h"
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
@@ -23,10 +23,10 @@ void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 	t2 = rk[2];
 	t3 = rk[3];
 
-	t0 ^= GETU32_LE(pt);					//  xor with plaintext block
-	t1 ^= GETU32_LE(pt + 4);
-	t2 ^= GETU32_LE(pt + 8);
-	t3 ^= GETU32_LE(pt + 12);
+	t0 ^= get32u_le(pt);					//  xor with plaintext block
+	t1 ^= get32u_le(pt + 4);
+	t2 ^= get32u_le(pt + 8);
+	t3 ^= get32u_le(pt + 12);
 
 	while (1) {								//  double round
 
@@ -105,10 +105,10 @@ void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 	t3 = saes32_encs(t3, u1, 2);
 	t3 = saes32_encs(t3, u2, 3);
 
-	PUTU32_LE(ct, t0);						//  write ciphertext block
-	PUTU32_LE(ct + 4, t1);
-	PUTU32_LE(ct + 8, t2);
-	PUTU32_LE(ct + 12, t3);
+	put32u_le(ct, t0);						//  write ciphertext block
+	put32u_le(ct + 4, t1);
+	put32u_le(ct + 8, t2);
+	put32u_le(ct + 12, t3);
 }
 
 //  round constants -- just iterations of the xtime() LFSR
@@ -127,10 +127,10 @@ void saes32_enc_key128(uint32_t rk[44], const uint8_t key[16])
 	const uint32_t *rke = &rk[44 - 4];		//  end pointer
 	const uint8_t *rc = aes_rcon;			//  round constants
 
-	t0 = GETU32_LE(key);					//  load secret key
-	t1 = GETU32_LE(key + 4);
-	t2 = GETU32_LE(key + 8);
-	t3 = GETU32_LE(key + 12);
+	t0 = get32u_le(key);					//  load secret key
+	t1 = get32u_le(key + 4);
+	t2 = get32u_le(key + 8);
+	t3 = get32u_le(key + 12);
 
 	while (1) {
 
@@ -144,7 +144,7 @@ void saes32_enc_key128(uint32_t rk[44], const uint8_t key[16])
 		rk += 4;							//  step pointer by one subkey
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rvb_ror(t3, 8);				//  rotate 8 bits (little endian!)
+		tr = rv32b_ror(t3, 8);				//  rotate 8 bits (little endian!)
 		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
 		t0 = saes32_encs(t0, tr, 1);
 		t0 = saes32_encs(t0, tr, 2);
@@ -163,12 +163,12 @@ void saes32_enc_key192(uint32_t rk[52], const uint8_t key[24])
 	const uint32_t *rke = &rk[52 - 4];		//  end pointer
 	const uint8_t *rc = aes_rcon;			//  round constants
 
-	t0 = GETU32_LE(key);					//  load secret key
-	t1 = GETU32_LE(key + 4);
-	t2 = GETU32_LE(key + 8);
-	t3 = GETU32_LE(key + 12);
-	t4 = GETU32_LE(key + 16);
-	t5 = GETU32_LE(key + 20);
+	t0 = get32u_le(key);					//  load secret key
+	t1 = get32u_le(key + 4);
+	t2 = get32u_le(key + 8);
+	t3 = get32u_le(key + 12);
+	t4 = get32u_le(key + 16);
+	t5 = get32u_le(key + 20);
 
 	while (1) {
 
@@ -183,7 +183,7 @@ void saes32_enc_key192(uint32_t rk[52], const uint8_t key[24])
 		rk += 6;							//  step pointer by 1.5 subkeys
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rvb_ror(t5, 8);				//  rotate 8 bits (little endian!)
+		tr = rv32b_ror(t5, 8);				//  rotate 8 bits (little endian!)
 		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
 		t0 = saes32_encs(t0, tr, 1);
 		t0 = saes32_encs(t0, tr, 2);
@@ -205,14 +205,14 @@ void saes32_enc_key256(uint32_t rk[60], const uint8_t key[32])
 	const uint32_t *rke = &rk[60 - 4];		//  end pointer
 	const uint8_t *rc = aes_rcon;			//  round constants
 
-	t0 = GETU32_LE(key);
-	t1 = GETU32_LE(key + 4);
-	t2 = GETU32_LE(key + 8);
-	t3 = GETU32_LE(key + 12);
-	t4 = GETU32_LE(key + 16);
-	t5 = GETU32_LE(key + 20);
-	t6 = GETU32_LE(key + 24);
-	t7 = GETU32_LE(key + 28);
+	t0 = get32u_le(key);
+	t1 = get32u_le(key + 4);
+	t2 = get32u_le(key + 8);
+	t3 = get32u_le(key + 12);
+	t4 = get32u_le(key + 16);
+	t5 = get32u_le(key + 20);
+	t6 = get32u_le(key + 24);
+	t7 = get32u_le(key + 28);
 
 	rk[0] = t0;								//  store first subkey
 	rk[1] = t1;
@@ -228,7 +228,7 @@ void saes32_enc_key256(uint32_t rk[60], const uint8_t key[32])
 		rk += 8;							//  step pointer by 2 subkeys
 
 		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rvb_ror(t7, 8);				//  rotate 8 bits (little endian!)
+		tr = rv32b_ror(t7, 8);				//  rotate 8 bits (little endian!)
 		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
 		t0 = saes32_encs(t0, tr, 1);
 		t0 = saes32_encs(t0, tr, 2);

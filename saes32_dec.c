@@ -4,9 +4,9 @@
 
 //  Running pseudocode for full AES-128/192/256 decryption.
 
-#include "crypto_rv32.h"
+#include "crypto_saes32.h"
 #include "aes_wrap.h"
-#include "endian.h"
+#include "rv_endian.h"
 
 //  Decrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
@@ -23,10 +23,10 @@ void saes32_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 	t3 = kp[3];
 	kp -= 8;
 
-	t0 ^= GETU32_LE(ct);					//  xor with ciphertext block
-	t1 ^= GETU32_LE(ct + 4);
-	t2 ^= GETU32_LE(ct + 8);
-	t3 ^= GETU32_LE(ct + 12);
+	t0 ^= get32u_le(ct);					//  xor with ciphertext block
+	t1 ^= get32u_le(ct + 4);
+	t2 ^= get32u_le(ct + 8);
+	t3 ^= get32u_le(ct + 12);
 
 	while (1) {
 		u0 = kp[4];							//  fetch odd subkey
@@ -104,10 +104,10 @@ void saes32_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 	t3 = saes32_decs(t3, u1, 2);
 	t3 = saes32_decs(t3, u0, 3);
 
-	PUTU32_LE(pt, t0);						//  write plaintext block
-	PUTU32_LE(pt + 4, t1);
-	PUTU32_LE(pt + 8, t2);
-	PUTU32_LE(pt + 12, t3);
+	put32u_le(pt, t0);						//  write plaintext block
+	put32u_le(pt + 4, t1);
+	put32u_le(pt + 8, t2);
+	put32u_le(pt + 12, t3);
 }
 
 //  Helper: apply inverse mixcolumns to a vector

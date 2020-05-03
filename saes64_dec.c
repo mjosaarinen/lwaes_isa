@@ -6,8 +6,8 @@
 
 #include "aes_wrap.h"
 #include "bitmanip.h"
-#include "endian.h"
-#include "crypto_rv64.h"
+#include "rv_endian.h"
+#include "crypto_saes64.h"
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
@@ -71,7 +71,7 @@ void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 
 }
 
-#include "crypto_rv32.h"
+#include "crypto_saes32.h"
 #include <stdio.h>
 
 //  Helper: apply inverse mixcolumns to a vector

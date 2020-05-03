@@ -2,7 +2,7 @@
 //  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-#include "crypto_rv32.h"
+#include "crypto_saes32.h"
 
 static inline uint32_t _l_hi32(uint64_t x)
 {

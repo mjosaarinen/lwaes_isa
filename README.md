@@ -109,8 +109,8 @@ in source file [bitmanip.c](bitmanip.c), with prototypes in
 [bitmanip.h](bitmanip.h). These are almost directly lifted from the current
 draft specification. The instructions relevant to GCM are the Carry-Less
 Multiply instructions `CMUL[H][W]` and also the Generalized Reverse `GREV[W]`.
-The `[W]` suffix indicates a 64-bit word size variant that is available
-only in RV64.
+The `[W]` suffix indicates a 32-bit word size variant that is available
+only in RV64 and is not used here.
 
 The low-level functions that use these instructions are emulated by
 [rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c).
@@ -118,7 +118,7 @@ I've verified their correctness against full AES-GCM test vectors in the
 framework. There may be further room for improvement -- I use such code to
 draft the final assembly implementations.
 
-An attempt has been made to pair `CMULH[W]` immediately followed by `CMUL[W]`,
+An attempt has been made to pair `CMULH` immediately followed by `CMUL`,
 as is done with `MULH`/`MUL`, although there is less of a performance
 advantage in this case.
 
@@ -148,9 +148,8 @@ accomplishes this.
 
 The multiplication itself can be asymptotically sped up with the Karatsuba
 method, which works even better in binary fields than it does with integers.
-This reduces the number of `CMULW`/`CMULHW` (RV64) pairs from 4 to 3 with
-and the number of `CMUL`/`CMULH` (RV32) pairs from 16 to 9, with the
-cost of many XORs.
+This reduces the number of `CMUL`/`CMULH` pairs on RV64 from 4 to 3 and
+the on RV32 from 16 to 9, with the cost of many XORs.
 
 
 ####    Reduction via Shifts or via Multiplication

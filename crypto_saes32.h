@@ -1,11 +1,11 @@
-//  crypto_rv32.h
+//  crypto_saes32.h
 //  2020-01-27  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  Prototypes for SAES32
 
-#ifndef _CRYPTO_RV32_H_
-#define _CRYPTO_RV32_H_
+#ifndef _CRYPTO_SAES32_H_
+#define _CRYPTO_SAES32_H_
 
 #include <stdint.h>
 

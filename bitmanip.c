@@ -8,7 +8,7 @@
 
 //  carryless multiply
 
-uint32_t rvb_clmul(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_clmul(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = 0;
 	for (int i = 0; i < 32; i++)
@@ -17,7 +17,7 @@ uint32_t rvb_clmul(uint32_t rs1, uint32_t rs2)
 	return x;
 }
 
-uint32_t rvb_clmulh(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_clmulh(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = 0;
 	for (int i = 1; i < 32; i++)
@@ -26,7 +26,7 @@ uint32_t rvb_clmulh(uint32_t rs1, uint32_t rs2)
 	return x;
 }
 
-uint32_t rvb_clmulr(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_clmulr(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = 0;
 	for (int i = 0; i < 32; i++)
@@ -35,7 +35,7 @@ uint32_t rvb_clmulr(uint32_t rs1, uint32_t rs2)
 	return x;
 }
 
-uint64_t rvb_clmulw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_clmul(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = 0;
 	for (int i = 0; i < 64; i++)
@@ -44,7 +44,7 @@ uint64_t rvb_clmulw(uint64_t rs1, uint64_t rs2)
 	return x;
 }
 
-uint64_t rvb_clmulhw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_clmulh(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = 0;
 	for (int i = 1; i < 64; i++)
@@ -53,7 +53,7 @@ uint64_t rvb_clmulhw(uint64_t rs1, uint64_t rs2)
 	return x;
 }
 
-uint64_t rvb_clmulrw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_clmulr(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = 0;
 	for (int i = 0; i < 64; i++)
@@ -64,7 +64,7 @@ uint64_t rvb_clmulrw(uint64_t rs1, uint64_t rs2)
 
 //  rotate right ROR / RORI
 
-uint32_t rvb_ror(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_ror(uint32_t rs1, uint32_t rs2)
 {
 	int shamt = rs2 & (32 - 1);
 	return (rs1 >> shamt) | (rs1 << ((32 - shamt) & (32 - 1)));
@@ -72,7 +72,7 @@ uint32_t rvb_ror(uint32_t rs1, uint32_t rs2)
 
 //  rotate right RORW / RORIW
 
-uint64_t rvb_rorw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_ror(uint64_t rs1, uint64_t rs2)
 {
 	int shamt = rs2 & (64 - 1);
 	return (rs1 >> shamt) | (rs1 << ((64 - shamt) & (64 - 1)));
@@ -80,14 +80,19 @@ uint64_t rvb_rorw(uint64_t rs1, uint64_t rs2)
 
 //  and with negate ANDN
 
-uint64_t rvb_andn(uint64_t rs1, uint64_t rs2)
+uint64_t rv32b_andn(uint32_t rs1, uint32_t rs2)
+{
+	return rs1 & ~rs2;
+}
+
+uint64_t rv64b_andn(uint64_t rs1, uint64_t rs2)
 {
 	return rs1 & ~rs2;
 }
 
 //  generalized reverse GREV / GREVI
 
-uint32_t rvb_grev(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_grev(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = rs1;
 	int shamt = rs2 & 31;
@@ -106,7 +111,7 @@ uint32_t rvb_grev(uint32_t rs1, uint32_t rs2)
 
 //  generalized reverse GREVW / GREVIW
 
-uint64_t rvb_grevw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_grev(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = rs1;
 	int shamt = rs2 & 63;
@@ -143,7 +148,7 @@ static inline uint32_t shuffle32_stage(uint32_t src, uint32_t ml,
 
 //  generalized shuffle SHFL / SHFLI
 
-uint32_t rvb_shfl(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_shfl(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = rs1;
 	int shamt = rs2 & 15;
@@ -162,7 +167,7 @@ uint32_t rvb_shfl(uint32_t rs1, uint32_t rs2)
 
 //  generalized unshuffle UNSHFL / UNSHFLI
 
-uint32_t rvb_unshfl(uint32_t rs1, uint32_t rs2)
+uint32_t rv32b_unshfl(uint32_t rs1, uint32_t rs2)
 {
 	uint32_t x = rs1;
 	int shamt = rs2 & 15;
@@ -192,7 +197,7 @@ static inline uint64_t shuffle64_stage(uint64_t src, uint64_t ml,
 
 //  generalized shuffle SHFLW
 
-uint64_t rvb_shflw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_shfl(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = rs1;
 	int shamt = rs2 & 31;
@@ -213,7 +218,7 @@ uint64_t rvb_shflw(uint64_t rs1, uint64_t rs2)
 
 //  generalized unshuffle UNSHFLW
 
-uint64_t rvb_unshflw(uint64_t rs1, uint64_t rs2)
+uint64_t rv64b_unshfl(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = rs1;
 	int shamt = rs2 & 31;

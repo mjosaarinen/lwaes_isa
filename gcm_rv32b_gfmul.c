@@ -14,10 +14,10 @@
 
 void rv32_ghash_rev(gf128_t * z)
 {
-	z->w[0] = rvb_grev(z->w[0], 7);
-	z->w[1] = rvb_grev(z->w[1], 7);
-	z->w[2] = rvb_grev(z->w[2], 7);
-	z->w[3] = rvb_grev(z->w[3], 7);
+	z->w[0] = rv32b_grev(z->w[0], 7);
+	z->w[1] = rv32b_grev(z->w[1], 7);
+	z->w[2] = rv32b_grev(z->w[2], 7);
+	z->w[3] = rv32b_grev(z->w[3], 7);
 }
 
 //  multiply z = ( z ^ rev(x) ) * h
@@ -41,10 +41,10 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	z3 = z->w[3];
 
 	//  4 x GREV
-	x0 = rvb_grev(x0, 7);					//  reverse input x only
-	x1 = rvb_grev(x1, 7);
-	x2 = rvb_grev(x2, 7);
-	x3 = rvb_grev(x3, 7);
+	x0 = rv32b_grev(x0, 7);					//  reverse input x only
+	x1 = rv32b_grev(x1, 7);
+	x2 = rv32b_grev(x2, 7);
+	x3 = rv32b_grev(x3, 7);
 
 	//  4 x XOR
 	x0 = x0 ^ z0;							//  z is kept unreversed
@@ -54,22 +54,22 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 
 	//  4 x CMULH, 4 x CLMUL, 3 x XOR
 	y = h->w[3];							//  start from highest word
-	z4 = rvb_clmulh(x3, y);
-	z3 = rvb_clmul(x3, y);
-	t1 = rvb_clmulh(x2, y);
-	z2 = rvb_clmul(x2, y);
+	z4 = rv32b_clmulh(x3, y);
+	z3 = rv32b_clmul(x3, y);
+	t1 = rv32b_clmulh(x2, y);
+	z2 = rv32b_clmul(x2, y);
 	z3 = z3 ^ t1;
-	t1 = rvb_clmulh(x1, y);
-	z1 = rvb_clmul(x1, y);
+	t1 = rv32b_clmulh(x1, y);
+	z1 = rv32b_clmul(x1, y);
 	z2 = z2 ^ t1;
-	t1 = rvb_clmulh(x0, y);
-	z0 = rvb_clmul(x0, y);
+	t1 = rv32b_clmulh(x0, y);
+	z0 = rv32b_clmul(x0, y);
 	z1 = z1 ^ t1;
 
 #ifdef NO_SHIFTRED
 	//  Mul reduction: 1 x CLMULH, 1 x CLMUL, 2 x XOR
-	t1 = rvb_clmulh(z4, 0x87);
-	t0 = rvb_clmul(z4, 0x87);
+	t1 = rv32b_clmulh(z4, 0x87);
+	t0 = rv32b_clmul(z4, 0x87);
 	z1 = z1 ^ t1;
 	z0 = z0 ^ t0;
 #else
@@ -84,23 +84,23 @@ void rv32_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h)
 		y = h->w[i];						//  unroll this if you like
 
 		//  4 x CLMULH, 4 x CLMUL, 7 x XOR
-		t1 = rvb_clmulh(x3, y);
-		t0 = rvb_clmul(x3, y);
+		t1 = rv32b_clmulh(x3, y);
+		t0 = rv32b_clmul(x3, y);
 		z4 = z3 ^ t1;
-		t1 = rvb_clmulh(x2, y);
-		t2 = rvb_clmul(x2, y);
+		t1 = rv32b_clmulh(x2, y);
+		t2 = rv32b_clmul(x2, y);
 		z3 = z2 ^ t0 ^ t1;
-		t1 = rvb_clmulh(x1, y);
-		t0 = rvb_clmul(x1, y);
+		t1 = rv32b_clmulh(x1, y);
+		t0 = rv32b_clmul(x1, y);
 		z2 = z1 ^ t1 ^ t2;
-		t1 = rvb_clmulh(x0, y);
-		t2 = rvb_clmul(x0, y);
+		t1 = rv32b_clmulh(x0, y);
+		t2 = rv32b_clmul(x0, y);
 		z1 = z0 ^ t0 ^ t1;
 
 #ifdef NO_SHIFTRED
 		//  Mul reduction: 1 x CLMULH, 1 x CLMUL, 2 x XOR
-		t1 = rvb_clmulh(z4, 0x87);
-		t0 = rvb_clmul(z4, 0x87);
+		t1 = rv32b_clmulh(z4, 0x87);
+		t0 = rv32b_clmul(z4, 0x87);
 		z1 = z1 ^ t1;
 		z0 = t2 ^ t0;
 #else
@@ -142,10 +142,10 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	y3 = h->w[3];
 
 	//  4 x GREV
-	x0 = rvb_grev(x0, 7);					//  reverse input x only
-	x1 = rvb_grev(x1, 7);
-	x2 = rvb_grev(x2, 7);
-	x3 = rvb_grev(x3, 7);
+	x0 = rv32b_grev(x0, 7);					//  reverse input x only
+	x1 = rv32b_grev(x1, 7);
+	x2 = rv32b_grev(x2, 7);
+	x3 = rv32b_grev(x3, 7);
 
 	//  4 x XOR
 	x0 = x0 ^ z0;							//  z is updated
@@ -156,27 +156,27 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	//  2-level Karatsuba multiplication
 	//  9 x CLMULH, 9 x CLMUL, 40 x XOR
 
-	z7 = rvb_clmulh(x3, y3);				//  high pair
-	z6 = rvb_clmul(x3, y3);
-	z5 = rvb_clmulh(x2, y2);
-	z4 = rvb_clmul(x2, y2);
+	z7 = rv32b_clmulh(x3, y3);				//  high pair
+	z6 = rv32b_clmul(x3, y3);
+	z5 = rv32b_clmulh(x2, y2);
+	z4 = rv32b_clmul(x2, y2);
 	t0 = x2 ^ x3;
 	t2 = y2 ^ y3;
-	t1 = rvb_clmulh(t0, t2);
-	t0 = rvb_clmul(t0, t2);
+	t1 = rv32b_clmulh(t0, t2);
+	t0 = rv32b_clmul(t0, t2);
 	t1 = t1 ^ z5 ^ z7;
 	t0 = t0 ^ z4 ^ z6;
 	z6 = z6 ^ t1;
 	z5 = z5 ^ t0;
 
-	z3 = rvb_clmulh(x1, y1);				//  low pair
-	z2 = rvb_clmul(x1, y1);
-	z1 = rvb_clmulh(x0, y0);
-	z0 = rvb_clmul(x0, y0);
+	z3 = rv32b_clmulh(x1, y1);				//  low pair
+	z2 = rv32b_clmul(x1, y1);
+	z1 = rv32b_clmulh(x0, y0);
+	z0 = rv32b_clmul(x0, y0);
 	t0 = x0 ^ x1;
 	t2 = y0 ^ y1;
-	t1 = rvb_clmulh(t0, t2);
-	t0 = rvb_clmul(t0, t2);
+	t1 = rv32b_clmulh(t0, t2);
+	t0 = rv32b_clmul(t0, t2);
 	t1 = t1 ^ z1 ^ z3;
 	t0 = t0 ^ z0 ^ z2;
 	z2 = z2 ^ t1;
@@ -187,15 +187,15 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 	t1 = x1 ^ x3;
 	t0 = x0 ^ x2;
 
-	x3 = rvb_clmulh(t1, t3);				//  middle
-	x2 = rvb_clmul(t1, t3);
-	x1 = rvb_clmulh(t0, t2);
-	x0 = rvb_clmul(t0, t2);
+	x3 = rv32b_clmulh(t1, t3);				//  middle
+	x2 = rv32b_clmul(t1, t3);
+	x1 = rv32b_clmulh(t0, t2);
+	x0 = rv32b_clmul(t0, t2);
 
 	t0 = t0 ^ t1;
 	t2 = t2 ^ t3;
-	t1 = rvb_clmulh(t0, t2);
-	t0 = rvb_clmul(t0, t2);
+	t1 = rv32b_clmulh(t0, t2);
+	t0 = rv32b_clmul(t0, t2);
 	t1 = t1 ^ x1 ^ x3;
 	t0 = t0 ^ x0 ^ x2;
 	x2 = x2 ^ t1;
@@ -214,20 +214,20 @@ void rv32_ghash_mul_kar(gf128_t * z, const gf128_t * x, const gf128_t * h)
 
 #ifdef NO_SHIFTRED
 	//  Mul reduction: 4 x CLMULH, 4 x CLMUL, 8 x XOR
-	t1 = rvb_clmulh(z7, 0x87);
-	t0 = rvb_clmul(z7, 0x87);
+	t1 = rv32b_clmulh(z7, 0x87);
+	t0 = rv32b_clmul(z7, 0x87);
 	z4 = z4 ^ t1;
 	z3 = z3 ^ t0;
-	t1 = rvb_clmulh(z6, 0x87);
-	t0 = rvb_clmul(z6, 0x87);
+	t1 = rv32b_clmulh(z6, 0x87);
+	t0 = rv32b_clmul(z6, 0x87);
 	z3 = z3 ^ t1;
 	z2 = z2 ^ t0;
-	t1 = rvb_clmulh(z5, 0x87);
-	t0 = rvb_clmul(z5, 0x87);
+	t1 = rv32b_clmulh(z5, 0x87);
+	t0 = rv32b_clmul(z5, 0x87);
 	z2 = z2 ^ t1;
 	z1 = z1 ^ t0;
-	t1 = rvb_clmulh(z4, 0x87);
-	t0 = rvb_clmul(z4, 0x87);
+	t1 = rv32b_clmulh(z4, 0x87);
+	t0 = rv32b_clmul(z4, 0x87);
 	z1 = z1 ^ t1;
 	z0 = z0 ^ t0;
 #else
