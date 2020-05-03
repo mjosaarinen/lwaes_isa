@@ -22,9 +22,15 @@ schedule for both ciphers. For design rationale and some analysis, see the
 short report [A Lightweight ISA Extension for AES and SM4](https://arxiv.org/abs/2002.07041) (to appear at SECRISC-V 2020). Note that there the same
 instruction is called "ENC1S".
 
-A more complex ISA extension may be appropriate for higher-end CPUs. The
+A more complex ISA extension is appropriate for higher-end CPUs. The
 primary goal of SAES32 / lweas is to eliminate timing-side vulnerabilities.
 Speed-up over pure software table-based implementations is roughly 500 %.
+
+**NOTE** After ENC1S proposal was adapted into the 
+[Crypto TG Draft](https://github.com/scarv/riscv-crypto) as SAES32, I'm 
+trying to keep this code up to date with it. There is also an initial
+emulation pseudocode for the 64-bit SAES64 instructions; no real assembler
+or HDL yet.
 
 
 ## Software and Hardware Source Code

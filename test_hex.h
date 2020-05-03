@@ -21,4 +21,7 @@ void prthex(const char *lab, const void *data, size_t len);
 //  check "data" of "len" bytes against a hexadecimal test vector "ref"
 int chkhex(const char *lab, const void *data, size_t len, const char *ref);
 
-#endif										//  _TEST_HEX_H_
+//	boolean return value check
+int chkret(const char *lab, int want, int have);
+
+#endif
