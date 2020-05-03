@@ -7,53 +7,17 @@
 #include "crypto_saes64.h"
 #include "crypto_saes32.h"
 
-static inline uint32_t _l_hi32(uint64_t x)
-{
-	return (uint32_t) (x >> 32);
-}
-
-static inline uint32_t _l_lo32(uint64_t x)
-{
-	return (uint32_t) x;
-}
-
-static inline uint64_t _l_to64(uint32_t lo, uint32_t hi)
-{
-	return ((uint64_t) lo) | (((uint64_t) hi) << 32);
-}
-
-uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2)
-{
-	uint32_t t0, t1, t2, t3;
-	uint32_t u0, u1;
-
-	t0 = _l_lo32(rs1);
-	t1 = _l_hi32(rs1);
-	t2 = _l_lo32(rs2);
-	t3 = _l_hi32(rs2);
-
-	u0 = saes32_encsm(0, t0, 0);
-	u0 = saes32_encsm(u0, t1, 1);
-	u0 = saes32_encsm(u0, t2, 2);
-	u0 = saes32_encsm(u0, t3, 3);
-
-	u1 = saes32_encsm(0, t1, 0);
-	u1 = saes32_encsm(u1, t2, 1);
-	u1 = saes32_encsm(u1, t3, 2);
-	u1 = saes32_encsm(u1, t0, 3);
-
-	return _l_to64(u0, u1);
-}
+//  encrypt (main rounds)
 
 uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
 {
 	uint32_t t0, t1, t2, t3;
 	uint32_t u0, u1;
 
-	t0 = _l_lo32(rs1);
-	t1 = _l_hi32(rs1);
-	t2 = _l_lo32(rs2);
-	t3 = _l_hi32(rs2);
+	t0 = rs1;
+	t1 = rs1 >> 32;
+	t2 = rs2;
+	t3 = rs2 >> 32;
 
 	u0 = saes32_encs(0, t0, 0);
 	u0 = saes32_encs(u0, t1, 1);
@@ -65,41 +29,45 @@ uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
 	u1 = saes32_encs(u1, t3, 2);
 	u1 = saes32_encs(u1, t0, 3);
 
-	return _l_to64(u0, u1);
+	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
 }
 
-uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2)
+//  encrypt (final round)
+
+uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2)
 {
 	uint32_t t0, t1, t2, t3;
 	uint32_t u0, u1;
 
-	t0 = _l_lo32(rs1);
-	t1 = _l_hi32(rs1);
-	t2 = _l_lo32(rs2);
-	t3 = _l_hi32(rs2);
+	t0 = rs1;
+	t1 = rs1 >> 32;
+	t2 = rs2;
+	t3 = rs2 >> 32;
 
-	u0 = saes32_decsm(0, t0, 0);
-	u0 = saes32_decsm(u0, t3, 1);
-	u0 = saes32_decsm(u0, t2, 2);
-	u0 = saes32_decsm(u0, t1, 3);
+	u0 = saes32_encsm(0, t0, 0);
+	u0 = saes32_encsm(u0, t1, 1);
+	u0 = saes32_encsm(u0, t2, 2);
+	u0 = saes32_encsm(u0, t3, 3);
 
-	u1 = saes32_decsm(0, t1, 0);
-	u1 = saes32_decsm(u1, t0, 1);
-	u1 = saes32_decsm(u1, t3, 2);
-	u1 = saes32_decsm(u1, t2, 3);
+	u1 = saes32_encsm(0, t1, 0);
+	u1 = saes32_encsm(u1, t2, 1);
+	u1 = saes32_encsm(u1, t3, 2);
+	u1 = saes32_encsm(u1, t0, 3);
 
-	return _l_to64(u0, u1);
+	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
 }
+
+//  decrypt (main rounds)
 
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 {
 	uint32_t t0, t1, t2, t3;
 	uint32_t u0, u1;
 
-	t0 = _l_lo32(rs1);
-	t1 = _l_hi32(rs1);
-	t2 = _l_lo32(rs2);
-	t3 = _l_hi32(rs2);
+	t0 = rs1;
+	t1 = rs1 >> 32;
+	t2 = rs2;
+	t3 = rs2 >> 32;
 
 	u0 = saes32_decs(0, t0, 0);
 	u0 = saes32_decs(u0, t3, 1);
@@ -111,15 +79,42 @@ uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 	u1 = saes32_decs(u1, t3, 2);
 	u1 = saes32_decs(u1, t2, 3);
 
-	return _l_to64(u0, u1);
+	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
 }
+
+//  decrypt (final round)
+
+uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2)
+{
+	uint32_t t0, t1, t2, t3;
+	uint32_t u0, u1;
+
+	t0 = rs1;
+	t1 = rs1 >> 32;
+	t2 = rs2;
+	t3 = rs2 >> 32;
+
+	u0 = saes32_decsm(0, t0, 0);
+	u0 = saes32_decsm(u0, t3, 1);
+	u0 = saes32_decsm(u0, t2, 2);
+	u0 = saes32_decsm(u0, t1, 3);
+
+	u1 = saes32_decsm(0, t1, 0);
+	u1 = saes32_decsm(u1, t0, 1);
+	u1 = saes32_decsm(u1, t3, 2);
+	u1 = saes32_decsm(u1, t2, 3);
+
+	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+}
+
+//  key schedule (inverse mixcolumns for decryption keys)
 
 uint64_t saes64_imix(uint64_t rs1)
 {
 	uint32_t t0, t1, x;
 
-	t0 = _l_lo32(rs1);
-	t1 = _l_hi32(rs1);
+	t0 = rs1;
+	t1 = rs1 >> 32;
 
 	x = saes32_encs(0, t0, 0);
 	x = saes32_encs(x, t0, 1);
@@ -141,8 +136,10 @@ uint64_t saes64_imix(uint64_t rs1)
 	t1 = saes32_decsm(t1, x, 2);
 	t1 = saes32_decsm(t1, x, 3);
 
-	return _l_to64(t0, t1);
+	return ((uint64_t) t0) | (((uint64_t) t1) << 32);
 }
+
+//  key schedule 1
 
 uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 {
@@ -168,14 +165,21 @@ uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 
 	u ^= rc;
 
-	return _l_to64(u, u);
+	return ((uint64_t) u) | (((uint64_t) u) << 32);
 }
+
+//  key schedule 2
 
 uint64_t saes64_ks2(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t rs1_1 = rs1 >> 32;
-	uint32_t rs2_0 = rs2;
-	uint32_t rs2_1 = rs2 >> 32;
+	uint32_t t1, t2, t3, u0, u1;
 
-	return _l_to64(rs1_1 ^ rs2_0, rs1_1 ^ rs2_0 ^ rs2_1);
+	t1 = rs1 >> 32;
+	t2 = rs2;
+	t3 = rs2 >> 32;
+
+	u0 = t1 ^ t2;
+	u1 = t1 ^ t2 ^ t3;
+
+	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
 }
