@@ -115,14 +115,14 @@ in source file [bitmanip.c](bitmanip.c), with prototypes in
 [bitmanip.h](bitmanip.h). These are almost directly lifted from the current
 draft specification. The instructions relevant to GCM are the Carry-Less
 Multiply instructions `CMUL[H][W]` and also the Generalized Reverse `GREV[W]`.
-The `[W]` suffix indicates a 32-bit word size variant that is available
-only in RV64 and is not used here.
+The `[W]` suffix indicates a 32-bit word size variant on RV64.
 
 The low-level functions that use these instructions are emulated by
-[rv32_ghash.c](rv32_ghash.c) and [rv64_ghash.c](rv64_ghash.c).
-I've verified their correctness against full AES-GCM test vectors in the
-framework. There may be further room for improvement -- I use such code to
-draft the final assembly implementations.
+[gcm_rv32b_gfmul.c](gcm_rv32b_gfmul.c) and 
+[gcm_rv64b_gfmul.c](gcm_rv64b_gfmul.c).
+Their correctness can be verified against the full AES-GCM test vectors 
+contained in the framework. There may be further room for improvement -- I
+use such code to draft the final assembly implementations.
 
 An attempt has been made to pair `CMULH` immediately followed by `CMUL`,
 as is done with `MULH`/`MUL`, although there is less of a performance
