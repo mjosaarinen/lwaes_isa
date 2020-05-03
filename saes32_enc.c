@@ -17,8 +17,8 @@ static const uint8_t aes_rcon[] = {
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-void aes_saes32_enc(uint8_t ct[16], const uint8_t pt[16],
-					const uint32_t rk[], int nr)
+void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
+					   const uint32_t rk[], int nr)
 {
 	uint32_t t0, t1, t2, t3;				//  even round state registers
 	uint32_t u0, u1, u2, u3;				//  odd round state registers
@@ -121,7 +121,7 @@ void aes_saes32_enc(uint8_t ct[16], const uint8_t pt[16],
 
 //  Key schedule for AES-128 Encryption.
 
-void saes32_128_enc_key(uint32_t rk[44], const uint8_t key[16])
+void saes32_enc_key_128(uint32_t rk[44], const uint8_t key[16])
 {
 	uint32_t t0, t1, t2, t3, tr;			//  subkey registers
 	const uint32_t *rke = &rk[44 - 4];		//  end pointer
@@ -157,7 +157,7 @@ void saes32_128_enc_key(uint32_t rk[44], const uint8_t key[16])
 
 //  Key schedule for AES-192 encryption.
 
-void saes32_192_enc_key(uint32_t rk[52], const uint8_t key[24])
+void saes32_enc_key_192(uint32_t rk[52], const uint8_t key[24])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, tr;	//  subkey registers
 	const uint32_t *rke = &rk[52 - 4];		//  end pointer
@@ -199,7 +199,7 @@ void saes32_192_enc_key(uint32_t rk[52], const uint8_t key[24])
 
 //  Key schedule for AES-256 encryption.
 
-void saes32_256_enc_key(uint32_t rk[60], const uint8_t key[32])
+void saes32_enc_key_256(uint32_t rk[60], const uint8_t key[32])
 {
 	uint32_t t0, t1, t2, t3, t4, t5, t6, t7, tr;	// subkey registers
 	const uint32_t *rke = &rk[60 - 4];		//  end pointer

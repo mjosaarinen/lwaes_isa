@@ -10,8 +10,8 @@
 
 //  Decrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
-					const uint32_t rk[], int nr)
+void saes32_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
+					   const uint32_t rk[], int nr)
 {
 	uint32_t t0, t1, t2, t3;				//  even round state registers
 	uint32_t u0, u1, u2, u3;				//  odd round state registers
@@ -138,7 +138,7 @@ void saes32_dec_invmc(uint32_t * v, size_t len)
 
 //  Key schedule for AES-128 decryption.
 
-void saes32_128_dec_key(uint32_t rk[44], const uint8_t key[16])
+void saes32_dec_key_128(uint32_t rk[44], const uint8_t key[16])
 {
 	//  create an encryption key and modify middle rounds
 	aes128_enc_key(rk, key);
@@ -147,7 +147,7 @@ void saes32_128_dec_key(uint32_t rk[44], const uint8_t key[16])
 
 //  Key schedule for AES-192 decryption.
 
-void saes32_192_dec_key(uint32_t rk[52], const uint8_t key[24])
+void saes32_dec_key_192(uint32_t rk[52], const uint8_t key[24])
 {
 	//  create an encryption key and modify middle rounds
 	aes192_enc_key(rk, key);
@@ -156,7 +156,7 @@ void saes32_192_dec_key(uint32_t rk[52], const uint8_t key[24])
 
 //  Key schedule for AES-256 decryption.
 
-void saes32_256_dec_key(uint32_t rk[60], const uint8_t key[32])
+void saes32_dec_key_256(uint32_t rk[60], const uint8_t key[32])
 {
 	//  create an encryption key and modify middle rounds
 	aes256_enc_key(rk, key);

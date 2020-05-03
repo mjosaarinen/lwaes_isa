@@ -35,14 +35,14 @@ extern void (*aes_enc_rounds)(uint8_t ct[16], const uint8_t pt[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations 
-void saes32_128_enc_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void saes32_192_enc_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void saes32_256_enc_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+void saes32_enc_key_128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_enc_key_192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_enc_key_256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 
-void aes_saes32_enc(uint8_t ct[16], const uint8_t pt[16],
-					const uint32_t rk[], int nr);
-void aes_saes64_enc(uint8_t ct[16], const uint8_t pt[16],
-					const uint32_t rk[], int nr);
+void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
+					   const uint32_t rk[], int nr);
+void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
+					   const uint32_t rk[], int nr);
 
 //  aliases
 #define aes128_enc_ecb(ct, pt, rk) aes_enc_rounds(ct, pt, rk, AES128_ROUNDS);
@@ -64,14 +64,14 @@ extern void (*aes_dec_rounds)(uint8_t pt[16], const uint8_t ct[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations
-void saes32_128_dec_key(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void saes32_192_dec_key(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void saes32_256_dec_key(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
+void saes32_dec_key_128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_dec_key_192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_dec_key_256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 
-void aes_saes32_dec(uint8_t pt[16], const uint8_t ct[16],
-					const uint32_t rk[], int nr);
-void aes_saes64_dec(uint8_t pt[16], const uint8_t ct[16],
-					const uint32_t rk[], int nr);
+void saes32_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
+					   const uint32_t rk[], int nr);
+void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
+					   const uint32_t rk[], int nr);
 
 //  aliases
 #define aes128_dec_ecb(ct, pt, rk) aes_dec_rounds(ct, pt, rk, AES128_ROUNDS);
