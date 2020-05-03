@@ -88,13 +88,12 @@ int chkhex(const char *lab, const void *data, size_t len, const char *ref)
 	return fail;
 }
 
-//	boolean return value check
+//  boolean return value check
 
 int chkret(const char *lab, int want, int have)
 {
-	printf("[%s] %s WANT=%d  HAVE=%d\n", 
-		want != have ? "FAIL" : "PASS", lab, want, have);
+	printf("[%s] %s WANT=%d  HAVE=%d\n",
+		   want != have ? "FAIL" : "PASS", lab, want, have);
 
 	return want != have ? 1 : 0;
 }
-

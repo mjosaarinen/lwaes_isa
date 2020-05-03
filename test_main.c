@@ -52,7 +52,6 @@ int main(int argc, char **argv)
 	if (argc > 1 && strcmp(argv[1], "tb") == 0) {
 		return test_hwtb();
 	}
-/*
 	//  algorithm tests
 	printf("[INFO] === AES using SAES64 ===\n");
 	aes_enc_rounds = saes64_enc_rounds;
@@ -64,7 +63,7 @@ int main(int argc, char **argv)
 	aes128_dec_key = saes64_dec_key128;
 	aes192_dec_key = saes64_dec_key192;
 	aes256_dec_key = saes64_dec_key256;
-*/
+	fail += test_aes();
 
 	printf("[INFO] === AES using SAES32 ===\n");
 	aes_enc_rounds = saes32_enc_rounds;
@@ -76,7 +75,6 @@ int main(int argc, char **argv)
 	aes128_dec_key = saes32_dec_key128;
 	aes192_dec_key = saes32_dec_key192;
 	aes256_dec_key = saes32_dec_key256;
-
 	fail += test_aes();
 
 	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");

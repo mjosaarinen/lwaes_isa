@@ -71,150 +71,111 @@ void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 
 }
 
-
-#include "crypto_saes32.h"
-
-//  round constants -- just iterations of the xtime() LFSR
-
-static const uint8_t aes_rcon[] = {
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
-};
-
-//  XXXXXXX THIS PART IS STILL MISSING
-
-uint64_t saes64_ks1(uint64_t rs1, uint8_t i);
-
 //  Key schedule for AES-128 Encryption.
+//  For each round 1 * SAES64.KS1, 2 * SAES64.KS2 and 2 * store
+
+#define SAES64_KEY128_STEP(i) {	\
+	kp[2*i] 	= k0;			\
+	kp[2*i + 1] = k1;			\
+	ks = saes64_ks1(k1, i);		\
+	k0 = saes64_ks2(ks, k0);	\
+	k1 = saes64_ks2(k0, k1); 	}
 
 void saes64_enc_key128(uint32_t rk[44], const uint8_t key[16])
 {
-	uint32_t t0, t1, t2, t3, tr;			//  subkey registers
-	const uint32_t *rke = &rk[44 - 4];		//  end pointer
-	const uint8_t *rc = aes_rcon;			//  round constants
+	uint64_t *kp = (uint64_t *) rk;			//  key pointer
+	uint64_t k0, k1, ks;
 
-	t0 = get32u_le(key);					//  load secret key
-	t1 = get32u_le(key + 4);
-	t2 = get32u_le(key + 8);
-	t3 = get32u_le(key + 12);
-
-	while (1) {
-
-		rk[0] = t0;							//  store subkey
-		rk[1] = t1;
-		rk[2] = t2;
-		rk[3] = t3;
-
-		if (rk == rke)						//  end condition
-			return;
-		rk += 4;							//  step pointer by one subkey
-
-		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rv32b_ror(t3, 8);				//  rotate 8 bits (little endian!)
-		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
-		t0 = saes32_encs(t0, tr, 1);
-		t0 = saes32_encs(t0, tr, 2);
-		t0 = saes32_encs(t0, tr, 3);
-		t1 ^= t0;
-		t2 ^= t1;
-		t3 ^= t2;
-	}
+	k0 = get64u_le(key);					//  load secret key
+	k1 = get64u_le(key + 8);
+	SAES64_KEY128_STEP(0);					//  5 insn each, unrolled
+	SAES64_KEY128_STEP(1);
+	SAES64_KEY128_STEP(2);
+	SAES64_KEY128_STEP(3);
+	SAES64_KEY128_STEP(4);
+	SAES64_KEY128_STEP(5);
+	SAES64_KEY128_STEP(6);
+	SAES64_KEY128_STEP(7);
+	SAES64_KEY128_STEP(8);
+	SAES64_KEY128_STEP(9);					//  (10 steps, 10 rounds)
+	kp[20] = k0;							//  last round key
+	kp[21] = k1;
 }
 
 //  Key schedule for AES-192 encryption.
+//  For each 1.5 rounds 1 * SAES64.KS1, 3 * SAES64.KS2 and 3 * store
+
+#define SAES64_KEY192_STEP(i) {	\
+	kp[3*i] 	= k0;			\
+	kp[3*i + 1] = k1;			\
+	kp[3*i + 2] = k2;			\
+	ks = saes64_ks1(k2, i);		\
+	k0 = saes64_ks2(ks, k0);	\
+	k1 = saes64_ks2(k0, k1);	\
+	k2 = saes64_ks2(k1, k2); 	}
 
 void saes64_enc_key192(uint32_t rk[52], const uint8_t key[24])
 {
-	uint32_t t0, t1, t2, t3, t4, t5, tr;	//  subkey registers
-	const uint32_t *rke = &rk[52 - 4];		//  end pointer
-	const uint8_t *rc = aes_rcon;			//  round constants
+	uint64_t *kp = (uint64_t *) rk;			//  key pointer
+	uint64_t k0, k1, k2, ks;
 
-	t0 = get32u_le(key);					//  load secret key
-	t1 = get32u_le(key + 4);
-	t2 = get32u_le(key + 8);
-	t3 = get32u_le(key + 12);
-	t4 = get32u_le(key + 16);
-	t5 = get32u_le(key + 20);
-
-	while (1) {
-
-		rk[0] = t0;							//  store subkey (or part)
-		rk[1] = t1;
-		rk[2] = t2;
-		rk[3] = t3;
-		if (rk == rke)						//  end condition
-			return;
-		rk[4] = t4;
-		rk[5] = t5;
-		rk += 6;							//  step pointer by 1.5 subkeys
-
-		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rv32b_ror(t5, 8);				//  rotate 8 bits (little endian!)
-		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
-		t0 = saes32_encs(t0, tr, 1);
-		t0 = saes32_encs(t0, tr, 2);
-		t0 = saes32_encs(t0, tr, 3);
-
-		t1 ^= t0;
-		t2 ^= t1;
-		t3 ^= t2;
-		t4 ^= t3;
-		t5 ^= t4;
-	}
+	k0 = get64u_le(key);					//  load secret key
+	k1 = get64u_le(key + 8);
+	k2 = get64u_le(key + 16);
+	SAES64_KEY192_STEP(0);					//  two steps is 3 rounds
+	SAES64_KEY192_STEP(1);					//  14/3 = 4.7 insn/round
+	SAES64_KEY192_STEP(2);
+	SAES64_KEY192_STEP(3);
+	SAES64_KEY192_STEP(4);
+	SAES64_KEY192_STEP(5);
+	SAES64_KEY192_STEP(6);
+	kp[21] = k0;							//  last full state
+	kp[22] = k1;
+	kp[23] = k2;
+	ks = saes64_ks1(k2, 7);					//  (8 steps, 12 rounds)
+	k0 = saes64_ks2(ks, k0);
+	k1 = saes64_ks2(k0, k1);				//  no need for k2
+	kp[24] = k0;							//  last round key
+	kp[25] = k1;
 }
 
 //  Key schedule for AES-256 encryption.
+//  For each 2 rounds: 2 * SAES64.KS1, 4 * SAES64.KS2 and 4 * store
+
+#define SAES64_KEY256_STEP(i) {	\
+	kp[4*i] 	= k0;			\
+	kp[4*i + 1] = k1;			\
+	kp[4*i + 2] = k2;			\
+	kp[4*i + 3] = k3;			\
+	ks = saes64_ks1(k3, i);		\
+	k0 = saes64_ks2(ks, k0);	\
+	k1 = saes64_ks2(k0, k1);	\
+	ks = saes64_ks1(k1, 10);	\
+	k2 = saes64_ks2(ks, k2);	\
+	k3 = saes64_ks2(k2, k3); 	}
 
 void saes64_enc_key256(uint32_t rk[60], const uint8_t key[32])
 {
-	uint32_t t0, t1, t2, t3, t4, t5, t6, t7, tr;	// subkey registers
-	const uint32_t *rke = &rk[60 - 4];		//  end pointer
-	const uint8_t *rc = aes_rcon;			//  round constants
+	uint64_t *kp = (uint64_t *) rk;			//  key pointer
+	uint64_t k0, k1, k2, k3, ks;
 
-	t0 = get32u_le(key);
-	t1 = get32u_le(key + 4);
-	t2 = get32u_le(key + 8);
-	t3 = get32u_le(key + 12);
-	t4 = get32u_le(key + 16);
-	t5 = get32u_le(key + 20);
-	t6 = get32u_le(key + 24);
-	t7 = get32u_le(key + 28);
-
-	rk[0] = t0;								//  store first subkey
-	rk[1] = t1;
-	rk[2] = t2;
-	rk[3] = t3;
-
-	while (1) {
-
-		rk[4] = t4;							//  store odd subkey
-		rk[5] = t5;
-		rk[6] = t6;
-		rk[7] = t7;
-		rk += 8;							//  step pointer by 2 subkeys
-
-		t0 ^= (uint32_t) * rc++;			//  round constant
-		tr = rv32b_ror(t7, 8);				//  rotate 8 bits (little endian!)
-		t0 = saes32_encs(t0, tr, 0);		//  SubWord()
-		t0 = saes32_encs(t0, tr, 1);
-		t0 = saes32_encs(t0, tr, 2);
-		t0 = saes32_encs(t0, tr, 3);
-		t1 ^= t0;
-		t2 ^= t1;
-		t3 ^= t2;
-
-		rk[0] = t0;							//  store even subkey
-		rk[1] = t1;
-		rk[2] = t2;
-		rk[3] = t3;
-		if (rk == rke)						//  end condition
-			return;
-
-		t4 = saes32_encs(t4, t3, 0);		//  SubWord() - NO rotation
-		t4 = saes32_encs(t4, t3, 1);
-		t4 = saes32_encs(t4, t3, 2);
-		t4 = saes32_encs(t4, t3, 3);
-		t5 ^= t4;
-		t6 ^= t5;
-		t7 ^= t6;
-	}
+	k0 = get64u_le(key);					//  load secret key
+	k1 = get64u_le(key + 8);
+	k2 = get64u_le(key + 16);
+	k3 = get64u_le(key + 24);
+	SAES64_KEY256_STEP(0);					//  1 steps is 2 rounds
+	SAES64_KEY256_STEP(1);					//  10/2 = 5 insn/round
+	SAES64_KEY256_STEP(2);
+	SAES64_KEY256_STEP(3);
+	SAES64_KEY256_STEP(4);
+	SAES64_KEY256_STEP(5);
+	kp[24] = k0;							//  store last full state
+	kp[25] = k1;
+	kp[26] = k2;
+	kp[27] = k3;
+	ks = saes64_ks1(k3, 6);					//  no need for k2, k3
+	k0 = saes64_ks2(ks, k0);
+	k1 = saes64_ks2(k0, k1);
+	kp[28] = k0;							//  store last round key
+	kp[29] = k1;
 }
