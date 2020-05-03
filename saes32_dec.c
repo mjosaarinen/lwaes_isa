@@ -138,7 +138,7 @@ void saes32_dec_invmc(uint32_t * v, size_t len)
 
 //  Key schedule for AES-128 decryption.
 
-void saes32_dec_key_128(uint32_t rk[44], const uint8_t key[16])
+void saes32_dec_key128(uint32_t rk[44], const uint8_t key[16])
 {
 	//  create an encryption key and modify middle rounds
 	aes128_enc_key(rk, key);
@@ -147,7 +147,7 @@ void saes32_dec_key_128(uint32_t rk[44], const uint8_t key[16])
 
 //  Key schedule for AES-192 decryption.
 
-void saes32_dec_key_192(uint32_t rk[52], const uint8_t key[24])
+void saes32_dec_key192(uint32_t rk[52], const uint8_t key[24])
 {
 	//  create an encryption key and modify middle rounds
 	aes192_enc_key(rk, key);
@@ -156,7 +156,7 @@ void saes32_dec_key_192(uint32_t rk[52], const uint8_t key[24])
 
 //  Key schedule for AES-256 decryption.
 
-void saes32_dec_key_256(uint32_t rk[60], const uint8_t key[32])
+void saes32_dec_key256(uint32_t rk[60], const uint8_t key[32])
 {
 	//  create an encryption key and modify middle rounds
 	aes256_enc_key(rk, key);

@@ -11,11 +11,11 @@
 //  encryption keying
 
 void (*aes128_enc_key)(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16])
-	= saes32_enc_key_128;
+	= saes32_enc_key128;
 void (*aes192_enc_key)(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24])
-	= saes32_enc_key_192;
+	= saes32_enc_key192;
 void (*aes256_enc_key)(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32])
-	= saes32_enc_key_256;
+	= saes32_enc_key256;
 
 //  encryption
 
@@ -25,11 +25,11 @@ void (*aes_enc_rounds)(uint8_t ct[16], const uint8_t pt[16],
 //  decryption keying
 
 void (*aes128_dec_key)(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16])
-	= saes32_dec_key_128;
+	= saes32_dec_key128;
 void (*aes192_dec_key)(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24])
-	= saes32_dec_key_192;
+	= saes32_dec_key192;
 void (*aes256_dec_key)(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32])
-	= saes32_dec_key_256;
+	= saes32_dec_key256;
 
 //  decryption
 

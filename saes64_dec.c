@@ -70,3 +70,49 @@ void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 	return;
 
 }
+
+#include "crypto_rv32.h"
+#include <stdio.h>
+
+//  Helper: apply inverse mixcolumns to a vector
+//  If decryption keys are computed in the fly (inverse key schedule), there's
+//  no need for the encryption instruction (but you need final subkey).
+
+void saes64_dec_invmc(uint64_t * v, size_t len)
+{
+	size_t i;
+	uint64_t x;
+
+	for (i = 0; i < len; i++) {
+		x = v[i];
+		x = saes64_imix(x);
+		v[i] = x;
+	}
+}
+
+//  Key schedule for AES-128 decryption.
+
+void saes64_dec_key128(uint32_t rk[44], const uint8_t key[16])
+{
+	//  create an encryption key and modify middle rounds
+	aes128_enc_key(rk, key);
+	saes64_dec_invmc(((uint64_t *) rk) + 2, AES128_RK_WORDS / 2 - 4);
+}
+
+//  Key schedule for AES-192 decryption.
+
+void saes64_dec_key192(uint32_t rk[52], const uint8_t key[24])
+{
+	//  create an encryption key and modify middle rounds
+	aes192_enc_key(rk, key);
+	saes64_dec_invmc(((uint64_t *) rk) + 2, AES192_RK_WORDS / 2 - 4);
+}
+
+//  Key schedule for AES-256 decryption.
+
+void saes64_dec_key256(uint32_t rk[60], const uint8_t key[32])
+{
+	//  create an encryption key and modify middle rounds
+	aes256_enc_key(rk, key);
+	saes64_dec_invmc(((uint64_t *) rk) + 2, AES256_RK_WORDS / 2 - 4);
+}

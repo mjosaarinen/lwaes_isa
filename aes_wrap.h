@@ -35,12 +35,15 @@ extern void (*aes_enc_rounds)(uint8_t ct[16], const uint8_t pt[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations 
-void saes32_enc_key_128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void saes32_enc_key_192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void saes32_enc_key_256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
-
+void saes32_enc_key128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_enc_key192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_enc_key256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 void saes32_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 					   const uint32_t rk[], int nr);
+
+void saes64_enc_key128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes64_enc_key192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes64_enc_key256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 					   const uint32_t rk[], int nr);
 
@@ -64,12 +67,15 @@ extern void (*aes_dec_rounds)(uint8_t pt[16], const uint8_t ct[16],
 							  const uint32_t rk[], int nr);
 
 //  implementations
-void saes32_dec_key_128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
-void saes32_dec_key_192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
-void saes32_dec_key_256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
-
+void saes32_dec_key128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes32_dec_key192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes32_dec_key256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 void saes32_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 					   const uint32_t rk[], int nr);
+
+void saes64_dec_key128(uint32_t rk[AES128_RK_WORDS], const uint8_t key[16]);
+void saes64_dec_key192(uint32_t rk[AES192_RK_WORDS], const uint8_t key[24]);
+void saes64_dec_key256(uint32_t rk[AES256_RK_WORDS], const uint8_t key[32]);
 void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 					   const uint32_t rk[], int nr);
 

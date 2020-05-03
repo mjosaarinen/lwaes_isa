@@ -21,4 +21,6 @@ uint64_t saes64_encs(uint64_t rs1, uint64_t rs2);
 uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2);
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2);
 
+uint64_t saes64_imix(uint64_t rs1);
+
 #endif

@@ -110,3 +110,33 @@ uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 
 	return _l_lo64(u0, u1);
 }
+
+uint64_t saes64_imix(uint64_t rs1)
+{
+	uint32_t t0, t1, x;
+
+	t0 = _l_lo32(rs1);
+	t1 = _l_hi32(rs1);
+
+	x = saes32_encs(0, t0, 0);
+	x = saes32_encs(x, t0, 1);
+	x = saes32_encs(x, t0, 2);
+	x = saes32_encs(x, t0, 3);
+
+	t0 = saes32_decsm(0, x, 0);
+	t0 = saes32_decsm(t0, x, 1);
+	t0 = saes32_decsm(t0, x, 2);
+	t0 = saes32_decsm(t0, x, 3);
+
+	x = saes32_encs(0, t1, 0);
+	x = saes32_encs(x, t1, 1);
+	x = saes32_encs(x, t1, 2);
+	x = saes32_encs(x, t1, 3);
+
+	t1 = saes32_decsm(0, x, 0);
+	t1 = saes32_decsm(t1, x, 1);
+	t1 = saes32_decsm(t1, x, 2);
+	t1 = saes32_decsm(t1, x, 3);
+
+	return _l_lo64(t0, t1);
+}
