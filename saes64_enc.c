@@ -2,7 +2,7 @@
 //  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//	SAES64: Proposed RV64 AES Extension.
+//  SAES64: Proposed RV64 AES Extension.
 //  "Running pseudocode" for full AES-128/192/256 encryption.
 
 #include "aes_wrap.h"
@@ -11,7 +11,7 @@
 
 //  Encrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-//	Per round: 2 * ENCSM, 2 * load, 2 * XOR
+//  Per round: 2 * ENCSM, 2 * load, 2 * XOR
 
 #define SAES64_ENC_ROUND(r0, r1, s0, s1, i) {	\
 	r0 = saes64_encsm(s0, s1);	\
@@ -32,12 +32,12 @@ void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 	t0 = ((const uint64_t *) pt)[0];		//  get plaintext
 	t1 = ((const uint64_t *) pt)[1];
 
-	k0 = kp[0];								//	load first round
+	k0 = kp[0];								//  load first round
 	k1 = kp[1];
 	t0 = t0 ^ k0;
 	t1 = t1 ^ k1;
 
-	SAES64_ENC_ROUND(u0, u1, t0, t1, 1);	//	6 insn / round
+	SAES64_ENC_ROUND(u0, u1, t0, t1, 1);	//  6 insn / round
 	SAES64_ENC_ROUND(t0, t1, u0, u1, 2);
 	SAES64_ENC_ROUND(u0, u1, t0, t1, 3);
 	SAES64_ENC_ROUND(t0, t1, u0, u1, 4);
@@ -47,26 +47,26 @@ void saes64_enc_rounds(uint8_t ct[16], const uint8_t pt[16],
 	SAES64_ENC_ROUND(t0, t1, u0, u1, 8);
 	SAES64_ENC_ROUND(u0, u1, t0, t1, 9);
 
-	if (nr >= 12) {							//	AES-192, AES-256
+	if (nr >= 12) {							//  AES-192, AES-256
 		SAES64_ENC_ROUND(t0, t1, u0, u1, 10);
 		SAES64_ENC_ROUND(u0, u1, t0, t1, 11);
 		if (nr > 12) {
 			SAES64_ENC_ROUND(t0, t1, u0, u1, 12);
 			SAES64_ENC_ROUND(u0, u1, t0, t1, 13);
-			k0 = kp[2 * 14];				//	AES-256 last round key
+			k0 = kp[2 * 14];				//  AES-256 last round key
 			k1 = kp[2 * 14 + 1];
 		} else {
-			k0 = kp[2 * 12];				//	AES-192 last round key
-			k1 = kp[2 * 12 + 1];		
+			k0 = kp[2 * 12];				//  AES-192 last round key
+			k1 = kp[2 * 12 + 1];
 		}
 	} else {
-		k0 = kp[2 * 10];					//	AES-128 last round key
-		k1 = kp[2 * 10 + 1];			
+		k0 = kp[2 * 10];					//  AES-128 last round key
+		k1 = kp[2 * 10 + 1];
 	}
-	
-	t0 = saes64_encs(u0, u1);				//	Final round; ENCS not ENCSM
+
+	t0 = saes64_encs(u0, u1);				//  Final round; ENCS not ENCSM
 	t1 = saes64_encs(u1, u0);
-	t0 = t0 ^ k0;							//	last round key
+	t0 = t0 ^ k0;							//  last round key
 	t1 = t1 ^ k1;
 
 	((uint64_t *) ct)[0] = t0;				//  store ciphertext

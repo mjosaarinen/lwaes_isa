@@ -34,7 +34,8 @@ int test_hwtb()
 
 		rd = saes32(rs1, rs2, fn);
 
-		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n", rd, rs1, rs2, fn);
+		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n", rd, rs1, rs2,
+			   fn);
 
 		rs2 += 0x01234567;
 	}
@@ -64,8 +65,6 @@ int main(int argc, char **argv)
 	aes192_dec_key = saes64_dec_key192;
 	aes256_dec_key = saes64_dec_key256;
 	fail += test_aes();
-
-	return fail;
 
 	printf("[INFO] === AES using SAES32 ===\n");
 	aes_enc_rounds = saes32_enc_rounds;

@@ -2,7 +2,7 @@
 //  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqhsield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//	SAES64: Proposed RV64 AES Extension.
+//  SAES64: Proposed RV64 AES Extension.
 //  "Running pseudocode" for full AES-128/192/256 decryption.
 
 #include "aes_wrap.h"
@@ -11,7 +11,7 @@
 
 //  Decrypt rounds. Implements AES-128/192/256 depending on nr = {10,12,14}
 
-//	Per round: 2 * load, 2 * XOR, 2 * DECSM
+//  Per round: 2 * load, 2 * XOR, 2 * DECSM
 
 #define SAES64_DEC_ROUND(r0, r1, s0, s1, i) {	\
 	k0 = kp[2 * i + 2];			\
@@ -27,22 +27,22 @@ void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 {
 	//  key pointer (just  a cast)
 	const uint64_t *kp = (const uint64_t *) rk;
-	
+
 	uint64_t t0, t1, u0, u1, k0, k1;
 
 	t0 = ((const uint64_t *) ct)[0];		//  get ciphertext
 	t1 = ((const uint64_t *) ct)[1];
 
 	if (nr >= 12) {
-		if (nr > 12) {						//	AES-256
+		if (nr > 12) {						//  AES-256
 			SAES64_DEC_ROUND(u0, u1, t0, t1, 13);
 			SAES64_DEC_ROUND(t0, t1, u0, u1, 12);
-		}									//	AES-192, AES-192
+		}									//  AES-192, AES-192
 		SAES64_DEC_ROUND(u0, u1, t0, t1, 11);
 		SAES64_DEC_ROUND(t0, t1, u0, u1, 10);
 	}
-	
-	SAES64_DEC_ROUND(u0, u1, t0, t1, 9);	//	6 insn / round
+
+	SAES64_DEC_ROUND(u0, u1, t0, t1, 9);	//  6 insn / round
 	SAES64_DEC_ROUND(t0, t1, u0, u1, 8);
 	SAES64_DEC_ROUND(u0, u1, t0, t1, 7);
 	SAES64_DEC_ROUND(t0, t1, u0, u1, 6);
@@ -52,11 +52,11 @@ void saes64_dec_rounds(uint8_t pt[16], const uint8_t ct[16],
 	SAES64_DEC_ROUND(t0, t1, u0, u1, 2);
 	SAES64_DEC_ROUND(u0, u1, t0, t1, 1);
 
-	k0 = kp[2];								//	final decrypt round
+	k0 = kp[2];								//  final decrypt round
 	k1 = kp[3];
 	u0 = u0 ^ k0;
 	u1 = u1 ^ k1;
-	t0 = saes64_decs(u0, u1);				//	DECS instead of DECSM
+	t0 = saes64_decs(u0, u1);				//  DECS instead of DECSM
 	t1 = saes64_decs(u1, u0);
 	k0 = kp[0];								//  first round key
 	k1 = kp[1];
