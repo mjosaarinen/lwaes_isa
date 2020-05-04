@@ -65,6 +65,8 @@ int main(int argc, char **argv)
 	aes256_dec_key = saes64_dec_key256;
 	fail += test_aes();
 
+	return fail;
+
 	printf("[INFO] === AES using SAES32 ===\n");
 	aes_enc_rounds = saes32_enc_rounds;
 	aes128_enc_key = saes32_enc_key128;
