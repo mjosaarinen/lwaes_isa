@@ -74,7 +74,6 @@ uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
 		break;
 
 	case SAES32_DECSM:						//  2 : AES Inverse MixCol
-//    ( case 6:     //  6 : AES Inverse MixCol *only* )
 		x2 = aes_xtime(x);					//  double x
 		x4 = aes_xtime(x2);					//  double to 4*x
 		x8 = aes_xtime(x4);					//  double to 8*x

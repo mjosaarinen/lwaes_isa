@@ -2,184 +2,169 @@
 //  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  Emulation code for SAES64   (XXX need to prettify)
+//  Emulation code for SAES64
 
 #include "saes64.h"
-#include "saes32.h"
+#include "sboxes.h"
+
+//  Multiply by 0x02 in AES's GF(256) - LFSR style
+
+static inline uint8_t aes_xtime(uint8_t x)
+{
+	return (x << 1) ^ ((x & 0x80) ? 0x11B : 0x00);
+}
 
 //  encrypt (main rounds)
 
 uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t t0, t1, t2, t3;
-	uint32_t u0, u1;
+	return ((uint64_t) aes_sbox[rs1 & 0xFF]) |
+		(((uint64_t) aes_sbox[(rs1 >> 40) & 0xFF]) <<  8) |
+		(((uint64_t) aes_sbox[(rs2 >> 16) & 0xFF]) << 16) |
+		(((uint64_t) aes_sbox[(rs2 >> 56) & 0xFF]) << 24) |
+		(((uint64_t) aes_sbox[(rs1 >> 32) & 0xFF]) << 32) |
+		(((uint64_t) aes_sbox[(rs2 >> 8)  & 0xFF]) << 40) |
+		(((uint64_t) aes_sbox[(rs2 >> 48) & 0xFF]) << 48) |
+		(((uint64_t) aes_sbox[(rs1 >> 24) & 0xFF]) << 56);
+}
 
-	t0 = rs1;
-	t1 = rs1 >> 32;
-	t2 = rs2;
-	t3 = rs2 >> 32;
+//  mixcolumns
 
-	u0 = saes32_encs(0, t0, 0);
-	u0 = saes32_encs(u0, t1, 1);
-	u0 = saes32_encs(u0, t2, 2);
-	u0 = saes32_encs(u0, t3, 3);
+static inline uint32_t saes64_mc8(uint32_t x)
+{
+	uint32_t x2;
 
-	u1 = saes32_encs(0, t1, 0);
-	u1 = saes32_encs(u1, t2, 1);
-	u1 = saes32_encs(u1, t3, 2);
-	u1 = saes32_encs(u1, t0, 3);
+	x2 = aes_xtime(x);						//  double x
+	x = ((x ^ x2) << 24) |					//  0x03    MixCol MDS Matrix
+		(x << 16) |							//  0x01
+		(x << 8) |							//  0x01
+		x2;									//  0x02
 
-	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+	return x;
+}
+
+static uint32_t saes64_mc32(uint32_t x)
+{
+	uint32_t y;
+
+	y = saes64_mc8((x >> 24) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_mc8((x >> 16) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_mc8((x >> 8) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_mc8(x & 0xFF);
+
+	return y;
 }
 
 //  encrypt (final round)
 
 uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t t0, t1, t2, t3;
-	uint32_t u0, u1;
+	uint64_t t;
 
-	t0 = rs1;
-	t1 = rs1 >> 32;
-	t2 = rs2;
-	t3 = rs2 >> 32;
+	t = saes64_encs(rs1, rs2);
 
-	u0 = saes32_encsm(0, t0, 0);
-	u0 = saes32_encsm(u0, t1, 1);
-	u0 = saes32_encsm(u0, t2, 2);
-	u0 = saes32_encsm(u0, t3, 3);
-
-	u1 = saes32_encsm(0, t1, 0);
-	u1 = saes32_encsm(u1, t2, 1);
-	u1 = saes32_encsm(u1, t3, 2);
-	u1 = saes32_encsm(u1, t0, 3);
-
-	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+	return ((uint64_t) saes64_mc32(t)) |
+		(((uint64_t) saes64_mc32(t >> 32)) << 32);
 }
 
 //  decrypt (main rounds)
 
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t t0, t1, t2, t3;
-	uint32_t u0, u1;
+	return ((uint64_t) aes_isbox[rs1 & 0xFF]) |
+		(((uint64_t) aes_isbox[(rs2 >> 40) & 0xFF]) <<  8) |
+		(((uint64_t) aes_isbox[(rs2 >> 16) & 0xFF]) << 16) |
+		(((uint64_t) aes_isbox[(rs1 >> 56) & 0xFF]) << 24) |
+		(((uint64_t) aes_isbox[(rs1 >> 32) & 0xFF]) << 32) |
+		(((uint64_t) aes_isbox[(rs1 >>  8) & 0xFF]) << 40) |
+		(((uint64_t) aes_isbox[(rs2 >> 48) & 0xFF]) << 48) |
+		(((uint64_t) aes_isbox[(rs2 >> 24) & 0xFF]) << 56);
+}
 
-	t0 = rs1;
-	t1 = rs1 >> 32;
-	t2 = rs2;
-	t3 = rs2 >> 32;
+//  inverse mixcolumns
 
-	u0 = saes32_decs(0, t0, 0);
-	u0 = saes32_decs(u0, t3, 1);
-	u0 = saes32_decs(u0, t2, 2);
-	u0 = saes32_decs(u0, t1, 3);
+static inline uint32_t saes64_imc8(uint32_t x)
+{
+	uint32_t x2, x4, x8;
 
-	u1 = saes32_decs(0, t1, 0);
-	u1 = saes32_decs(u1, t0, 1);
-	u1 = saes32_decs(u1, t3, 2);
-	u1 = saes32_decs(u1, t2, 3);
+	x2 = aes_xtime(x);						//  double x
+	x4 = aes_xtime(x2);						//  double to 4*x
+	x8 = aes_xtime(x4);						//  double to 8*x
 
-	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+	x = ((x ^ x2 ^ x8) << 24) |				//  0x0B    Inv MixCol MDS Matrix
+		((x ^ x4 ^ x8) << 16) |				//  0x0D
+		((x ^ x8) << 8) |					//  0x09
+		(x2 ^ x4 ^ x8);						//  0x0E
+
+	return x;
+}
+
+static uint32_t saes64_imc32(uint32_t x)
+{
+	uint32_t y;
+
+	y = saes64_imc8((x >> 24) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_imc8((x >> 16) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_imc8((x >> 8) & 0xFF);
+	y = (y << 8) | (y >> 24);
+	y ^= saes64_imc8(x & 0xFF);
+
+	return y;
 }
 
 //  decrypt (final round)
 
 uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t t0, t1, t2, t3;
-	uint32_t u0, u1;
-
-	t0 = rs1;
-	t1 = rs1 >> 32;
-	t2 = rs2;
-	t3 = rs2 >> 32;
-
-	u0 = saes32_decsm(0, t0, 0);
-	u0 = saes32_decsm(u0, t3, 1);
-	u0 = saes32_decsm(u0, t2, 2);
-	u0 = saes32_decsm(u0, t1, 3);
-
-	u1 = saes32_decsm(0, t1, 0);
-	u1 = saes32_decsm(u1, t0, 1);
-	u1 = saes32_decsm(u1, t3, 2);
-	u1 = saes32_decsm(u1, t2, 3);
-
-	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+	return saes64_imix(saes64_decs(rs1, rs2));
 }
 
 //  key schedule (inverse mixcolumns for decryption keys)
 
 uint64_t saes64_imix(uint64_t rs1)
 {
-	uint32_t t0, t1, x;
-
-	t0 = rs1;
-	t1 = rs1 >> 32;
-
-	x = saes32_encs(0, t0, 0);
-	x = saes32_encs(x, t0, 1);
-	x = saes32_encs(x, t0, 2);
-	x = saes32_encs(x, t0, 3);
-
-	t0 = saes32_decsm(0, x, 0);
-	t0 = saes32_decsm(t0, x, 1);
-	t0 = saes32_decsm(t0, x, 2);
-	t0 = saes32_decsm(t0, x, 3);
-
-	x = saes32_encs(0, t1, 0);
-	x = saes32_encs(x, t1, 1);
-	x = saes32_encs(x, t1, 2);
-	x = saes32_encs(x, t1, 3);
-
-	t1 = saes32_decsm(0, x, 0);
-	t1 = saes32_decsm(t1, x, 1);
-	t1 = saes32_decsm(t1, x, 2);
-	t1 = saes32_decsm(t1, x, 3);
-
-	return ((uint64_t) t0) | (((uint64_t) t1) << 32);
+	return ((uint64_t) saes64_imc32(rs1)) |
+		(((uint64_t) saes64_imc32(rs1 >> 32)) << 32);
 }
 
 //  key schedule 1
 
 uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 {
-	//  round constants -- just iterations of the xtime() LFSR
-	const uint8_t aes_rcon[] = {
-		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
-	};
-	uint32_t t, u;
-	uint32_t rc;
+	uint32_t t, rc;
 
 	t = rs1 >> 32;
 	rc = 0;
 
 	if (i != 10) {
-		t = (t >> 8) | (t << 24);			//  t= ROR(t, 8)
-		rc = aes_rcon[i];
+		t = (t >> 8) | (t << 24);			//  t = ROR(t, 8)
+		rc = aes_rcon[i];					//  round constant
 	}
 
-	u = saes32_encs(0, t, 0);
-	u = saes32_encs(u, t, 1);
-	u = saes32_encs(u, t, 2);
-	u = saes32_encs(u, t, 3);
+	//	subword
+	t = ((uint32_t) aes_sbox[t & 0xFF]) |
+		(((uint32_t) aes_sbox[(t >>  8) & 0xFF]) <<  8) |
+		(((uint32_t) aes_sbox[(t >> 16) & 0xFF]) << 16) |
+		(((uint32_t) aes_sbox[(t >> 24) & 0xFF]) << 24);
 
-	u ^= rc;
+	t ^= rc;
 
-	return ((uint64_t) u) | (((uint64_t) u) << 32);
+	return ((uint64_t) t) | (((uint64_t) t) << 32);
 }
 
 //  key schedule 2
 
 uint64_t saes64_ks2(uint64_t rs1, uint64_t rs2)
 {
-	uint32_t t1, t2, t3, u0, u1;
+	uint32_t t;
 
-	t1 = rs1 >> 32;
-	t2 = rs2;
-	t3 = rs2 >> 32;
+	t = (rs1 >> 32) ^ (rs2 & 0xFFFFFFFF);	//  32 bits
 
-	u0 = t1 ^ t2;
-	u1 = t1 ^ t2 ^ t3;
-
-	return ((uint64_t) u0) | (((uint64_t) u1) << 32);
+	return ((uint64_t) t) ^					//  low 32 bits
+		(((uint64_t) t) << 32) ^ (rs2 & 0xFFFFFFFF00000000LL);
 }
