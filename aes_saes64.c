@@ -49,6 +49,8 @@ void aes_enc_rounds_saes64(uint8_t ct[16], const uint8_t pt[16],
 	SAES64_ENC_ROUND(t0, t1, u0, u1, 8);
 	SAES64_ENC_ROUND(u0, u1, t0, t1, 9);
 
+	//	In reality we would entirely inline these for all 128/192/256 versions
+
 	if (nr >= 12) {							//  AES-192, AES-256
 		SAES64_ENC_ROUND(t0, t1, u0, u1, 10);
 		SAES64_ENC_ROUND(u0, u1, t0, t1, 11);
@@ -225,6 +227,8 @@ void aes_dec_rounds_saes64(uint8_t pt[16], const uint8_t ct[16],
 
 	t0 = ((const uint64_t *) ct)[0];		//  get ciphertext
 	t1 = ((const uint64_t *) ct)[1];
+
+	//	In reality we would entirely inline these for all 128/192/256 versions
 
 	if (nr >= 12) {
 		if (nr > 12) {						//  AES-256
