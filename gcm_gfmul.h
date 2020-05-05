@@ -38,7 +38,6 @@ void rv64_ghash_mul(gf128_t * z, const gf128_t * x, const gf128_t * h);
 extern void (*ghash_rev)(gf128_t * z);
 
 //  finite field multiply z = ( z ^ rev(x) ) * h
-extern void (*ghash_mul)(gf128_t * z, const gf128_t * x,
-						 const gf128_t * h);
+extern void (*ghash_mul)(gf128_t * z, const gf128_t * x, const gf128_t * h);
 
 #endif										//  _GCM_GFMUL_H_

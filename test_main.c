@@ -10,7 +10,10 @@
 #include <string.h>
 
 #include "aes_wrap.h"
-#include "crypto_saes32.h"
+#include "saes32.h"
+#include "aes_saes32.h"
+#include "aes_saes64.h"
+
 #include "gcm_wrap.h"
 #include "gcm_gfmul.h"
 
@@ -34,8 +37,7 @@ int test_hwtb()
 
 		rd = saes32(rs1, rs2, fn);
 
-		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n", rd, rs1, rs2,
-			   fn);
+		printf("[TB] rd=%08x rs1=%08x rs2=%08x fn=%02x\n", rd, rs1, rs2, fn);
 
 		rs2 += 0x01234567;
 	}
@@ -55,28 +57,44 @@ int main(int argc, char **argv)
 	}
 	//  algorithm tests
 	printf("[INFO] === AES using SAES64 ===\n");
-	aes_enc_rounds = saes64_enc_rounds;
-	aes128_enc_key = saes64_enc_key128;
-	aes192_enc_key = saes64_enc_key192;
-	aes256_enc_key = saes64_enc_key256;
 
-	aes_dec_rounds = saes64_dec_rounds;
-	aes128_dec_key = saes64_dec_key128;
-	aes192_dec_key = saes64_dec_key192;
-	aes256_dec_key = saes64_dec_key256;
-	fail += test_aes();
+	aes128_enc_key = aes128_enc_key_saes64;	//  set encryption key
+	aes192_enc_key = aes192_enc_key_saes64;
+	aes256_enc_key = aes256_enc_key_saes64;
+
+	aes128_enc_ecb = aes128_enc_ecb_saes64;	//  encrypt a block
+	aes192_enc_ecb = aes192_enc_ecb_saes64;
+	aes256_enc_ecb = aes256_enc_ecb_saes64;
+
+	aes128_dec_key = aes128_dec_key_saes64;	//  set decryption key
+	aes192_dec_key = aes192_dec_key_saes64;
+	aes256_dec_key = aes256_dec_key_saes64;
+
+	aes128_dec_ecb = aes128_dec_ecb_saes64;	//  decrypt a block
+	aes192_dec_ecb = aes192_dec_ecb_saes64;
+	aes256_dec_ecb = aes256_dec_ecb_saes64;
+
+	fail += test_aes();						//  run tests with UUT = SAES64
 
 	printf("[INFO] === AES using SAES32 ===\n");
-	aes_enc_rounds = saes32_enc_rounds;
-	aes128_enc_key = saes32_enc_key128;
-	aes192_enc_key = saes32_enc_key192;
-	aes256_enc_key = saes32_enc_key256;
 
-	aes_dec_rounds = saes32_dec_rounds;
-	aes128_dec_key = saes32_dec_key128;
-	aes192_dec_key = saes32_dec_key192;
-	aes256_dec_key = saes32_dec_key256;
-	fail += test_aes();
+	aes128_enc_key = aes128_enc_key_saes32;	//  set encryption key
+	aes192_enc_key = aes192_enc_key_saes32;
+	aes256_enc_key = aes256_enc_key_saes32;
+
+	aes128_enc_ecb = aes128_enc_ecb_saes32;	//  encrypt a block
+	aes192_enc_ecb = aes192_enc_ecb_saes32;
+	aes256_enc_ecb = aes256_enc_ecb_saes32;
+
+	aes128_dec_key = aes128_dec_key_saes32;	//  set decryption key
+	aes192_dec_key = aes192_dec_key_saes32;
+	aes256_dec_key = aes256_dec_key_saes32;
+
+	aes128_dec_ecb = aes128_dec_ecb_saes32;	//  decrypt a block
+	aes192_dec_ecb = aes192_dec_ecb_saes32;
+	aes256_dec_ecb = aes256_dec_ecb_saes32;
+
+	fail += test_aes();						//  run tests with UUT = SAES32
 
 	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
 	ghash_rev = rv64_ghash_rev;

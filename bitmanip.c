@@ -203,20 +203,15 @@ uint64_t rv64b_shfl(uint64_t rs1, uint64_t rs2)
 	int shamt = rs2 & 31;
 
 	if (shamt & 16)
-		x = shuffle64_stage(x, 0x0000FFFF00000000LL, 0x00000000FFFF0000LL,
-							16);
+		x = shuffle64_stage(x, 0x0000FFFF00000000LL, 0x00000000FFFF0000LL, 16);
 	if (shamt & 8)
-		x = shuffle64_stage(x, 0x00FF000000FF0000LL, 0x0000FF000000FF00LL,
-							8);
+		x = shuffle64_stage(x, 0x00FF000000FF0000LL, 0x0000FF000000FF00LL, 8);
 	if (shamt & 4)
-		x = shuffle64_stage(x, 0x0F000F000F000F00LL, 0x00F000F000F000F0LL,
-							4);
+		x = shuffle64_stage(x, 0x0F000F000F000F00LL, 0x00F000F000F000F0LL, 4);
 	if (shamt & 2)
-		x = shuffle64_stage(x, 0x3030303030303030LL, 0x0C0C0C0C0C0C0C0CLL,
-							2);
+		x = shuffle64_stage(x, 0x3030303030303030LL, 0x0C0C0C0C0C0C0C0CLL, 2);
 	if (shamt & 1)
-		x = shuffle64_stage(x, 0x4444444444444444LL, 0x2222222222222222LL,
-							1);
+		x = shuffle64_stage(x, 0x4444444444444444LL, 0x2222222222222222LL, 1);
 
 	return x;
 }
@@ -229,20 +224,15 @@ uint64_t rv64b_unshfl(uint64_t rs1, uint64_t rs2)
 	int shamt = rs2 & 31;
 
 	if (shamt & 1)
-		x = shuffle64_stage(x, 0x4444444444444444LL, 0x2222222222222222LL,
-							1);
+		x = shuffle64_stage(x, 0x4444444444444444LL, 0x2222222222222222LL, 1);
 	if (shamt & 2)
-		x = shuffle64_stage(x, 0x3030303030303030LL, 0x0C0C0C0C0C0C0C0CLL,
-							2);
+		x = shuffle64_stage(x, 0x3030303030303030LL, 0x0C0C0C0C0C0C0C0CLL, 2);
 	if (shamt & 4)
-		x = shuffle64_stage(x, 0x0F000F000F000F00LL, 0x00F000F000F000F0LL,
-							4);
+		x = shuffle64_stage(x, 0x0F000F000F000F00LL, 0x00F000F000F000F0LL, 4);
 	if (shamt & 8)
-		x = shuffle64_stage(x, 0x00FF000000FF0000LL, 0x0000FF000000FF00LL,
-							8);
+		x = shuffle64_stage(x, 0x00FF000000FF0000LL, 0x0000FF000000FF00LL, 8);
 	if (shamt & 16)
-		x = shuffle64_stage(x, 0x0000FFFF00000000LL, 0x00000000FFFF0000LL,
-							16);
+		x = shuffle64_stage(x, 0x0000FFFF00000000LL, 0x00000000FFFF0000LL, 16);
 
 	return x;
 }

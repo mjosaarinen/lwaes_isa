@@ -57,7 +57,7 @@ code for those is not provided here.
 ## Technical Details
 
 The instruction is encapsulated in a single emulator function in
-[crypto_saes32.c](crypto_saes32.c):
+[saes32.c](saes32.c):
 ```C
 uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn);
 ```
@@ -76,7 +76,7 @@ The `fn` immediate "constant" is currently 5 bits, covering encryption,
 decryption, and key schedule for both algorithms. Bits `fn[1:0]` specify
 the input byte and output rotation while `fn[4:2]` specify the operation.
 Appropriate pseudo instruction names for the code points can be proposed;
-current identifiers defined in [crypto_saes32.h](crypto_saes32.h) are:
+current identifiers defined in [saes32.h](saes32.h) are:
 
 | **Identifier** 	| **fn[4:2]** | **Description or Use**             |
 |-------------------|:-----------:|------------------------------------|
@@ -259,13 +259,9 @@ test vectors.
 
 ```console
 $ make
-gcc  -c aes_enc.c -o aes_enc.o
-gcc  -c sm4_encdec.c -o sm4_encdec.o
-gcc  -c aes_dec.c -o aes_dec.o
-gcc  -c saes32.c -o saes32.o
 gcc  -c test_main.c -o test_main.o
 [..]
-gcc  -o xtest aes_enc.o sm4_encdec.o aes_dec.o saes32.o test_main.o
+gcc  -o xtest aes_enc.o sm4....
 $ ./xtest
 [INFO] === AES using SAES32 ===
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A

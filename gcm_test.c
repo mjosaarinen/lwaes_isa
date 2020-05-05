@@ -41,8 +41,7 @@ int test_gcm()
 
 	flag |= !(aes128_dec_vfy_gcm(xt, ct, clen, k, iv) ||
 			  memcmp(xt, pt, mlen) != 0);
-	printf("[%s] GCM AES-128 verify / corrupt test\n",
-		   flag ? "FAIL" : "PASS");
+	printf("[%s] GCM AES-128 verify / corrupt test\n", flag ? "FAIL" : "PASS");
 	if (flag)
 		fail++;
 
@@ -70,8 +69,7 @@ int test_gcm()
 
 	flag |= !(aes192_dec_vfy_gcm(xt, ct, clen, k, iv) ||
 			  memcmp(xt, pt, mlen) != 0);
-	printf("[%s] GCM AES-192 verify / corrupt test\n",
-		   flag ? "FAIL" : "PASS");
+	printf("[%s] GCM AES-192 verify / corrupt test\n", flag ? "FAIL" : "PASS");
 	if (flag)
 		fail++;
 
@@ -100,8 +98,7 @@ int test_gcm()
 
 	flag |= !(aes256_dec_vfy_gcm(xt, ct, clen, k, iv) ||
 			  memcmp(xt, pt, mlen) != 0);
-	printf("[%s] GCM AES-256 verify / corrupt test\n",
-		   flag ? "FAIL" : "PASS");
+	printf("[%s] GCM AES-256 verify / corrupt test\n", flag ? "FAIL" : "PASS");
 	if (flag)
 		fail++;
 

@@ -1,11 +1,11 @@
-//  ssm4_encdec.c
+//  sm4_ssm4.c
 //  2020-01-27  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  SM4 (Chinese Encryption Standard) Encryption and Decryption
+//  SM4 (Chinese Encryption Standard) Encryption and Decryption.
 
 #include "sm4_wrap.h"
-#include "crypto_saes32.h"
+#include "saes32.h"
 #include "rv_endian.h"
 
 //  SSM4_ED_X4  is a block of four ssm4.ed instructions:

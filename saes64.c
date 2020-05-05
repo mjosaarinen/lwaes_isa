@@ -1,11 +1,11 @@
-//  crypto_saes64.c
+//  saes64.c
 //  2020-05-03  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  Emulation code for SAES64   (XXX need to prettify)
 
-#include "crypto_saes64.h"
-#include "crypto_saes32.h"
+#include "saes64.h"
+#include "saes32.h"
 
 //  encrypt (main rounds)
 

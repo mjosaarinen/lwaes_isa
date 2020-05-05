@@ -1,17 +1,20 @@
-//  crypto_saes32.c
-//  2020-01-24  Markku-Juhani O. Saarinen <mjos@pqshield.com>
+//  sboxes.c
+//  2020-05-05  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
-//  Running pseudocode for SAES32 (and ENC4S) AES/SM4 instruction.
+//  Data for AES and SM4.
 
-#include "crypto_saes32.h"
+#include "sboxes.h"
 
-//  Note that these three S-Boxes are affinely related -- they are all
-//  based on multiplicative inverse x^-1 in the finite field GF(256).
+//  AES Round Constants
+
+const uint8_t aes_rcon[] = {
+	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
+};
 
 //  AES Forward S-Box
 
-static const uint8_t aes_sbox[256] = {
+const uint8_t aes_sbox[256] = {
 	0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B,
 	0xFE, 0xD7, 0xAB, 0x76, 0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0,
 	0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0, 0xB7, 0xFD, 0x93, 0x26,
@@ -38,7 +41,7 @@ static const uint8_t aes_sbox[256] = {
 
 //  AES Inverse S-Box
 
-static const uint8_t aes_isbox[256] = {
+const uint8_t aes_isbox[256] = {
 	0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E,
 	0x81, 0xF3, 0xD7, 0xFB, 0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87,
 	0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB, 0x54, 0x7B, 0x94, 0x32,
@@ -65,7 +68,7 @@ static const uint8_t aes_isbox[256] = {
 
 //  SM4 Forward S-Box (there is no need for an inverse S-Box)
 
-static const uint8_t sm4_sbox[256] = {
+const uint8_t sm4_sbox[256] = {
 	0xD6, 0x90, 0xE9, 0xFE, 0xCC, 0xE1, 0x3D, 0xB7, 0x16, 0xB6, 0x14, 0xC2,
 	0x28, 0xFB, 0x2C, 0x05, 0x2B, 0x67, 0x9A, 0x76, 0x2A, 0xBE, 0x04, 0xC3,
 	0xAA, 0x44, 0x13, 0x26, 0x49, 0x86, 0x06, 0x99, 0x9C, 0x42, 0x50, 0xF4,
@@ -89,95 +92,3 @@ static const uint8_t sm4_sbox[256] = {
 	0x18, 0xF0, 0x7D, 0xEC, 0x3A, 0xDC, 0x4D, 0x20, 0x79, 0xEE, 0x5F, 0x3E,
 	0xD7, 0xCB, 0x39, 0x48
 };
-
-//  Multiply by 0x02 in AES's GF(256) - LFSR style
-
-static inline uint8_t aes_xtime(uint8_t x)
-{
-	return (x << 1) ^ ((x & 0x80) ? 0x11B : 0x00);
-}
-
-//  === THIS IS THE SINGLE LIGHTWEIGHT INSTRUCTION FOR AES AND SM4  ===
-
-//  SAES32: Instruction for a byte select, single S-box, and linear operation.
-
-uint32_t saes32(uint32_t rs1, uint32_t rs2, int fn)
-{
-	uint32_t fa, fb, x, x2, x4, x8;
-
-	fa = 8 * (fn & 3);						//  [1:0]   byte select / rotate
-	fb = (fn >> 2) & 7;						//  [4:2]   cipher select
-
-	//  select input byte
-
-	x = (rs2 >> fa) & 0xFF;					//  select byte
-
-	//  8->8 bit s-box
-
-	switch (fb) {
-
-	case SAES32_ENCSM:						//  0 : AES Forward + MC
-	case SAES32_ENCS:						//  1 : AES Forward "key"
-		x = aes_sbox[x];
-		break;
-
-	case SAES32_DECSM:						//  1 : AES Inverse + MC
-	case SAES32_DECS:						//  2 : AES Inverse "key"
-		x = aes_isbox[x];
-		break;
-
-	case SSM4_ED:							//  3 : SM4 encrypt/decrypt
-	case SSM4_KS:							//  4 : SM4 key schedule
-		x = sm4_sbox[x];
-		break;
-
-	default:								//  none
-		break;
-	}
-
-	//  8->32 bit linear transforms expressed as little-endian
-
-	switch (fb) {
-
-	case SAES32_ENCSM:						//  0 : AES Forward MixCol
-		x2 = aes_xtime(x);					//  double x
-		x = ((x ^ x2) << 24) |				//  0x03    MixCol MDS Matrix
-			(x << 16) |						//  0x01
-			(x << 8) |						//  0x01
-			x2;								//  0x02
-		break;
-
-	case SAES32_DECSM:						//  2 : AES Inverse MixCol
-//    ( case 6:     //  6 : AES Inverse MixCol *only* )
-		x2 = aes_xtime(x);					//  double x
-		x4 = aes_xtime(x2);					//  double to 4*x
-		x8 = aes_xtime(x4);					//  double to 8*x
-		x = ((x ^ x2 ^ x8) << 24) |			//  0x0B    Inv MixCol MDS Matrix
-			((x ^ x4 ^ x8) << 16) |			//  0x0D
-			((x ^ x8) << 8) |				//  0x09
-			(x2 ^ x4 ^ x8);					//  0x0E
-		break;
-
-	case SSM4_ED:							//  4 : SM4 linear transform L 
-		x = x ^ (x << 8) ^ (x << 2) ^ (x << 18) ^
-			((x & 0x3F) << 26) ^ ((x & 0xC0) << 10);
-		break;
-
-	case SSM4_KS:							//  5 : SM4 transform L' (key)
-		x = x ^ ((x & 0x07) << 29) ^ ((x & 0xFE) << 7) ^
-			((x & 1) << 23) ^ ((x & 0xF8) << 13);
-		break;
-
-	default:								//  none
-		break;
-
-	}
-
-	//  rotate output left by fa bits
-
-	if (fa != 0) {
-		x = (x << fa) | (x >> (32 - fa));
-	}
-
-	return x ^ rs1;							//  XOR with rs2
-}
