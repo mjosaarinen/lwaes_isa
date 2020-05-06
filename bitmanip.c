@@ -35,6 +35,8 @@ uint32_t rv32b_clmulr(uint32_t rs1, uint32_t rs2)
 	return x;
 }
 
+//	64-bit
+
 uint64_t rv64b_clmul(uint64_t rs1, uint64_t rs2)
 {
 	uint64_t x = 0;
@@ -69,8 +71,6 @@ uint32_t rv32b_ror(uint32_t rs1, uint32_t rs2)
 	int shamt = rs2 & (32 - 1);
 	return (rs1 >> shamt) | (rs1 << ((32 - shamt) & (32 - 1)));
 }
-
-//  rotate right RORW / RORIW
 
 uint64_t rv64b_ror(uint64_t rs1, uint64_t rs2)
 {
@@ -108,8 +108,6 @@ uint32_t rv32b_grev(uint32_t rs1, uint32_t rs2)
 		x = ((x & 0x0000FFFF) << 16) | ((x & 0xFFFF0000) >> 16);
 	return x;
 }
-
-//  generalized reverse GREVW / GREVIW
 
 uint64_t rv64b_grev(uint64_t rs1, uint64_t rs2)
 {
