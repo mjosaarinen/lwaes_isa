@@ -3,7 +3,7 @@
 //  Copyright (c) 2020, PQShield Ltd. All rights reserved.
 
 //  "Running pseudocode" for full AES-128/192/256 encryption and decryption
-//  using SAES32.xxx instructions.
+//  using SAES64.xxx instructions.
 
 #include <stddef.h>
 
