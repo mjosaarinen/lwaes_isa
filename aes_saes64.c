@@ -49,7 +49,7 @@ void aes_enc_rounds_saes64(uint8_t ct[16], const uint8_t pt[16],
 	SAES64_ENC_ROUND(t0, t1, u0, u1, 8);
 	SAES64_ENC_ROUND(u0, u1, t0, t1, 9);
 
-	//	In reality we would entirely inline these for all 128/192/256 versions
+	//  In reality we would entirely inline these for all 128/192/256 versions
 
 	if (nr >= 12) {							//  AES-192, AES-256
 		SAES64_ENC_ROUND(t0, t1, u0, u1, 10);
@@ -76,6 +76,8 @@ void aes_enc_rounds_saes64(uint8_t ct[16], const uint8_t pt[16],
 	((uint64_t *) ct)[0] = t0;				//  store ciphertext
 	((uint64_t *) ct)[1] = t1;
 }
+
+//  Wrappers
 
 void aes128_enc_ecb_saes64(uint8_t ct[16], const uint8_t pt[16],
 						   const uint32_t rk[AES128_RK_WORDS])
@@ -228,7 +230,7 @@ void aes_dec_rounds_saes64(uint8_t pt[16], const uint8_t ct[16],
 	t0 = ((const uint64_t *) ct)[0];		//  get ciphertext
 	t1 = ((const uint64_t *) ct)[1];
 
-	//	In reality we would entirely inline these for all 128/192/256 versions
+	//  In reality we would entirely inline these for all 128/192/256 versions
 
 	if (nr >= 12) {
 		if (nr > 12) {						//  AES-256
@@ -267,6 +269,8 @@ void aes_dec_rounds_saes64(uint8_t pt[16], const uint8_t ct[16],
 
 }
 
+//  Wrappers
+
 void aes128_dec_ecb_saes64(uint8_t pt[16], const uint8_t ct[16],
 						   const uint32_t rk[AES128_RK_WORDS])
 {
@@ -286,17 +290,13 @@ void aes256_dec_ecb_saes64(uint8_t pt[16], const uint8_t ct[16],
 }
 
 //  Helper: apply inverse mixcolumns to a vector
-//  If decryption keys are computed in the fly (inverse key schedule), there's
 
-void saes64_dec_invmc(uint64_t * v, size_t len)
+static inline void saes64_dec_invmc(uint64_t * v, size_t len)
 {
 	size_t i;
-	uint64_t x;
 
 	for (i = 0; i < len; i++) {
-		x = v[i];
-		x = saes64_imix(x);
-		v[i] = x;
+		v[i] = saes64_imix(v[i]);
 	}
 }
 

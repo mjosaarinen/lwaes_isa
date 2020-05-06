@@ -19,11 +19,11 @@ static inline uint8_t aes_xtime(uint8_t x)
 uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
 {
 	return ((uint64_t) aes_sbox[rs1 & 0xFF]) |
-		(((uint64_t) aes_sbox[(rs1 >> 40) & 0xFF]) <<  8) |
+		(((uint64_t) aes_sbox[(rs1 >> 40) & 0xFF]) << 8) |
 		(((uint64_t) aes_sbox[(rs2 >> 16) & 0xFF]) << 16) |
 		(((uint64_t) aes_sbox[(rs2 >> 56) & 0xFF]) << 24) |
 		(((uint64_t) aes_sbox[(rs1 >> 32) & 0xFF]) << 32) |
-		(((uint64_t) aes_sbox[(rs2 >> 8)  & 0xFF]) << 40) |
+		(((uint64_t) aes_sbox[(rs2 >> 8) & 0xFF]) << 40) |
 		(((uint64_t) aes_sbox[(rs2 >> 48) & 0xFF]) << 48) |
 		(((uint64_t) aes_sbox[(rs1 >> 24) & 0xFF]) << 56);
 }
@@ -75,11 +75,11 @@ uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2)
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 {
 	return ((uint64_t) aes_isbox[rs1 & 0xFF]) |
-		(((uint64_t) aes_isbox[(rs2 >> 40) & 0xFF]) <<  8) |
+		(((uint64_t) aes_isbox[(rs2 >> 40) & 0xFF]) << 8) |
 		(((uint64_t) aes_isbox[(rs2 >> 16) & 0xFF]) << 16) |
 		(((uint64_t) aes_isbox[(rs1 >> 56) & 0xFF]) << 24) |
 		(((uint64_t) aes_isbox[(rs1 >> 32) & 0xFF]) << 32) |
-		(((uint64_t) aes_isbox[(rs1 >>  8) & 0xFF]) << 40) |
+		(((uint64_t) aes_isbox[(rs1 >> 8) & 0xFF]) << 40) |
 		(((uint64_t) aes_isbox[(rs2 >> 48) & 0xFF]) << 48) |
 		(((uint64_t) aes_isbox[(rs2 >> 24) & 0xFF]) << 56);
 }
@@ -145,10 +145,9 @@ uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 		t = (t >> 8) | (t << 24);			//  t = ROR(t, 8)
 		rc = aes_rcon[i];					//  round constant
 	}
-
-	//	subword
+	//  subword
 	t = ((uint32_t) aes_sbox[t & 0xFF]) |
-		(((uint32_t) aes_sbox[(t >>  8) & 0xFF]) <<  8) |
+		(((uint32_t) aes_sbox[(t >> 8) & 0xFF]) << 8) |
 		(((uint32_t) aes_sbox[(t >> 16) & 0xFF]) << 16) |
 		(((uint32_t) aes_sbox[(t >> 24) & 0xFF]) << 24);
 

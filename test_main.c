@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 	if (argc > 1 && strcmp(argv[1], "tb") == 0) {
 		return test_hwtb();
 	}
-
 	//  algorithm tests
 
 	printf("[INFO] === AES using SAES32 ===\n");

@@ -137,7 +137,6 @@ void aes256_enc_ecb_saes32(uint8_t ct[16], const uint8_t pt[16],
 	aes_enc_rounds_saes32(ct, pt, rk, AES256_ROUNDS);
 }
 
-
 //  Key schedule for AES-128 Encryption.
 
 void aes128_enc_key_saes32(uint32_t rk[44], const uint8_t key[16])
@@ -398,8 +397,6 @@ void aes256_dec_ecb_saes32(uint8_t pt[16], const uint8_t ct[16],
 }
 
 //  Helper: apply inverse mixcolumns to a vector
-//  If decryption keys are computed in the fly (inverse key schedule), there's
-//  no need for the encryption instruction (but you need final subkey).
 
 void saes32_dec_invmc(uint32_t * v, size_t len)
 {
