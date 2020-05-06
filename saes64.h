@@ -9,25 +9,27 @@
 
 #include <stdint.h>
 
-//  "hardware simulation interface"
-
-uint64_t saes64(uint64_t rs1, uint64_t rs2, int fn);
-
 //  === (Pseudo) Instructions ===
 
-//  AES Encryption
+//  SAES64.ENCSM:   Half of ShiftRows, SubBytes, and MixColumns
 uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2);
+
+//  SAES64.ENCS:    Half of ShiftRows and SubBytes (last round)
 uint64_t saes64_encs(uint64_t rs1, uint64_t rs2);
 
-//  AES Decryption
-
+//  SAES64.DECSM:   Half of Inverse ShiftRows, SubBytes, and MixColumns
 uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2);
+
+//  SAES64.DECS:    Half of Inverse ShiftRows and SubBytes (last round)
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2);
 
-//  AES Key Schedule
-
+//  SAES64.IMIX:    Inverse MixColumns for decryption key schedule
 uint64_t saes64_imix(uint64_t rs1);
+
+//  SAES.KS1:       Key Schedule 1 -- SubWord and opt. rotation, round const
 uint64_t saes64_ks1(uint64_t rs1, uint8_t i);
+
+//  SAES.KS1:       Key Schedule 1 -- SubWord and opt. rotation, round const
 uint64_t saes64_ks2(uint64_t rs1, uint64_t rs2);
 
 #endif										//  _SAES64_H_

@@ -7,28 +7,14 @@
 #include "saes64.h"
 #include "sboxes.h"
 
-//  Multiply by 0x02 in AES's GF(256) - LFSR style
+//  ( Multiply by 0x02 in AES's GF(256) - LFSR style )
 
 static inline uint8_t aes_xtime(uint8_t x)
 {
 	return (x << 1) ^ ((x & 0x80) ? 0x11B : 0x00);
 }
 
-//  encrypt (main rounds)
-
-uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
-{
-	return ((uint64_t) aes_sbox[rs1 & 0xFF]) |
-		(((uint64_t) aes_sbox[(rs1 >> 40) & 0xFF]) << 8) |
-		(((uint64_t) aes_sbox[(rs2 >> 16) & 0xFF]) << 16) |
-		(((uint64_t) aes_sbox[(rs2 >> 56) & 0xFF]) << 24) |
-		(((uint64_t) aes_sbox[(rs1 >> 32) & 0xFF]) << 32) |
-		(((uint64_t) aes_sbox[(rs2 >> 8) & 0xFF]) << 40) |
-		(((uint64_t) aes_sbox[(rs2 >> 48) & 0xFF]) << 48) |
-		(((uint64_t) aes_sbox[(rs1 >> 24) & 0xFF]) << 56);
-}
-
-//  mixcolumns
+//  ( MixColumns functions )
 
 static inline uint32_t saes64_mc8(uint32_t x)
 {
@@ -58,19 +44,37 @@ static uint32_t saes64_mc32(uint32_t x)
 	return y;
 }
 
-//  encrypt (final round)
+//  SAES64.ENCS:    Half of ShiftRows and SubBytes (last round)
+
+uint64_t saes64_encs(uint64_t rs1, uint64_t rs2)
+{
+	return ((uint64_t) aes_sbox[rs1 & 0xFF]) |
+		(((uint64_t) aes_sbox[(rs1 >> 40) & 0xFF]) << 8) |
+		(((uint64_t) aes_sbox[(rs2 >> 16) & 0xFF]) << 16) |
+		(((uint64_t) aes_sbox[(rs2 >> 56) & 0xFF]) << 24) |
+		(((uint64_t) aes_sbox[(rs1 >> 32) & 0xFF]) << 32) |
+		(((uint64_t) aes_sbox[(rs2 >> 8) & 0xFF]) << 40) |
+		(((uint64_t) aes_sbox[(rs2 >> 48) & 0xFF]) << 48) |
+		(((uint64_t) aes_sbox[(rs1 >> 24) & 0xFF]) << 56);
+}
+
+//  SAES64.ENCSM:   Half of ShiftRows, SubBytes, and MixColumns
 
 uint64_t saes64_encsm(uint64_t rs1, uint64_t rs2)
 {
-	uint64_t t;
+	uint64_t x;
 
-	t = saes64_encs(rs1, rs2);
+	//  ShiftRows and SubBytes
+	x = saes64_encs(rs1, rs2);
 
-	return ((uint64_t) saes64_mc32(t)) |
-		(((uint64_t) saes64_mc32(t >> 32)) << 32);
+	//  MixColumns
+	x = ((uint64_t) saes64_mc32(x)) |
+		(((uint64_t) saes64_mc32(x >> 32)) << 32);
+
+	return x;
 }
 
-//  decrypt (main rounds)
+//  SAES64.DECS:    Half of Inverse ShiftRows and SubBytes (last round)
 
 uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 {
@@ -84,7 +88,19 @@ uint64_t saes64_decs(uint64_t rs1, uint64_t rs2)
 		(((uint64_t) aes_isbox[(rs2 >> 24) & 0xFF]) << 56);
 }
 
-//  inverse mixcolumns
+//  SAES64.DECSM:   Half of Inverse ShiftRows, SubBytes, and MixColumns
+
+uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2)
+{
+	uint64_t x;
+
+	x = saes64_decs(rs1, rs2);				//  Inverse ShiftRows, SubBytes
+	x = saes64_imix(x);						//  Inverse MixColumns  
+
+	return x;
+}
+
+//  ( Inverse MixColumns functions )
 
 static inline uint32_t saes64_imc8(uint32_t x)
 {
@@ -117,14 +133,7 @@ static uint32_t saes64_imc32(uint32_t x)
 	return y;
 }
 
-//  decrypt (final round)
-
-uint64_t saes64_decsm(uint64_t rs1, uint64_t rs2)
-{
-	return saes64_imix(saes64_decs(rs1, rs2));
-}
-
-//  key schedule (inverse mixcolumns for decryption keys)
+//  SAES64.IMIX:    Inverse MixColumns for decryption key schedule
 
 uint64_t saes64_imix(uint64_t rs1)
 {
@@ -132,7 +141,7 @@ uint64_t saes64_imix(uint64_t rs1)
 		(((uint64_t) saes64_imc32(rs1 >> 32)) << 32);
 }
 
-//  key schedule 1
+//  SAES.KS1:       Key Schedule 1 -- SubWord and opt. rotation, round const
 
 uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 {
@@ -141,11 +150,11 @@ uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 	t = rs1 >> 32;
 	rc = 0;
 
-	if (i != 10) {
+	if (i < 10) {							//  10: don't do it
 		t = (t >> 8) | (t << 24);			//  t = ROR(t, 8)
 		rc = aes_rcon[i];					//  round constant
 	}
-	//  subword
+	//  SubWord
 	t = ((uint32_t) aes_sbox[t & 0xFF]) |
 		(((uint32_t) aes_sbox[(t >> 8) & 0xFF]) << 8) |
 		(((uint32_t) aes_sbox[(t >> 16) & 0xFF]) << 16) |
@@ -156,7 +165,7 @@ uint64_t saes64_ks1(uint64_t rs1, uint8_t i)
 	return ((uint64_t) t) | (((uint64_t) t) << 32);
 }
 
-//  key schedule 2
+//  SAES.KS2:       Key Schedule 2 -- Linear expansion
 
 uint64_t saes64_ks2(uint64_t rs1, uint64_t rs2)
 {
