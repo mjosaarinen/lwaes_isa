@@ -13,9 +13,11 @@
 #include "saes32.h"
 #include "aes_saes32.h"
 #include "aes_saes64.h"
+#include "aes_otf_saes64.h"
 
 #include "gcm_wrap.h"
 #include "gcm_gfmul.h"
+
 
 //  unit tests
 
@@ -77,6 +79,14 @@ int main(int argc, char **argv)
 
 	fail += test_aes();						//  run tests with UUT = SAES32
 
+	printf("[INFO] === AES using SAES64 / On-the-fly keying ===\n");
+
+	aes128_enc_ecb = aes128_enc_otf_saes64;
+	aes192_enc_ecb = aes192_enc_otf_saes64;
+	aes256_enc_ecb = aes256_enc_otf_saes64;
+
+	fail += test_aes();						//  run tests with UUT = OTF/64
+
 	printf("[INFO] === AES using SAES64 ===\n");
 
 	aes128_enc_key = aes128_enc_key_saes64;	//  set encryption key
@@ -96,6 +106,8 @@ int main(int argc, char **argv)
 	aes256_dec_ecb = aes256_dec_ecb_saes64;
 
 	fail += test_aes();						//  run tests with UUT = SAES64
+
+
 
 	printf("[INFO] === GCM using rv64_ghash_mul() ===\n");
 	ghash_rev = rv64_ghash_rev;
