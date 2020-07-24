@@ -263,6 +263,7 @@ gcc  -c test_main.c -o test_main.o
 [..]
 gcc  -o xtest aes_enc.o sm4....
 $ ./xtest
+< .. TEST TEST TEST .. >
 [INFO] === AES using SAES32 ===
 [PASS] AES-128 Enc 69C4E0D86A7B0430D8CDB78070B4C55A
 [PASS] AES-128 Dec 00112233445566778899AABBCCDDEEFF
@@ -276,7 +277,7 @@ $ ./xtest
 [PASS] AES-192 Dec AE2D8A571E03AC9C9EB76FAC45AF8E51
 [PASS] AES-256 Enc B6ED21B99CA6F4F9F153E7B1BEAFED1D
 [PASS] AES-256 Dec 30C81C46A35CE411E5FBC1191A0A52EF
-< .. GCM tests here .. >
+< .. GCM tests, SAES64 tests, etc here .. >
 [PASS] all tests passed.
 $
 ```
