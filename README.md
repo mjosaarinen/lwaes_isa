@@ -1,5 +1,11 @@
 # A Lightweight (RISC-V) ISA Extension for AES and SM4
 
+**[HISTORICAL]** *This personal repo was used for work-in-progress 
+contributions to the RISC-V Cryptographic Extensions Task Group in 2020
+and is no longer updated.*
+See [riscv-crypto](https://github.com/riscv/riscv-crypto/) for
+up to date information.
+
 January 22, 2020  Markku-Juhani O. Saarinen <mjos@pqshield.com>
 
 **Updated** April 23, 2020: Renamed ENC1S as SAES32 (and SSM4) as per current
